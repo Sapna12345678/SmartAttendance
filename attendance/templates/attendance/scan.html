@@ -1,29 +1,20 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Attendance Verification | Smart Attendance</title>
 
-
     <style>
-
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
         }
 
-
         body {
-
             font-family:
                 -apple-system,
                 BlinkMacSystemFont,
@@ -31,9 +22,7 @@
                 Roboto,
                 Arial,
                 sans-serif;
-
             min-height: 100vh;
-
             background:
                 linear-gradient(
                     135deg,
@@ -41,621 +30,341 @@
                     #f8fbff 50%,
                     #eef8f5 100%
                 );
-
             padding: 20px;
-
             color: #172033;
         }
 
-
         .container {
-
             width: 100%;
-
             max-width: 600px;
-
             margin: 0 auto;
         }
 
-
         .card {
-
             background: #ffffff;
-
             border-radius: 22px;
-
             box-shadow:
                 0 15px 40px
                 rgba(31, 51, 73, 0.12);
-
             overflow: hidden;
         }
 
-
-        /* =====================================================
-           HEADER
-           ===================================================== */
-
         .header {
-
             background:
                 linear-gradient(
                     135deg,
                     #14213d,
                     #1d3557
                 );
-
             color: white;
-
             padding: 28px 22px;
-
             text-align: center;
         }
 
-
         .logo {
-
             width: 70px;
             height: 70px;
-
             margin: 0 auto 15px;
-
             border-radius: 18px;
-
             background:
                 rgba(255,255,255,0.12);
-
             display: flex;
-
             align-items: center;
-
             justify-content: center;
-
             font-size: 32px;
-
             font-weight: 800;
-
             letter-spacing: -1px;
         }
 
-
         .header h1 {
-
             font-size: 24px;
-
             font-weight: 700;
-
             margin-bottom: 7px;
         }
 
-
         .header p {
-
             font-size: 14px;
-
             opacity: 0.85;
         }
 
-
-        /* =====================================================
-           CONTENT
-           ===================================================== */
-
         .content {
-
             padding: 25px 22px 28px;
         }
 
-
-        /* =====================================================
-           STATUS
-           ===================================================== */
-
         .status-box {
-
             padding: 16px;
-
             border-radius: 14px;
-
             margin-bottom: 20px;
-
             text-align: center;
         }
 
-
         .status-valid {
-
             background: #eaf8ef;
-
             color: #187a43;
-
-            border:
-                1px solid #bce8cc;
+            border: 1px solid #bce8cc;
         }
-
 
         .status-invalid {
-
             background: #fff0f0;
-
             color: #b42318;
-
-            border:
-                1px solid #f3c0c0;
+            border: 1px solid #f3c0c0;
         }
 
-
         .status-icon {
-
             font-size: 28px;
-
             margin-bottom: 7px;
         }
 
-
         .status-title {
-
             font-size: 17px;
-
             font-weight: 700;
         }
 
-
         .status-text {
-
             font-size: 13px;
-
             margin-top: 4px;
-
             line-height: 1.5;
         }
 
-
-        /* =====================================================
-           DETAILS
-           ===================================================== */
-
         .details {
-
             background: #f7f9fc;
-
             border-radius: 16px;
-
             padding: 18px;
-
             margin-bottom: 20px;
         }
 
-
         .details-title {
-
             font-size: 16px;
-
             font-weight: 700;
-
             margin-bottom: 15px;
-
             color: #172033;
         }
 
-
         .detail-row {
-
             display: flex;
-
-            justify-content:
-                space-between;
-
+            justify-content: space-between;
             align-items: center;
-
             gap: 15px;
-
             padding: 11px 0;
-
-            border-bottom:
-                1px solid #e6eaf0;
+            border-bottom: 1px solid #e6eaf0;
         }
 
-
         .detail-row:last-child {
-
             border-bottom: none;
         }
 
-
         .detail-label {
-
             color: #697586;
-
             font-size: 13px;
-
             flex-shrink: 0;
         }
 
-
         .detail-value {
-
             font-size: 13px;
-
             font-weight: 600;
-
             text-align: right;
-
             word-break: break-word;
         }
 
-
         .loading {
-
             color: #8a94a6;
-
             font-weight: 500;
         }
 
-
-        /* =====================================================
-           TIMER
-           ===================================================== */
-
         .timer-box {
-
             background: #fff8e7;
-
-            border:
-                1px solid #f5d98b;
-
+            border: 1px solid #f5d98b;
             color: #8a5a00;
-
             border-radius: 14px;
-
             padding: 15px;
-
             text-align: center;
-
             margin-bottom: 20px;
         }
 
-
         .timer-label {
-
             font-size: 12px;
-
             margin-bottom: 4px;
         }
 
-
         .timer {
-
             font-size: 26px;
-
             font-weight: 800;
         }
 
-
         .timer.expired {
-
             color: #b42318;
         }
 
-
-        /* =====================================================
-           GPS
-           ===================================================== */
-
         .gps-box {
-
             background: #eef6ff;
-
-            border:
-                1px solid #c8def7;
-
+            border: 1px solid #c8def7;
             border-radius: 16px;
-
             padding: 18px;
-
             margin-bottom: 20px;
         }
 
-
         .gps-title {
-
             display: flex;
-
             align-items: center;
-
             gap: 8px;
-
             font-size: 16px;
-
             font-weight: 700;
-
             margin-bottom: 14px;
         }
 
-
         .gps-status {
-
             font-size: 14px;
-
             color: #4b5b70;
-
             margin-bottom: 12px;
-
             line-height: 1.5;
         }
 
-
         .location-data {
-
             display: none;
-
             background: #ffffff;
-
             border-radius: 12px;
-
             padding: 12px;
         }
 
-
         .location-row {
-
             display: flex;
-
-            justify-content:
-                space-between;
-
+            justify-content: space-between;
             gap: 10px;
-
             padding: 7px 0;
-
             font-size: 12px;
         }
 
-
         .location-row span:first-child {
-
             color: #697586;
         }
 
-
         .location-row span:last-child {
-
             font-weight: 600;
-
             text-align: right;
         }
 
-
-        /* =====================================================
-           BUTTON
-           ===================================================== */
-
         .btn {
-
             width: 100%;
-
             border: none;
-
             border-radius: 14px;
-
             padding: 15px 18px;
-
             font-size: 15px;
-
             font-weight: 700;
-
             cursor: pointer;
-
             transition:
                 transform 0.15s ease,
                 opacity 0.15s ease;
         }
 
-
         .btn:active {
-
             transform: scale(0.98);
         }
 
-
         .btn-primary {
-
             background:
                 linear-gradient(
                     135deg,
                     #1d4ed8,
                     #2563eb
                 );
-
             color: #ffffff;
-
             box-shadow:
                 0 8px 20px
                 rgba(37, 99, 235, 0.22);
         }
 
-
         .btn-primary:disabled {
-
             opacity: 0.55;
-
             cursor: not-allowed;
-
             box-shadow: none;
         }
 
-
-        /* =====================================================
-           MESSAGE
-           ===================================================== */
-
         .message {
-
             display: none;
-
             padding: 14px 15px;
-
             border-radius: 13px;
-
             margin-top: 15px;
-
             font-size: 13px;
-
             line-height: 1.5;
         }
 
-
         .message.error {
-
             background: #fff0f0;
-
-            border:
-                1px solid #f1c1c1;
-
+            border: 1px solid #f1c1c1;
             color: #a51d1d;
         }
 
-
         .message.success {
-
             background: #eaf8ef;
-
-            border:
-                1px solid #bce8cc;
-
+            border: 1px solid #bce8cc;
             color: #187a43;
         }
 
-
         .message.info {
-
             background: #eef6ff;
-
-            border:
-                1px solid #c8def7;
-
+            border: 1px solid #c8def7;
             color: #245a91;
         }
 
-
-        /* =====================================================
-           FOOTER
-           ===================================================== */
-
         .footer {
-
             text-align: center;
-
             color: #7a8699;
-
             font-size: 12px;
-
             margin-top: 18px;
-
             line-height: 1.6;
         }
 
-
-        /* =====================================================
-           SPINNER
-           ===================================================== */
-
         .spinner {
-
             width: 18px;
-
             height: 18px;
-
-            border:
-                3px solid
-                rgba(255,255,255,0.4);
-
-            border-top-color:
-                #ffffff;
-
+            border: 3px solid rgba(255,255,255,0.4);
+            border-top-color: #ffffff;
             border-radius: 50%;
-
             display: inline-block;
-
-            animation:
-                spin 0.8s linear infinite;
-
+            animation: spin 0.8s linear infinite;
             vertical-align: middle;
-
             margin-right: 7px;
         }
 
-
         @keyframes spin {
-
             to {
-
-                transform:
-                    rotate(360deg);
+                transform: rotate(360deg);
             }
         }
 
-
-        /* =====================================================
-           MOBILE
-           ===================================================== */
-
         @media (max-width: 480px) {
-
             body {
-
                 padding: 12px;
             }
 
-
             .header {
-
                 padding: 24px 18px;
             }
 
-
             .content {
-
-                padding:
-                    20px 16px 22px;
+                padding: 20px 16px 22px;
             }
 
-
             .header h1 {
-
                 font-size: 21px;
             }
 
-
             .detail-row {
-
-                align-items:
-                    flex-start;
+                align-items: flex-start;
             }
 
-
             .detail-value {
-
                 max-width: 62%;
             }
         }
-
     </style>
-
 </head>
 
-
 <body>
-
 
 <div class="container">
 
     <div class="card">
-
-
-        <!-- =====================================================
-             HEADER
-             ===================================================== -->
 
         <div class="header">
 
@@ -673,13 +382,7 @@
 
         </div>
 
-
         <div class="content">
-
-
-            <!-- =================================================
-                 STATUS
-                 ================================================= -->
 
             <div
                 id="statusBox"
@@ -693,14 +396,12 @@
                     ✓
                 </div>
 
-
                 <div
                     id="statusTitle"
                     class="status-title"
                 >
                     QR Code Valid
                 </div>
-
 
                 <div
                     id="statusText"
@@ -711,17 +412,11 @@
 
             </div>
 
-
-            <!-- =================================================
-                 ATTENDANCE DETAILS
-                 ================================================= -->
-
             <div class="details">
 
                 <div class="details-title">
                     Attendance Details
                 </div>
-
 
                 <div class="detail-row">
 
@@ -738,7 +433,6 @@
 
                 </div>
 
-
                 <div class="detail-row">
 
                     <span class="detail-label">
@@ -753,7 +447,6 @@
                     </span>
 
                 </div>
-
 
                 <div class="detail-row">
 
@@ -770,7 +463,6 @@
 
                 </div>
 
-
                 <div class="detail-row">
 
                     <span class="detail-label">
@@ -785,7 +477,6 @@
                     </span>
 
                 </div>
-
 
                 <div class="detail-row">
 
@@ -804,17 +495,11 @@
 
             </div>
 
-
-            <!-- =================================================
-                 TIMER
-                 ================================================= -->
-
             <div class="timer-box">
 
                 <div class="timer-label">
                     QR Time Left
                 </div>
-
 
                 <div
                     id="timer"
@@ -824,11 +509,6 @@
                 </div>
 
             </div>
-
-
-            <!-- =================================================
-                 GPS
-                 ================================================= -->
 
             <div class="gps-box">
 
@@ -844,14 +524,12 @@
 
                 </div>
 
-
                 <div
                     id="gpsStatus"
                     class="gps-status"
                 >
                     Waiting for location permission...
                 </div>
-
 
                 <div
                     id="locationData"
@@ -870,7 +548,6 @@
 
                     </div>
 
-
                     <div class="location-row">
 
                         <span>
@@ -882,7 +559,6 @@
                         </span>
 
                     </div>
-
 
                     <div class="location-row">
 
@@ -900,11 +576,6 @@
 
             </div>
 
-
-            <!-- =================================================
-                 VERIFY BUTTON
-                 ================================================= -->
-
             <button
                 id="verifyButton"
                 class="btn btn-primary"
@@ -915,25 +586,14 @@
                 Verify Location &amp; Mark Attendance
             </button>
 
-
-            <!-- =================================================
-                 MESSAGE
-                 ================================================= -->
-
             <div
                 id="message"
                 class="message"
             ></div>
 
-
         </div>
 
     </div>
-
-
-    <!-- =========================================================
-         FOOTER
-         ========================================================= -->
 
     <div class="footer">
 
@@ -946,138 +606,70 @@
 
 </div>
 
-
 <script>
-
-
-    /* ============================================================
-       URL / SESSION
-       ============================================================ */
 
     const urlParams =
         new URLSearchParams(
             window.location.search
         );
 
-
     const sessionId =
         urlParams.get("session");
 
-
     let latitude = null;
-
     let longitude = null;
-
     let accuracy = null;
-
     let sessionExpiresAt = null;
-
     let timerInterval = null;
-
     let locationReady = false;
-
     let sessionLoaded = false;
 
-
-    /* ============================================================
-       DOM ELEMENTS
-       ============================================================ */
-
     const sessionDisplay =
-        document.getElementById(
-            "sessionDisplay"
-        );
-
+        document.getElementById("sessionDisplay");
 
     const subjectDisplay =
-        document.getElementById(
-            "subjectDisplay"
-        );
-
+        document.getElementById("subjectDisplay");
 
     const branchDisplay =
-        document.getElementById(
-            "branchDisplay"
-        );
-
+        document.getElementById("branchDisplay");
 
     const sectionDisplay =
-        document.getElementById(
-            "sectionDisplay"
-        );
-
+        document.getElementById("sectionDisplay");
 
     const semesterDisplay =
-        document.getElementById(
-            "semesterDisplay"
-        );
-
+        document.getElementById("semesterDisplay");
 
     const timerElement =
-        document.getElementById(
-            "timer"
-        );
-
+        document.getElementById("timer");
 
     const gpsStatus =
-        document.getElementById(
-            "gpsStatus"
-        );
-
+        document.getElementById("gpsStatus");
 
     const locationData =
-        document.getElementById(
-            "locationData"
-        );
-
+        document.getElementById("locationData");
 
     const verifyButton =
-        document.getElementById(
-            "verifyButton"
-        );
-
+        document.getElementById("verifyButton");
 
     const messageElement =
-        document.getElementById(
-            "message"
-        );
-
+        document.getElementById("message");
 
     const statusBox =
-        document.getElementById(
-            "statusBox"
-        );
-
+        document.getElementById("statusBox");
 
     const statusIcon =
-        document.getElementById(
-            "statusIcon"
-        );
-
+        document.getElementById("statusIcon");
 
     const statusTitle =
-        document.getElementById(
-            "statusTitle"
-        );
-
+        document.getElementById("statusTitle");
 
     const statusText =
-        document.getElementById(
-            "statusText"
-        );
+        document.getElementById("statusText");
 
 
-    /* ============================================================
-       MESSAGE FUNCTIONS
-       ============================================================ */
+    function showMessage(text, type = "info") {
 
-    function showMessage(
-        text,
-        type = "info"
-    ) {
-
-        messageElement.textContent =
-            text;
+        messageElement.textContent = text;
 
         messageElement.className =
             "message " + type;
@@ -1096,85 +688,57 @@
 
     function showError(text) {
 
-        showMessage(
-            text,
-            "error"
-        );
+        showMessage(text, "error");
     }
 
 
     function showSuccess(text) {
 
-        showMessage(
-            text,
-            "success"
-        );
+        showMessage(text, "success");
     }
 
 
     function showInfo(text) {
 
-        showMessage(
-            text,
-            "info"
-        );
+        showMessage(text, "info");
     }
 
-
-    /* ============================================================
-       INVALID QR
-       ============================================================ */
 
     function invalidQR(text) {
 
         statusBox.className =
             "status-box status-invalid";
 
-
         statusIcon.textContent =
             "✕";
-
 
         statusTitle.textContent =
             "Invalid Attendance QR";
 
-
         statusText.textContent =
             text ||
             "Please scan a fresh QR code.";
-
 
         verifyButton.disabled =
             true;
     }
 
 
-    /* ============================================================
-       MARK SESSION AS VALID
-       ============================================================ */
-
     function validQR() {
 
         statusBox.className =
             "status-box status-valid";
 
-
         statusIcon.textContent =
             "✓";
 
-
         statusTitle.textContent =
             "QR Code Valid";
-
 
         statusText.textContent =
             "Please verify your location to mark attendance.";
     }
 
-
-    /* ============================================================
-       LOAD SESSION DATA
-       ============================================================ */
 
     async function loadSession() {
 
@@ -1194,35 +758,10 @@
 
         try {
 
-            /*
-            --------------------------------------------------------
-            IMPORTANT
-
-            Django views.py returns:
-
-            {
-                success: true,
-                session_id: "...",
-                subject: "...",
-                branch: "...",
-                section: "...",
-                semester: "...",
-                created_at: "...",
-                expires_at: "...",
-                active: true
-            }
-
-            So we read data.subject directly.
-            --------------------------------------------------------
-            */
-
-
             const requestUrl =
                 window.location.pathname +
                 "?session=" +
-                encodeURIComponent(
-                    sessionId
-                ) +
+                encodeURIComponent(sessionId) +
                 "&data=1";
 
 
@@ -1232,14 +771,11 @@
                     {
                         method: "GET",
 
-                        credentials:
-                            "same-origin",
+                        credentials: "same-origin",
 
-                        cache:
-                            "no-store",
+                        cache: "no-store",
 
                         headers: {
-
                             "Accept":
                                 "application/json"
                         }
@@ -1260,10 +796,6 @@
             );
 
 
-            /* ----------------------------------------------------
-               HTTP ERROR
-               ---------------------------------------------------- */
-
             if (!response.ok) {
 
                 let errorMessage =
@@ -1281,35 +813,23 @@
                         const errorData =
                             await response.json();
 
-
                         errorMessage =
                             errorData.error ||
                             errorData.message ||
                             errorMessage;
 
-                    }
+                    } catch (e) {
 
-                    catch (e) {
-
-                        console.error(
-                            e
-                        );
+                        console.error(e);
                     }
                 }
 
 
-                invalidQR(
-                    errorMessage
-                );
-
+                invalidQR(errorMessage);
 
                 return;
             }
 
-
-            /* ----------------------------------------------------
-               Must be JSON
-               ---------------------------------------------------- */
 
             if (
                 !contentType.includes(
@@ -1317,16 +837,9 @@
                 )
             ) {
 
-                console.error(
-                    "Expected JSON but received:",
-                    contentType
-                );
-
-
                 invalidQR(
                     "Attendance session data could not be loaded."
                 );
-
 
                 return;
             }
@@ -1342,12 +855,17 @@
             );
 
 
-            /* ----------------------------------------------------
-               BACKEND VALIDATION
-               ---------------------------------------------------- */
+            /*
+             * IMPORTANT:
+             * views.py returns:
+             * valid: true
+             *
+             * Therefore we check data.valid,
+             * not data.success.
+             */
 
             if (
-                data.success !== true
+                data.valid !== true
             ) {
 
                 invalidQR(
@@ -1356,80 +874,52 @@
                     "Invalid attendance QR."
                 );
 
-
                 return;
             }
 
-
-            /* ====================================================
-               SESSION
-               ==================================================== */
 
             sessionDisplay.textContent =
                 data.session_id ||
                 sessionId;
 
 
-            /* ====================================================
-               SUBJECT
-               ==================================================== */
-
             subjectDisplay.textContent =
                 data.subject ||
                 "General";
-
 
             subjectDisplay.classList.remove(
                 "loading"
             );
 
 
-            /* ====================================================
-               BRANCH
-               ==================================================== */
-
             branchDisplay.textContent =
                 data.branch ||
                 "Not specified";
-
 
             branchDisplay.classList.remove(
                 "loading"
             );
 
 
-            /* ====================================================
-               SECTION
-               ==================================================== */
-
             sectionDisplay.textContent =
                 data.section ||
                 "Not specified";
-
 
             sectionDisplay.classList.remove(
                 "loading"
             );
 
 
-            /* ====================================================
-               SEMESTER
-               ==================================================== */
-
             if (
-                data.semester !==
-                    undefined &&
-                data.semester !==
-                    null &&
+                data.semester !== undefined &&
+                data.semester !== null &&
                 data.semester !== ""
             ) {
 
                 semesterDisplay.textContent =
-                    data.semester;
+                    "Semester " + data.semester;
 
-            }
-
-            else {
+            } else {
 
                 semesterDisplay.textContent =
                     "Not specified";
@@ -1441,13 +931,7 @@
             );
 
 
-            /* ====================================================
-               EXPIRATION
-               ==================================================== */
-
-            if (
-                data.expires_at
-            ) {
+            if (data.expires_at) {
 
                 const expiryDate =
                     new Date(
@@ -1464,40 +948,24 @@
                     sessionExpiresAt =
                         expiryDate.getTime();
 
-
                     startTimer();
 
-                }
-
-                else {
+                } else {
 
                     timerElement.textContent =
                         "Invalid time";
                 }
 
-            }
-
-            else {
+            } else {
 
                 timerElement.textContent =
                     "Unavailable";
             }
 
 
-            /* ====================================================
-               SESSION LOADED
-               ==================================================== */
-
-            sessionLoaded =
-                true;
-
+            sessionLoaded = true;
 
             validQR();
-
-
-            /* ====================================================
-               START GPS
-               ==================================================== */
 
             initializeGPS();
 
@@ -1516,18 +984,12 @@
                 "Unable to load attendance session. Please scan a fresh QR."
             );
         }
-
     }
 
-
-    /* ============================================================
-       TIMER
-       ============================================================ */
 
     function startTimer() {
 
         if (!sessionExpiresAt) {
-
             return;
         }
 
@@ -1554,32 +1016,25 @@
                 );
 
 
-            if (
-                remaining <= 0
-            ) {
+            if (remaining <= 0) {
 
                 timerElement.textContent =
                     "Expired";
-
 
                 timerElement.classList.add(
                     "expired"
                 );
 
-
                 verifyButton.disabled =
                     true;
-
 
                 invalidQR(
                     "QR expired. Please scan a fresh QR."
                 );
 
-
                 clearInterval(
                     timerInterval
                 );
-
 
                 return;
             }
@@ -1591,8 +1046,7 @@
 
 
             timerElement.textContent =
-                remaining +
-                " seconds";
+                remaining + " seconds";
         }
 
 
@@ -1607,10 +1061,6 @@
     }
 
 
-    /* ============================================================
-       GPS
-       ============================================================ */
-
     function initializeGPS() {
 
         if (!navigator.geolocation) {
@@ -1618,11 +1068,9 @@
             gpsStatus.textContent =
                 "GPS is not supported on this device.";
 
-
             showError(
                 "Your browser does not support location services."
             );
-
 
             return;
         }
@@ -1644,10 +1092,8 @@
                 latitude =
                     position.coords.latitude;
 
-
                 longitude =
                     position.coords.longitude;
-
 
                 accuracy =
                     position.coords.accuracy;
@@ -1670,36 +1116,24 @@
                 ).textContent =
                     Math.round(
                         accuracy
-                    ) +
-                    " meters";
+                    ) + " meters";
 
 
                 locationData.style.display =
                     "block";
 
 
-                locationReady =
-                    true;
+                locationReady = true;
 
 
                 gpsStatus.textContent =
                     "✓ Location detected successfully.";
 
 
-                /*
-                ----------------------------------------------------
-                Enable button only when:
-                1. QR session loaded
-                2. QR not expired
-                3. GPS available
-                ----------------------------------------------------
-                */
-
                 if (
                     sessionLoaded &&
                     sessionExpiresAt &&
-                    Date.now() <
-                        sessionExpiresAt
+                    Date.now() < sessionExpiresAt
                 ) {
 
                     verifyButton.disabled =
@@ -1721,12 +1155,9 @@
                 );
 
 
-                locationReady =
-                    false;
+                locationReady = false;
 
-
-                verifyButton.disabled =
-                    true;
+                verifyButton.disabled = true;
 
 
                 let errorMessage =
@@ -1741,10 +1172,7 @@
                     errorMessage =
                         "Location permission denied. Please allow location access for this website and reload the page.";
 
-                }
-
-
-                else if (
+                } else if (
                     error.code ===
                     error.POSITION_UNAVAILABLE
                 ) {
@@ -1752,17 +1180,13 @@
                     errorMessage =
                         "Location information is unavailable. Please turn on Location/GPS and try again.";
 
-                }
-
-
-                else if (
+                } else if (
                     error.code ===
                     error.TIMEOUT
                 ) {
 
                     errorMessage =
                         "Location request timed out. Please try again.";
-
                 }
 
 
@@ -1777,22 +1201,13 @@
 
 
             {
-                enableHighAccuracy:
-                    true,
-
-                timeout:
-                    20000,
-
-                maximumAge:
-                    0
+                enableHighAccuracy: true,
+                timeout: 20000,
+                maximumAge: 0
             }
         );
     }
 
-
-    /* ============================================================
-       CSRF COOKIE
-       ============================================================ */
 
     function getCookie(name) {
 
@@ -1829,15 +1244,7 @@
     }
 
 
-    /* ============================================================
-       VERIFY LOCATION + MARK ATTENDANCE
-       ============================================================ */
-
     async function verifyLocation() {
-
-        /* --------------------------------------------------------
-           Session check
-           -------------------------------------------------------- */
 
         if (!sessionId) {
 
@@ -1848,10 +1255,6 @@
             return;
         }
 
-
-        /* --------------------------------------------------------
-           GPS check
-           -------------------------------------------------------- */
 
         if (
             latitude === null ||
@@ -1866,14 +1269,9 @@
         }
 
 
-        /* --------------------------------------------------------
-           QR expiry check
-           -------------------------------------------------------- */
-
         if (
             !sessionExpiresAt ||
-            Date.now() >=
-                sessionExpiresAt
+            Date.now() >= sessionExpiresAt
         ) {
 
             invalidQR(
@@ -1884,32 +1282,19 @@
         }
 
 
-        /* --------------------------------------------------------
-           Disable button while submitting
-           -------------------------------------------------------- */
-
-        verifyButton.disabled =
-            true;
-
+        verifyButton.disabled = true;
 
         verifyButton.innerHTML =
             '<span class="spinner"></span>' +
             'Verifying Location...';
-
 
         hideMessage();
 
 
         try {
 
-            /* ----------------------------------------------------
-               Get CSRF cookie
-               ---------------------------------------------------- */
-
             const csrfToken =
-                getCookie(
-                    "csrftoken"
-                );
+                getCookie("csrftoken");
 
 
             if (!csrfToken) {
@@ -1920,17 +1305,12 @@
             }
 
 
-            /* ----------------------------------------------------
-               POST attendance
-               ---------------------------------------------------- */
-
             const response =
                 await fetch(
                     "/mark-attendance/",
                     {
 
-                        method:
-                            "POST",
+                        method: "POST",
 
                         credentials:
                             "same-origin",
@@ -1970,10 +1350,6 @@
                 );
 
 
-            /* ----------------------------------------------------
-               Read response
-               ---------------------------------------------------- */
-
             const responseText =
                 await response.text();
 
@@ -1995,9 +1371,7 @@
                         responseText
                     );
 
-            }
-
-            catch (jsonError) {
+            } catch (jsonError) {
 
                 console.error(
                     "Response is not JSON:",
@@ -2005,10 +1379,6 @@
                 );
             }
 
-
-            /* ----------------------------------------------------
-               SERVER ERROR
-               ---------------------------------------------------- */
 
             if (!response.ok) {
 
@@ -2028,10 +1398,6 @@
                 );
             }
 
-
-            /* ----------------------------------------------------
-               SUCCESS
-               ---------------------------------------------------- */
 
             if (
                 data &&
@@ -2073,10 +1439,6 @@
             }
 
 
-            /* ----------------------------------------------------
-               FAILURE RESPONSE
-               ---------------------------------------------------- */
-
             const failureMessage =
                 data &&
                 (
@@ -2114,19 +1476,13 @@
             verifyButton.innerHTML =
                 "Verify Location &amp; Mark Attendance";
         }
-
     }
 
-
-    /* ============================================================
-       START
-       ============================================================ */
 
     loadSession();
 
 </script>
 
-
 </body>
-
 </html>
+
