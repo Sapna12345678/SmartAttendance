@@ -1,0 +1,1048 @@
+html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Generate Attendance QR</title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+        rel="stylesheet"
+    >
+
+    <style>
+
+        body {
+            background: #f4f7fb;
+            font-family: Arial, sans-serif;
+            color: #172033;
+        }
+
+        .navbar {
+            background: #14213d;
+            min-height: 65px;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 20px;
+        }
+
+        .main-wrapper {
+            max-width: 1100px;
+            margin: 35px auto;
+            padding: 0 18px;
+        }
+
+        .page-title {
+            font-weight: 700;
+            color: #14213d;
+        }
+
+        .card-box {
+            background: white;
+            border-radius: 18px;
+            padding: 30px;
+            box-shadow: 0 8px 30px rgba(0,0,0,.08);
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #344054;
+        }
+
+        .form-control,
+        .form-select {
+            min-height: 48px;
+            border-radius: 10px;
+        }
+
+        .btn-primary {
+            background: #2563eb;
+            border-color: #2563eb;
+            border-radius: 10px;
+            padding: 12px 22px;
+            font-weight: 600;
+        }
+
+        .btn-primary:hover {
+            background: #1d4ed8;
+            border-color: #1d4ed8;
+        }
+
+        .qr-card {
+            text-align: center;
+        }
+
+        .qr-image {
+            width: 330px;
+            height: 330px;
+            object-fit: contain;
+            padding: 12px;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 16px;
+            box-shadow: 0 8px 30px rgba(0,0,0,.12);
+        }
+
+        .timer-box {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: #fff1f2;
+            color: #dc2626;
+            padding: 12px 22px;
+            border-radius: 12px;
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .active-box {
+            background: #ecfdf3;
+            color: #15803d;
+            border-radius: 10px;
+            padding: 12px;
+            font-weight: 600;
+        }
+
+        .session-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 12px;
+            word-break: break-all;
+            font-size: 13px;
+        }
+
+        .url-box {
+            background: #eff6ff;
+            border: 1px solid #dbeafe;
+            color: #1d4ed8;
+            border-radius: 10px;
+            padding: 12px;
+            word-break: break-all;
+            font-size: 13px;
+        }
+
+        .info-item {
+            background: #f8fafc;
+            border-radius: 10px;
+            padding: 14px;
+            height: 100%;
+        }
+
+        .info-label {
+            font-size: 12px;
+            color: #667085;
+            margin-bottom: 4px;
+        }
+
+        .info-value {
+            font-weight: 700;
+            color: #172033;
+        }
+
+        .expired {
+            background: #f1f5f9;
+            color: #64748b;
+        }
+
+        .generate-icon {
+            font-size: 18px;
+        }
+
+        @media (max-width: 768px) {
+
+            .main-wrapper {
+                margin-top: 20px;
+            }
+
+            .card-box {
+                padding: 20px;
+            }
+
+            .qr-image {
+                width: 270px;
+                height: 270px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- =====================================================
+     NAVBAR
+===================================================== -->
+
+<nav class="navbar navbar-dark">
+
+    <div class="container">
+
+        <a
+            class="navbar-brand"
+            href="{% url 'home' %}"
+        >
+
+            <i class="bi bi-qr-code-scan me-2"></i>
+
+            Smart Attendance
+
+        </a>
+
+
+        <a
+            href="{% url 'teacher_dashboard' %}"
+            class="btn btn-light btn-sm"
+        >
+
+            <i class="bi bi-speedometer2 me-1"></i>
+
+            Dashboard
+
+        </a>
+
+    </div>
+
+</nav>
+
+
+<!-- =====================================================
+     MAIN
+===================================================== -->
+
+<div class="main-wrapper">
+
+
+    <div class="mb-4">
+
+        <h2 class="page-title">
+
+            <i class="bi bi-qr-code me-2"></i>
+
+            Generate Attendance QR
+
+        </h2>
+
+        <p class="text-muted">
+
+            Create a secure, time-limited QR code
+            for your attendance session.
+
+        </p>
+
+    </div>
+
+
+    <!-- =================================================
+         ERROR MESSAGE
+    ================================================== -->
+
+    {% if error %}
+
+    <div class="alert alert-danger">
+
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+
+        {{ error }}
+
+    </div>
+
+    {% endif %}
+
+
+    <!-- =================================================
+         GENERATE FORM
+    ================================================== -->
+
+    {% if not session %}
+
+    <div class="card-box">
+
+        <!-- IMPORTANT:
+             generate_qr view expects GET request
+             and generate=1
+        -->
+
+        <form
+            method="GET"
+            action="{% url 'generate_qr' %}"
+        >
+
+            <input
+                type="hidden"
+                name="generate"
+                value="1"
+            >
+
+
+            <div class="row g-4">
+
+
+                <!-- =====================================
+                     SUBJECT
+                ====================================== -->
+
+                <div class="col-md-6">
+
+                    <label class="form-label">
+
+                        Subject
+
+                    </label>
+
+                    <select
+                        name="subject"
+                        class="form-select"
+                        required
+                    >
+
+                        <option value="">
+
+                            Select Subject
+
+                        </option>
+
+                        {% for subject in subjects %}
+
+                        <option
+                            value="{{ subject.id }}"
+                            {% if selected_subject and selected_subject.id == subject.id %}
+                                selected
+                            {% endif %}
+                        >
+
+                            {% if subject.code %}
+                                {{ subject.code }} -
+                            {% endif %}
+
+                            {{ subject.name }}
+
+                        </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+                <!-- =====================================
+                     BRANCH
+                ====================================== -->
+
+                <div class="col-md-6">
+
+                    <label class="form-label">
+
+                        Branch
+
+                    </label>
+
+                    <input
+                        type="text"
+                        name="branch"
+                        class="form-control"
+                        placeholder="e.g. MCA"
+                        value="{{ selected_branch|default:'' }}"
+                    >
+
+                </div>
+
+
+                <!-- =====================================
+                     SECTION
+                ====================================== -->
+
+                <div class="col-md-6">
+
+                    <label class="form-label">
+
+                        Section
+
+                    </label>
+
+                    <input
+                        type="text"
+                        name="section"
+                        class="form-control"
+                        placeholder="e.g. A"
+                        value="{{ selected_section|default:'' }}"
+                    >
+
+                </div>
+
+
+                <!-- =====================================
+                     SEMESTER
+                ====================================== -->
+
+                <div class="col-md-6">
+
+                    <label class="form-label">
+
+                        Semester
+
+                    </label>
+
+                    <select
+                        name="semester"
+                        class="form-select"
+                    >
+
+                        <option value="">
+
+                            Select Semester
+
+                        </option>
+
+                        <option
+                            value="1"
+                            {% if selected_semester == "1" %}
+                                selected
+                            {% endif %}
+                        >
+                            Semester 1
+                        </option>
+
+                        <option
+                            value="2"
+                            {% if selected_semester == "2" %}
+                                selected
+                            {% endif %}
+                        >
+                            Semester 2
+                        </option>
+
+                        <option
+                            value="3"
+                            {% if selected_semester == "3" %}
+                                selected
+                            {% endif %}
+                        >
+                            Semester 3
+                        </option>
+
+                        <option
+                            value="4"
+                            {% if selected_semester == "4" %}
+                                selected
+                            {% endif %}
+                        >
+                            Semester 4
+                        </option>
+
+                        <option
+                            value="5"
+                            {% if selected_semester == "5" %}
+                                selected
+                            {% endif %}
+                        >
+                            Semester 5
+                        </option>
+
+                        <option
+                            value="6"
+                            {% if selected_semester == "6" %}
+                                selected
+                            {% endif %}
+                        >
+                            Semester 6
+                        </option>
+
+                        <option
+                            value="7"
+                            {% if selected_semester == "7" %}
+                                selected
+                            {% endif %}
+                        >
+                            Semester 7
+                        </option>
+
+                        <option
+                            value="8"
+                            {% if selected_semester == "8" %}
+                                selected
+                            {% endif %}
+                        >
+                            Semester 8
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- =====================================
+                     QR VALIDITY
+                ====================================== -->
+
+                <div class="col-md-6">
+
+                    <label class="form-label">
+
+                        QR Validity
+
+                    </label>
+
+                    <select
+                        name="duration"
+                        class="form-select"
+                    >
+
+                        <option value="30">
+
+                            30 Seconds
+
+                        </option>
+
+                        <option
+                            value="60"
+                            {% if duration == 60 %}
+                                selected
+                            {% endif %}
+                        >
+
+                            1 Minute
+
+                        </option>
+
+                        <option value="90">
+
+                            90 Seconds
+
+                        </option>
+
+                        <option value="120">
+
+                            2 Minutes
+
+                        </option>
+
+                        <option value="180">
+
+                            3 Minutes
+
+                        </option>
+
+                        <option value="300">
+
+                            5 Minutes
+
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- =====================================
+                     GENERATE BUTTON
+                ====================================== -->
+
+                <div class="col-md-6 d-flex align-items-end">
+
+                    <button
+                        type="submit"
+                        class="btn btn-primary w-100"
+                    >
+
+                        <i class="bi bi-qr-code generate-icon me-2"></i>
+
+                        Generate Secure QR
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </form>
+
+    </div>
+
+    {% endif %}
+
+
+    <!-- =================================================
+         GENERATED QR
+    ================================================== -->
+
+    {% if session %}
+
+    <div class="row g-4">
+
+
+        <!-- =============================================
+             QR CARD
+        ============================================== -->
+
+        <div class="col-lg-7">
+
+            <div class="card-box qr-card">
+
+
+                <div class="active-box mb-4">
+
+                    <i class="bi bi-check-circle-fill me-2"></i>
+
+                    Attendance Session Active
+
+                </div>
+
+
+                <h4 class="fw-bold mb-3">
+
+                    Scan this QR to mark attendance
+
+                </h4>
+
+
+                <div class="mb-4">
+
+                    <img
+                        src="{{ qr_image_url }}"
+                        alt="Attendance QR Code"
+                        class="qr-image"
+                        id="qrImage"
+                    >
+
+                </div>
+
+
+                <!-- =====================================
+                     TIMER
+                ====================================== -->
+
+                <div class="mb-4">
+
+                    <div
+                        id="timer"
+                        class="timer-box"
+                    >
+
+                        <i class="bi bi-clock"></i>
+
+                        <span id="timerText">
+
+                            {{ remaining_seconds }} seconds
+
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =====================================
+                     BUTTONS
+                ====================================== -->
+
+                <div
+                    class="d-flex flex-wrap justify-content-center gap-2"
+                >
+
+                    <a
+                        href="{% url 'projector' %}"
+                        class="btn btn-success"
+                    >
+
+                        <i class="bi bi-display me-1"></i>
+
+                        Projector Mode
+
+                    </a>
+
+
+                    <a
+                        href="{{ qr_image_url }}"
+                        download="{{ filename }}"
+                        class="btn btn-outline-primary"
+                    >
+
+                        <i class="bi bi-download me-1"></i>
+
+                        Download QR
+
+                    </a>
+
+
+                    <button
+                        type="button"
+                        class="btn btn-outline-dark"
+                        onclick="openFullscreen()"
+                    >
+
+                        <i class="bi bi-fullscreen me-1"></i>
+
+                        Fullscreen
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =============================================
+             SESSION DETAILS
+        ============================================== -->
+
+        <div class="col-lg-5">
+
+            <div class="card-box">
+
+
+                <h5 class="fw-bold mb-4">
+
+                    Session Details
+
+                </h5>
+
+
+                <div class="row g-3">
+
+
+                    <!-- SUBJECT -->
+
+                    <div class="col-12">
+
+                        <div class="info-item">
+
+                            <div class="info-label">
+
+                                Subject
+
+                            </div>
+
+                            <div class="info-value">
+
+                                {% if session.subject %}
+
+                                    {% if session.subject.code %}
+
+                                        {{ session.subject.code }} -
+
+                                    {% endif %}
+
+                                    {{ session.subject.name }}
+
+                                {% else %}
+
+                                    No Subject
+
+                                {% endif %}
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- BRANCH -->
+
+                    <div class="col-6">
+
+                        <div class="info-item">
+
+                            <div class="info-label">
+
+                                Branch
+
+                            </div>
+
+                            <div class="info-value">
+
+                                {{ session.branch|default:"All" }}
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- SECTION -->
+
+                    <div class="col-6">
+
+                        <div class="info-item">
+
+                            <div class="info-label">
+
+                                Section
+
+                            </div>
+
+                            <div class="info-value">
+
+                                {{ session.section|default:"All" }}
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- SEMESTER -->
+
+                    <div class="col-6">
+
+                        <div class="info-item">
+
+                            <div class="info-label">
+
+                                Semester
+
+                            </div>
+
+                            <div class="info-value">
+
+                                {% if session.semester %}
+
+                                    Semester {{ session.semester }}
+
+                                {% else %}
+
+                                    All
+
+                                {% endif %}
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- DURATION -->
+
+                    <div class="col-6">
+
+                        <div class="info-item">
+
+                            <div class="info-label">
+
+                                Duration
+
+                            </div>
+
+                            <div class="info-value">
+
+                                {{ duration }} sec
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+
+                <hr class="my-4">
+
+
+                <!-- SESSION ID -->
+
+                <div class="mb-2">
+
+                    <small class="text-muted">
+
+                        Session ID
+
+                    </small>
+
+                </div>
+
+                <div class="session-box">
+
+                    {{ session.session_id }}
+
+                </div>
+
+
+                <!-- SCAN URL -->
+
+                <div class="mt-4 mb-2">
+
+                    <small class="text-muted">
+
+                        Scan URL
+
+                    </small>
+
+                </div>
+
+                <div class="url-box">
+
+                    {{ scan_url }}
+
+                </div>
+
+
+                <div class="alert alert-info mt-4 mb-0">
+
+                    <i class="bi bi-shield-check me-2"></i>
+
+                    This QR is linked to this attendance
+                    session and expires automatically.
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    {% endif %}
+
+
+</div>
+
+
+<!-- =====================================================
+     JAVASCRIPT
+===================================================== -->
+
+{% if session %}
+
+<script>
+
+    const expiryTime =
+        new Date(
+            "{{ session.expires_at|date:'c' }}"
+        ).getTime();
+
+
+    const timerBox =
+        document.getElementById("timer");
+
+
+    const timerText =
+        document.getElementById("timerText");
+
+
+    function updateTimer() {
+
+        const now =
+            new Date().getTime();
+
+
+        const difference =
+            expiryTime - now;
+
+
+        const seconds =
+            Math.max(
+                0,
+                Math.floor(
+                    difference / 1000
+                )
+            );
+
+
+        if (seconds > 0) {
+
+            timerText.innerText =
+                seconds + " seconds";
+
+        } else {
+
+            timerText.innerText =
+                "QR Code Expired";
+
+
+            timerBox.classList.add(
+                "expired"
+            );
+
+
+            clearInterval(
+                timerInterval
+            );
+
+
+            setTimeout(
+                function() {
+
+                    window.location.href =
+                        "{% url 'generate_qr' %}";
+
+                },
+                2500
+            );
+
+        }
+
+    }
+
+
+    updateTimer();
+
+
+    const timerInterval =
+        setInterval(
+            updateTimer,
+            1000
+        );
+
+
+    function openFullscreen() {
+
+        const qrImage =
+            document.getElementById(
+                "qrImage"
+            );
+
+
+        if (
+            qrImage &&
+            qrImage.requestFullscreen
+        ) {
+
+            qrImage.requestFullscreen();
+
+        }
+
+    }
+
+</script>
+
+{% endif %}
+
+
+<script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
+</script>
+
+
+</body>
+
+</html>
+

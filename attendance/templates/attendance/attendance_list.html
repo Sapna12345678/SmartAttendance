@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Attendance Report</title>
+
+
+    <style>
+
+        body {
+
+            margin: 0;
+
+            font-family: Arial, sans-serif;
+
+            background: #f1f5f9;
+
+            padding: 30px;
+        }
+
+
+        .container {
+
+            max-width: 1100px;
+
+            margin: auto;
+        }
+
+
+        h1 {
+
+            color: #1e293b;
+
+            margin-bottom: 5px;
+        }
+
+
+        .date {
+
+            color: #64748b;
+
+            margin-bottom: 25px;
+        }
+
+
+        /* =========================================
+           FILTER BOX
+        ========================================= */
+
+        .filter-box {
+
+            background: white;
+
+            padding: 20px;
+
+            border-radius: 15px;
+
+            box-shadow:
+                0 5px 20px rgba(0,0,0,.08);
+
+            margin-bottom: 25px;
+        }
+
+
+        .filter-box h3 {
+
+            margin-top: 0;
+
+            color: #334155;
+        }
+
+
+        .filters {
+
+            display: flex;
+
+            gap: 12px;
+
+            flex-wrap: wrap;
+
+            align-items: center;
+        }
+
+
+        .filters input {
+
+            padding: 12px;
+
+            border:
+                1px solid #cbd5e1;
+
+            border-radius: 8px;
+
+            font-size: 14px;
+        }
+
+
+        .filters input[type="date"] {
+
+            min-width: 160px;
+        }
+
+
+        .filters input[type="text"] {
+
+            min-width: 240px;
+        }
+
+
+        /* FILTER BUTTON */
+
+        .filter-btn {
+
+            padding: 12px 20px;
+
+            border: none;
+
+            background: #2563eb;
+
+            color: white;
+
+            border-radius: 8px;
+
+            cursor: pointer;
+
+            font-weight: bold;
+        }
+
+
+        .filter-btn:hover {
+
+            background: #1d4ed8;
+        }
+
+
+        /* CLEAR BUTTON */
+
+        .clear-btn {
+
+            padding: 12px 20px;
+
+            background: #64748b;
+
+            color: white;
+
+            text-decoration: none;
+
+            border-radius: 8px;
+        }
+
+
+        .clear-btn:hover {
+
+            background: #475569;
+        }
+
+
+        /* =========================================
+           EXCEL BUTTON
+        ========================================= */
+
+        .excel-btn {
+
+            display: inline-block;
+
+            padding: 12px 20px;
+
+            background: #15803d;
+
+            color: white;
+
+            text-decoration: none;
+
+            border-radius: 8px;
+
+            font-weight: bold;
+
+            margin-left: 0;
+
+        }
+
+
+        .excel-btn:hover {
+
+            background: #166534;
+
+            color: white;
+        }
+
+
+        /* =========================================
+           SUMMARY CARDS
+        ========================================= */
+
+        .cards {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(4, 1fr);
+
+            gap: 18px;
+
+            margin-bottom: 30px;
+        }
+
+
+        .card {
+
+            background: white;
+
+            padding: 22px;
+
+            border-radius: 15px;
+
+            box-shadow:
+                0 5px 20px rgba(0,0,0,.08);
+        }
+
+
+        .card h3 {
+
+            margin: 0 0 10px;
+
+            color: #64748b;
+
+            font-size: 15px;
+        }
+
+
+        .number {
+
+            font-size: 30px;
+
+            font-weight: bold;
+        }
+
+
+        /* =========================================
+           TABLE
+        ========================================= */
+
+        .table-box {
+
+            background: white;
+
+            padding: 20px;
+
+            border-radius: 15px;
+
+            box-shadow:
+                0 5px 20px rgba(0,0,0,.08);
+
+            overflow-x: auto;
+        }
+
+
+        .table-title {
+
+            display: flex;
+
+            justify-content:
+                space-between;
+
+            align-items: center;
+
+            margin-bottom: 15px;
+        }
+
+
+        .table-title h2 {
+
+            margin: 0;
+
+            color: #1e293b;
+        }
+
+
+        table {
+
+            width: 100%;
+
+            border-collapse: collapse;
+        }
+
+
+        th,
+        td {
+
+            padding: 14px;
+
+            border-bottom:
+                1px solid #e2e8f0;
+
+            text-align: left;
+        }
+
+
+        th {
+
+            background: #f8fafc;
+
+            color: #334155;
+        }
+
+
+        tr:hover {
+
+            background: #f8fafc;
+        }
+
+
+        /* PRESENT */
+
+        .present {
+
+            color: #15803d;
+
+            font-weight: bold;
+        }
+
+
+        /* ABSENT */
+
+        .absent {
+
+            color: #dc2626;
+
+            font-weight: bold;
+        }
+
+
+        /* =========================================
+           BACK BUTTON
+        ========================================= */
+
+        .back {
+
+            display: inline-block;
+
+            margin-top: 20px;
+
+            padding: 12px 20px;
+
+            background: #2563eb;
+
+            color: white;
+
+            text-decoration: none;
+
+            border-radius: 10px;
+        }
+
+
+        .back:hover {
+
+            background: #1d4ed8;
+        }
+
+
+        /* =========================================
+           MOBILE
+        ========================================= */
+
+        @media(max-width: 800px) {
+
+            .cards {
+
+                grid-template-columns:
+                    repeat(2, 1fr);
+            }
+
+        }
+
+
+        @media(max-width: 500px) {
+
+            body {
+
+                padding: 15px;
+            }
+
+
+            .cards {
+
+                grid-template-columns: 1fr;
+            }
+
+
+            .filters {
+
+                flex-direction: column;
+
+                align-items: stretch;
+            }
+
+
+            .filters input[type="text"],
+            .filters input[type="date"] {
+
+                min-width: unset;
+
+                width: 100%;
+
+                box-sizing: border-box;
+            }
+
+
+            .filter-btn,
+            .clear-btn,
+            .excel-btn {
+
+                width: 100%;
+
+                box-sizing: border-box;
+
+                text-align: center;
+
+                margin-left: 0;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="container">
+
+
+    <!-- =========================================
+         PAGE TITLE
+    ========================================= -->
+
+    <h1>
+        📊 Attendance Report
+    </h1>
+
+
+    <div class="date">
+
+        Date:
+
+        {{ selected_date }}
+
+    </div>
+
+
+    <!-- =========================================
+         FILTER SECTION
+    ========================================= -->
+
+    <div class="filter-box">
+
+        <h3>
+            🔎 Filter Attendance
+        </h3>
+
+
+        <form method="get">
+
+            <div class="filters">
+
+
+                <!-- DATE FILTER -->
+
+                <input
+                    type="date"
+                    name="date"
+                    value="{{ selected_date|date:'Y-m-d' }}"
+                >
+
+
+                <!-- STUDENT SEARCH -->
+
+                <input
+                    type="text"
+                    name="search"
+                    value="{{ search }}"
+                    placeholder="Search student name or roll no"
+                >
+
+
+                <!-- FILTER -->
+
+                <button
+                    type="submit"
+                    class="filter-btn"
+                >
+                    🔍 Filter
+                </button>
+
+
+                <!-- CLEAR -->
+
+                <a
+                    href="{% url 'attendance_list' %}"
+                    class="clear-btn"
+                >
+                    Clear
+                </a>
+
+
+                <!-- EXPORT EXCEL -->
+
+                <a
+                    href="{% url 'export_attendance_excel' %}?date={{ selected_date|date:'Y-m-d' }}&search={{ search|urlencode }}"
+                    class="excel-btn"
+                >
+                    📥 Export Excel
+                </a>
+
+
+            </div>
+
+        </form>
+
+    </div>
+
+
+    <!-- =========================================
+         SUMMARY CARDS
+    ========================================= -->
+
+    <div class="cards">
+
+
+        <!-- TOTAL -->
+
+        <div class="card">
+
+            <h3>
+                Total Students
+            </h3>
+
+            <div class="number">
+
+                {{ total_students }}
+
+            </div>
+
+        </div>
+
+
+        <!-- PRESENT -->
+
+        <div class="card">
+
+            <h3>
+                Present
+            </h3>
+
+            <div class="number present">
+
+                {{ present_count }}
+
+            </div>
+
+        </div>
+
+
+        <!-- ABSENT -->
+
+        <div class="card">
+
+            <h3>
+                Absent
+            </h3>
+
+            <div class="number absent">
+
+                {{ absent_count }}
+
+            </div>
+
+        </div>
+
+
+        <!-- ATTENDANCE -->
+
+        <div class="card">
+
+            <h3>
+                Attendance
+            </h3>
+
+            <div class="number">
+
+                {{ attendance_percentage }}%
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+    <!-- =========================================
+         ATTENDANCE TABLE
+    ========================================= -->
+
+    <div class="table-box">
+
+
+        <div class="table-title">
+
+            <h2>
+                Attendance Records
+            </h2>
+
+        </div>
+
+
+        <table>
+
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        Student Name
+                    </th>
+
+                    <th>
+                        Roll No
+                    </th>
+
+                    <th>
+                        Course
+                    </th>
+
+                    <th>
+                        Year
+                    </th>
+
+                    <th>
+                        Status
+                    </th>
+
+                    <th>
+                        Date
+                    </th>
+
+                    <th>
+                        Time
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+
+                {% for attendance in attendances %}
+
+                <tr>
+
+
+                    <td>
+                        {{ attendance.student.name }}
+                    </td>
+
+
+                    <td>
+                        {{ attendance.student.roll_no }}
+                    </td>
+
+
+                    <td>
+                        {{ attendance.student.course|default:"-" }}
+                    </td>
+
+
+                    <td>
+                        {{ attendance.student.year|default:"-" }}
+                    </td>
+
+
+                    <td>
+
+
+                        {% if attendance.status == "Present" %}
+
+                            <span class="present">
+
+                                ✓ Present
+
+                            </span>
+
+                        {% else %}
+
+                            <span class="absent">
+
+                                ✗ Absent
+
+                            </span>
+
+                        {% endif %}
+
+
+                    </td>
+
+
+                    <td>
+
+                        {{ attendance.date }}
+
+                    </td>
+
+
+                    <td>
+
+                        {{ attendance.time }}
+
+                    </td>
+
+
+                </tr>
+
+
+                {% empty %}
+
+
+                <tr>
+
+                    <td
+                        colspan="7"
+                        style="
+                            text-align:center;
+                            padding:30px;
+                        "
+                    >
+
+                        No attendance records found.
+
+                    </td>
+
+                </tr>
+
+
+                {% endfor %}
+
+
+            </tbody>
+
+
+        </table>
+
+
+    </div>
+
+
+    <!-- =========================================
+         BACK TO DASHBOARD
+    ========================================= -->
+
+    <a
+        href="/"
+        class="back"
+    >
+
+        ← Back to Dashboard
+
+    </a>
+
+
+</div>
+
+
+</body>
+
+</html>

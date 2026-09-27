@@ -1,0 +1,1876 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Teacher Dashboard | Smart Attendance</title>
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        body {
+            background: #f4f7fb;
+            color: #172033;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        /* ================= LAYOUT ================= */
+
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ================= SIDEBAR ================= */
+
+        .sidebar {
+            width: 250px;
+            background: #101c36;
+            color: white;
+            padding: 24px 18px;
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            overflow-y: auto;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 5px 10px 25px;
+            border-bottom: 1px solid rgba(255,255,255,.1);
+            margin-bottom: 20px;
+        }
+
+        .logo-icon {
+            width: 43px;
+            height: 43px;
+            background: #2563eb;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            font-weight: bold;
+        }
+
+        .logo-text h2 {
+            font-size: 15px;
+            letter-spacing: .5px;
+        }
+
+        .logo-text p {
+            font-size: 9px;
+            color: #94a3b8;
+            letter-spacing: 1px;
+            margin-top: 4px;
+        }
+
+        .menu-title {
+            font-size: 9px;
+            color: #64748b;
+            letter-spacing: 1.2px;
+            font-weight: bold;
+            padding: 0 12px;
+            margin: 22px 0 9px;
+        }
+
+        .menu a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #cbd5e1;
+            padding: 11px 13px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 4px;
+            transition: .2s;
+        }
+
+        .menu a:hover,
+        .menu a.active {
+            background: #1d4ed8;
+            color: white;
+        }
+
+        .menu-icon {
+            width: 20px;
+            text-align: center;
+            font-size: 15px;
+        }
+
+        .logout {
+            margin-top: 25px;
+            border-top: 1px solid rgba(255,255,255,.1);
+            padding-top: 18px;
+        }
+
+        .logout a {
+            color: #fca5a5;
+        }
+
+        .logout a:hover {
+            background: #7f1d1d;
+            color: white;
+        }
+
+        /* ================= MAIN ================= */
+
+        .main {
+            margin-left: 250px;
+            width: calc(100% - 250px);
+            min-height: 100vh;
+        }
+
+        /* ================= TOPBAR ================= */
+
+        .topbar {
+            height: 72px;
+            background: white;
+            border-bottom: 1px solid #e5eaf1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 32px;
+        }
+
+        .page-title {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .page-subtitle {
+            color: #718096;
+            font-size: 11px;
+            margin-top: 4px;
+        }
+
+        .teacher-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .avatar {
+            width: 38px;
+            height: 38px;
+            background: #e0e7ff;
+            color: #1d4ed8;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .teacher-name {
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .teacher-role {
+            font-size: 10px;
+            color: #718096;
+            margin-top: 3px;
+        }
+
+        /* ================= CONTENT ================= */
+
+        .content {
+            padding: 30px 32px;
+            max-width: 1500px;
+            margin: auto;
+        }
+
+        .welcome {
+            margin-bottom: 25px;
+        }
+
+        .welcome h1 {
+            font-size: 26px;
+            margin-bottom: 7px;
+        }
+
+        .welcome p {
+            color: #718096;
+            font-size: 13px;
+        }
+
+        /* ================= STATS ================= */
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 17px;
+        }
+
+        .stat-card {
+            background: white;
+            border: 1px solid #e7ebf2;
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(15,23,42,.03);
+        }
+
+        .stat-label {
+            color: #718096;
+            font-size: 11px;
+            margin-bottom: 8px;
+        }
+
+        .stat-number {
+            font-size: 26px;
+            font-weight: 700;
+        }
+
+        .stat-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 17px;
+            font-weight: bold;
+        }
+
+        .blue {
+            background: #e8f0ff;
+            color: #2563eb;
+        }
+
+        .green {
+            background: #e6f8ef;
+            color: #059669;
+        }
+
+        .red {
+            background: #feecec;
+            color: #dc2626;
+        }
+
+        .purple {
+            background: #f0eaff;
+            color: #7c3aed;
+        }
+
+        /* ================= SECTION ================= */
+
+        .section-heading {
+            margin: 27px 0 14px;
+        }
+
+        .section-heading h2 {
+            font-size: 16px;
+        }
+
+        .section-heading p {
+            color: #718096;
+            font-size: 11px;
+            margin-top: 4px;
+        }
+
+        /* ================= ACTIONS ================= */
+
+        .actions {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+
+        .action-card {
+            background: white;
+            border: 1px solid #e7ebf2;
+            border-radius: 12px;
+            padding: 19px;
+            transition: .2s;
+            box-shadow: 0 2px 8px rgba(15,23,42,.03);
+        }
+
+        .action-card:hover {
+            transform: translateY(-2px);
+            border-color: #bfdbfe;
+            box-shadow: 0 7px 20px rgba(15,23,42,.08);
+        }
+
+        .action-icon {
+            width: 42px;
+            height: 42px;
+            background: #eff6ff;
+            color: #2563eb;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            margin-bottom: 13px;
+        }
+
+        .action-card h3 {
+            font-size: 13px;
+            margin-bottom: 7px;
+        }
+
+        .action-card p {
+            color: #718096;
+            font-size: 11px;
+            line-height: 1.5;
+            margin-bottom: 13px;
+        }
+
+        .action-btn {
+            color: #2563eb;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        /* ================= TWO COLUMNS ================= */
+
+        .two-column {
+            display: grid;
+            grid-template-columns: 1.55fr 1fr;
+            gap: 19px;
+            margin-top: 24px;
+        }
+
+        .panel {
+            background: white;
+            border: 1px solid #e7ebf2;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(15,23,42,.03);
+        }
+
+        .panel-header {
+            padding: 17px 19px;
+            border-bottom: 1px solid #edf0f5;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-header h2 {
+            font-size: 14px;
+        }
+
+        .panel-header span {
+            display: block;
+            color: #718096;
+            font-size: 10px;
+            margin-top: 4px;
+        }
+
+        /* ================= TABLE ================= */
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #f8fafc;
+            color: #718096;
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            text-align: left;
+            padding: 11px 14px;
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 12px 14px;
+            border-top: 1px solid #edf0f5;
+            font-size: 11px;
+            white-space: nowrap;
+        }
+
+        .student-name {
+            font-weight: 600;
+        }
+
+        .roll {
+            color: #64748b;
+        }
+
+        /* ================= STATUS ================= */
+
+        .status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 9px;
+            font-weight: 700;
+        }
+
+        .status-present {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .status-absent {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .verified {
+            color: #059669;
+            font-weight: 600;
+        }
+
+        .not-verified {
+            color: #94a3b8;
+        }
+
+        /* ================= STUDENTS ================= */
+
+        .student-list {
+            max-height: 430px;
+            overflow-y: auto;
+        }
+
+        .student-row {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            padding: 12px 17px;
+            border-bottom: 1px solid #edf0f5;
+        }
+
+        .student-row:last-child {
+            border-bottom: none;
+        }
+
+        .student-avatar {
+            width: 34px;
+            height: 34px;
+            flex-shrink: 0;
+            background: #eff6ff;
+            color: #2563eb;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .student-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .student-info strong {
+            display: block;
+            font-size: 11px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .student-info span {
+            display: block;
+            color: #718096;
+            font-size: 9px;
+            margin-top: 3px;
+        }
+
+        .student-academic {
+            text-align: right;
+            color: #64748b;
+            font-size: 9px;
+            line-height: 1.6;
+        }
+
+        /* ================= QR SESSION ================= */
+
+        .qr-session {
+            background: #f8fafc;
+            border: 1px solid #edf0f5;
+            margin: 14px;
+            padding: 14px;
+            border-radius: 9px;
+        }
+
+        .qr-session-title {
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .qr-session-details {
+            color: #718096;
+            font-size: 9px;
+            line-height: 1.7;
+            margin-top: 5px;
+        }
+
+        .qr-active {
+            display: inline-block;
+            background: #dcfce7;
+            color: #15803d;
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 8px;
+            font-weight: bold;
+            margin-top: 7px;
+        }
+
+        /* ================= SECURITY ================= */
+
+        .security-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        .security-card {
+            background: white;
+            border: 1px solid #e7ebf2;
+            border-radius: 12px;
+            padding: 18px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .security-icon {
+            width: 41px;
+            height: 41px;
+            background: #ecfdf5;
+            color: #059669;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .security-card h3 {
+            font-size: 11px;
+            margin-bottom: 4px;
+        }
+
+        .security-card p {
+            color: #718096;
+            font-size: 9px;
+        }
+
+        .enabled {
+            color: #059669 !important;
+            font-weight: bold;
+            margin-top: 3px;
+        }
+
+        /* ================= SUMMARY ================= */
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+        }
+
+        .summary-item {
+            padding: 21px;
+            border-right: 1px solid #edf0f5;
+        }
+
+        .summary-item:last-child {
+            border-right: none;
+        }
+
+        .summary-label {
+            color: #718096;
+            font-size: 10px;
+            margin-bottom: 7px;
+        }
+
+        .summary-number {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        /* ================= EMPTY ================= */
+
+        .empty {
+            padding: 30px 18px;
+            text-align: center;
+            color: #94a3b8;
+            font-size: 11px;
+        }
+
+        /* ================= FOOTER ================= */
+
+        .footer {
+            text-align: center;
+            color: #94a3b8;
+            font-size: 9px;
+            padding: 27px 0 15px;
+        }
+
+        /* ================= RESPONSIVE ================= */
+
+        @media (max-width: 1150px) {
+
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .actions {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 750px) {
+
+            .sidebar {
+                width: 68px;
+                padding: 20px 9px;
+            }
+
+            .logo {
+                justify-content: center;
+                padding-left: 0;
+                padding-right: 0;
+            }
+
+            .logo-text,
+            .menu-title,
+            .menu a span {
+                display: none;
+            }
+
+            .menu a {
+                justify-content: center;
+                padding: 11px;
+            }
+
+            .logout span {
+                display: none;
+            }
+
+            .logout a {
+                justify-content: center;
+            }
+
+            .main {
+                margin-left: 68px;
+                width: calc(100% - 68px);
+            }
+
+            .topbar {
+                padding: 0 16px;
+            }
+
+            .teacher-name,
+            .teacher-role {
+                display: none;
+            }
+
+            .content {
+                padding: 22px 15px;
+            }
+
+            .stats,
+            .actions,
+            .security-grid,
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .summary-item {
+                border-right: none;
+                border-bottom: 1px solid #edf0f5;
+            }
+
+            .summary-item:last-child {
+                border-bottom: none;
+            }
+
+            .welcome h1 {
+                font-size: 22px;
+            }
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="layout">
+
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <aside class="sidebar">
+
+
+        <div class="logo">
+
+            <div class="logo-icon">
+                QR
+            </div>
+
+            <div class="logo-text">
+
+                <h2>
+                    SMART ATTENDANCE
+                </h2>
+
+                <p>
+                    COLLEGE MANAGEMENT
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="menu-title">
+            MAIN MENU
+        </div>
+
+
+        <nav class="menu">
+
+            <a
+                href="{% url 'teacher_dashboard' %}"
+                class="active"
+            >
+
+                <div class="menu-icon">
+                    ⌂
+                </div>
+
+                <span>
+                    Dashboard
+                </span>
+
+            </a>
+
+
+            <a href="{% url 'generate_qr' %}">
+
+                <div class="menu-icon">
+                    ▣
+                </div>
+
+                <span>
+                    Generate QR
+                </span>
+
+            </a>
+
+
+            <a href="{% url 'projector' %}">
+
+                <div class="menu-icon">
+                    ▤
+                </div>
+
+                <span>
+                    Projector Mode
+                </span>
+
+            </a>
+
+
+            <a href="{% url 'students_page' %}">
+
+                <div class="menu-icon">
+                    ♙
+                </div>
+
+                <span>
+                    Students
+                </span>
+
+            </a>
+
+        </nav>
+
+
+        <div class="menu-title">
+            ATTENDANCE
+        </div>
+
+
+        <nav class="menu">
+
+
+            <a href="{% url 'attendance_list' %}">
+
+                <div class="menu-icon">
+                    ▥
+                </div>
+
+                <span>
+                    Attendance Records
+                </span>
+
+            </a>
+
+
+            <a href="{% url 'today_attendance' %}">
+
+                <div class="menu-icon">
+                    ◷
+                </div>
+
+                <span>
+                    Today's Attendance
+                </span>
+
+            </a>
+
+
+            <a href="{% url 'subject_wise_attendance' %}">
+
+                <div class="menu-icon">
+                    ▦
+                </div>
+
+                <span>
+                    Subject-wise
+                </span>
+
+            </a>
+
+
+            <a href="{% url 'student_history' %}">
+
+                <div class="menu-icon">
+                    ◴
+                </div>
+
+                <span>
+                    Student History
+                </span>
+
+            </a>
+
+
+            <a href="{% url 'export_attendance_excel' %}">
+
+                <div class="menu-icon">
+                    ⇩
+                </div>
+
+                <span>
+                    Export Excel
+                </span>
+
+            </a>
+
+
+        </nav>
+
+
+        <div class="logout">
+
+            <a href="{% url 'teacher_logout' %}">
+
+                <div class="menu-icon">
+                    ↪
+                </div>
+
+                <span>
+                    Logout
+                </span>
+
+            </a>
+
+        </div>
+
+
+    </aside>
+
+
+    <!-- =====================================================
+         MAIN
+    ====================================================== -->
+
+    <main class="main">
+
+
+        <!-- TOP BAR -->
+
+        <header class="topbar">
+
+            <div>
+
+                <div class="page-title">
+                    Teacher Dashboard
+                </div>
+
+                <div class="page-subtitle">
+                    Smart Attendance Management System
+                </div>
+
+            </div>
+
+
+            <div class="teacher-profile">
+
+                <div class="avatar">
+                    T
+                </div>
+
+                <div>
+
+                    <div class="teacher-name">
+                        {{ request.user.username|default:"Teacher" }}
+                    </div>
+
+                    <div class="teacher-role">
+                        Faculty / Teacher
+                    </div>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- =====================================================
+             CONTENT
+        ====================================================== -->
+
+        <section class="content">
+
+
+            <!-- WELCOME -->
+
+            <div class="welcome">
+
+                <h1>
+                    Welcome to Smart Attendance
+                </h1>
+
+                <p>
+                    Manage QR attendance, students, GPS verification
+                    and attendance reports from one professional dashboard.
+                </p>
+
+            </div>
+
+
+            <!-- =================================================
+                 STAT CARDS
+            ================================================== -->
+
+            <div class="stats">
+
+
+                <!-- TOTAL STUDENTS -->
+
+                <div class="stat-card">
+
+                    <div>
+
+                        <div class="stat-label">
+                            Total Students
+                        </div>
+
+                        <div class="stat-number">
+                            {{ total_students|default:0 }}
+                        </div>
+
+                    </div>
+
+                    <div class="stat-icon blue">
+                        ♙
+                    </div>
+
+                </div>
+
+
+                <!-- PRESENT -->
+
+                <div class="stat-card">
+
+                    <div>
+
+                        <div class="stat-label">
+                            Present Today
+                        </div>
+
+                        <div class="stat-number">
+                            {{ present_today|default:0 }}
+                        </div>
+
+                    </div>
+
+                    <div class="stat-icon green">
+                        ✓
+                    </div>
+
+                </div>
+
+
+                <!-- ABSENT -->
+
+                <div class="stat-card">
+
+                    <div>
+
+                        <div class="stat-label">
+                            Absent Today
+                        </div>
+
+                        <div class="stat-number">
+                            {{ absent_today|default:0 }}
+                        </div>
+
+                    </div>
+
+                    <div class="stat-icon red">
+                        !
+                    </div>
+
+                </div>
+
+
+                <!-- ACTIVE QR -->
+
+                <div class="stat-card">
+
+                    <div>
+
+                        <div class="stat-label">
+                            Active QR Sessions
+                        </div>
+
+                        <div class="stat-number">
+                            {{ active_qr_count|default:0 }}
+                        </div>
+
+                    </div>
+
+                    <div class="stat-icon purple">
+                        QR
+                    </div>
+
+                </div>
+
+
+            </div>
+
+
+            <!-- =================================================
+                 ATTENDANCE MANAGEMENT
+            ================================================== -->
+
+            <div class="section-heading">
+
+                <h2>
+                    Attendance Management
+                </h2>
+
+                <p>
+                    Start and manage today's attendance.
+                </p>
+
+            </div>
+
+
+            <div class="actions">
+
+
+                <!-- GENERATE QR -->
+
+                <a
+                    href="{% url 'generate_qr' %}"
+                    class="action-card"
+                >
+
+                    <div class="action-icon">
+                        ▣
+                    </div>
+
+                    <h3>
+                        Generate QR Code
+                    </h3>
+
+                    <p>
+                        Create a unique time-limited attendance QR
+                        for your selected subject and class.
+                    </p>
+
+                    <span class="action-btn">
+                        Generate QR →
+                    </span>
+
+                </a>
+
+
+                <!-- PROJECTOR -->
+
+                <a
+                    href="{% url 'projector' %}"
+                    class="action-card"
+                >
+
+                    <div class="action-icon">
+                        ▤
+                    </div>
+
+                    <h3>
+                        Projector Mode
+                    </h3>
+
+                    <p>
+                        Display the active attendance QR code
+                        on the classroom projector.
+                    </p>
+
+                    <span class="action-btn">
+                        Open Projector →
+                    </span>
+
+                </a>
+
+
+                <!-- SUBJECT -->
+
+                <a
+                    href="{% url 'subject_wise_attendance' %}"
+                    class="action-card"
+                >
+
+                    <div class="action-icon">
+                        ▥
+                    </div>
+
+                    <h3>
+                        Subject-wise Attendance
+                    </h3>
+
+                    <p>
+                        Check attendance percentage separately
+                        for every subject and student.
+                    </p>
+
+                    <span class="action-btn">
+                        View Subject Report →
+                    </span>
+
+                </a>
+
+
+                <!-- HISTORY -->
+
+                <a
+                    href="{% url 'student_history' %}"
+                    class="action-card"
+                >
+
+                    <div class="action-icon">
+                        ◴
+                    </div>
+
+                    <h3>
+                        Student History
+                    </h3>
+
+                    <p>
+                        View complete attendance history
+                        of an individual student.
+                    </p>
+
+                    <span class="action-btn">
+                        View History →
+                    </span>
+
+                </a>
+
+
+            </div>
+
+
+            <!-- =================================================
+                 RECENT ATTENDANCE + STUDENTS
+            ================================================== -->
+
+            <div class="two-column">
+
+
+                <!-- RECENT ATTENDANCE -->
+
+                <div class="panel">
+
+
+                    <div class="panel-header">
+
+                        <div>
+
+                            <h2>
+                                Recent Attendance
+                            </h2>
+
+                            <span>
+                                Latest attendance activity
+                            </span>
+
+                        </div>
+
+
+                        <a
+                            href="{% url 'attendance_list' %}"
+                            class="action-btn"
+                        >
+                            View All →
+                        </a>
+
+                    </div>
+
+
+                    <div class="table-wrapper">
+
+
+                        {% if recent_attendance %}
+
+
+                        <table>
+
+                            <thead>
+
+                                <tr>
+
+                                    <th>
+                                        #
+                                    </th>
+
+                                    <th>
+                                        Student
+                                    </th>
+
+                                    <th>
+                                        Roll No
+                                    </th>
+
+                                    <th>
+                                        Subject
+                                    </th>
+
+                                    <th>
+                                        Date
+                                    </th>
+
+                                    <th>
+                                        Time
+                                    </th>
+
+                                    <th>
+                                        Status
+                                    </th>
+
+                                    <th>
+                                        Location
+                                    </th>
+
+                                </tr>
+
+                            </thead>
+
+
+                            <tbody>
+
+
+                                {% for attendance in recent_attendance %}
+
+
+                                <tr>
+
+                                    <td>
+                                        {{ forloop.counter }}
+                                    </td>
+
+
+                                    <td class="student-name">
+                                        {{ attendance.student.name }}
+                                    </td>
+
+
+                                    <td class="roll">
+                                        {{ attendance.student.roll_no }}
+                                    </td>
+
+
+                                    <td>
+
+                                        {% if attendance.subject %}
+                                            {{ attendance.subject.name }}
+                                        {% else %}
+                                            General
+                                        {% endif %}
+
+                                    </td>
+
+
+                                    <td>
+                                        {{ attendance.date|date:"d M Y" }}
+                                    </td>
+
+
+                                    <td>
+                                        {{ attendance.time|time:"h:i A" }}
+                                    </td>
+
+
+                                    <td>
+
+                                        {% if attendance.status == "Present" %}
+
+                                            <span class="status status-present">
+                                                Present
+                                            </span>
+
+                                        {% else %}
+
+                                            <span class="status status-absent">
+                                                Absent
+                                            </span>
+
+                                        {% endif %}
+
+                                    </td>
+
+
+                                    <td>
+
+                                        {% if attendance.location_verified %}
+
+                                            <span class="verified">
+                                                ✓ Verified
+                                            </span>
+
+                                        {% else %}
+
+                                            <span class="not-verified">
+                                                Not Verified
+                                            </span>
+
+                                        {% endif %}
+
+                                    </td>
+
+                                </tr>
+
+
+                                {% endfor %}
+
+
+                            </tbody>
+
+                        </table>
+
+
+                        {% else %}
+
+
+                        <div class="empty">
+                            No attendance records available yet.
+                        </div>
+
+
+                        {% endif %}
+
+
+                    </div>
+
+                </div>
+
+
+                <!-- REGISTERED STUDENTS -->
+
+                <div class="panel">
+
+
+                    <div class="panel-header">
+
+                        <div>
+
+                            <h2>
+                                Registered Students
+                            </h2>
+
+                            <span>
+                                {{ total_students }}
+                                students currently registered
+                            </span>
+
+                        </div>
+
+
+                        <a
+                            href="{% url 'students_page' %}"
+                            class="action-btn"
+                        >
+                            View All →
+                        </a>
+
+                    </div>
+
+
+                    <div class="student-list">
+
+
+                        {% if students %}
+
+
+                            {% for student in students %}
+
+
+                            <div class="student-row">
+
+
+                                <div class="student-avatar">
+
+                                    {{ student.name|first|upper }}
+
+                                </div>
+
+
+                                <div class="student-info">
+
+                                    <strong>
+                                        {{ student.name }}
+                                    </strong>
+
+                                    <span>
+                                        Roll No:
+                                        {{ student.roll_no }}
+                                    </span>
+
+                                </div>
+
+
+                                <div class="student-academic">
+
+                                    {% if student.branch %}
+                                        {{ student.branch }}
+                                    {% else %}
+                                        —
+                                    {% endif %}
+
+                                    <br>
+
+                                    {% if student.section %}
+                                        Section
+                                        {{ student.section }}
+                                    {% else %}
+                                        —
+                                    {% endif %}
+
+                                    {% if student.semester %}
+                                        <br>
+                                        Sem
+                                        {{ student.semester }}
+                                    {% endif %}
+
+                                </div>
+
+
+                            </div>
+
+
+                            {% endfor %}
+
+
+                        {% else %}
+
+
+                            <div class="empty">
+                                No students registered.
+                            </div>
+
+
+                        {% endif %}
+
+
+                    </div>
+
+
+                </div>
+
+
+            </div>
+
+
+            <!-- =================================================
+                 ACTIVE QR SESSIONS
+            ================================================== -->
+
+            <div class="section-heading">
+
+                <h2>
+                    Active QR Sessions
+                </h2>
+
+                <p>
+                    Currently running attendance sessions.
+                </p>
+
+            </div>
+
+
+            <div class="panel">
+
+
+                {% if active_sessions %}
+
+
+                    {% for session in active_sessions %}
+
+
+                    <div class="qr-session">
+
+
+                        <div class="qr-session-title">
+
+                            {% if session.subject %}
+                                {{ session.subject.name }}
+                            {% else %}
+                                General Attendance
+                            {% endif %}
+
+                        </div>
+
+
+                        <div class="qr-session-details">
+
+                            Session:
+                            {{ session.session_id }}
+
+                            <br>
+
+                            Created:
+                            {{ session.created_at|date:"d M Y, h:i A" }}
+
+                            <br>
+
+                            Expires:
+                            {{ session.expires_at|date:"d M Y, h:i A" }}
+
+
+                            {% if session.branch %}
+
+                                <br>
+
+                                Branch:
+                                {{ session.branch }}
+
+                            {% endif %}
+
+
+                            {% if session.section %}
+
+                                | Section:
+                                {{ session.section }}
+
+                            {% endif %}
+
+
+                            {% if session.semester %}
+
+                                | Semester:
+                                {{ session.semester }}
+
+                            {% endif %}
+
+                        </div>
+
+
+                        <span class="qr-active">
+                            ● ACTIVE
+                        </span>
+
+
+                    </div>
+
+
+                    {% endfor %}
+
+
+                {% else %}
+
+
+                    <div class="empty">
+
+                        No active QR session.
+
+                        <br><br>
+
+                        <a
+                            href="{% url 'generate_qr' %}"
+                            class="action-btn"
+                        >
+                            Generate New QR →
+                        </a>
+
+                    </div>
+
+
+                {% endif %}
+
+
+            </div>
+
+
+            <!-- =================================================
+                 SYSTEM STATUS
+            ================================================== -->
+
+            <div class="section-heading">
+
+                <h2>
+                    System Status
+                </h2>
+
+                <p>
+                    Current attendance security status.
+                </p>
+
+            </div>
+
+
+            <div class="security-grid">
+
+
+                <!-- GPS -->
+
+                <div class="security-card">
+
+                    <div class="security-icon">
+                        GPS
+                    </div>
+
+                    <div>
+
+                        <h3>
+                            GPS Verification
+                        </h3>
+
+                        <p>
+                            Location based attendance verification
+                        </p>
+
+                        <p class="enabled">
+                            ● Enabled
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <!-- QR -->
+
+                <div class="security-card">
+
+                    <div class="security-icon">
+                        QR
+                    </div>
+
+                    <div>
+
+                        <h3>
+                            Secure QR Attendance
+                        </h3>
+
+                        <p>
+                            Time-limited attendance sessions
+                        </p>
+
+                        <p class="enabled">
+                            ● Active
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <!-- DATABASE -->
+
+                <div class="security-card">
+
+                    <div class="security-icon">
+                        DB
+                    </div>
+
+                    <div>
+
+                        <h3>
+                            Database
+                        </h3>
+
+                        <p>
+                            Attendance records available
+                        </p>
+
+                        <p class="enabled">
+                            ● Connected
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+
+            <!-- =================================================
+                 TODAY SUMMARY
+            ================================================== -->
+
+            <div
+                class="panel"
+                style="margin-top:25px;"
+            >
+
+
+                <div class="panel-header">
+
+                    <div>
+
+                        <h2>
+                            Today's Summary
+                        </h2>
+
+                        <span>
+                            Current attendance overview
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="summary-grid">
+
+
+                    <div class="summary-item">
+
+                        <div class="summary-label">
+                            Attendance
+                        </div>
+
+                        <div class="summary-number">
+                            {{ attendance_percentage|default:0 }}%
+                        </div>
+
+                    </div>
+
+
+                    <div class="summary-item">
+
+                        <div class="summary-label">
+                            Students
+                        </div>
+
+                        <div class="summary-number">
+                            {{ total_students|default:0 }}
+                        </div>
+
+                    </div>
+
+
+                    <div class="summary-item">
+
+                        <div class="summary-label">
+                            Present
+                        </div>
+
+                        <div
+                            class="summary-number"
+                            style="color:#059669;"
+                        >
+                            {{ present_today|default:0 }}
+                        </div>
+
+                    </div>
+
+
+                    <div class="summary-item">
+
+                        <div class="summary-label">
+                            Absent
+                        </div>
+
+                        <div
+                            class="summary-number"
+                            style="color:#dc2626;"
+                        >
+                            {{ absent_today|default:0 }}
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+            </div>
+
+
+            <!-- FOOTER -->
+
+            <div class="footer">
+
+                Smart Attendance System
+                &nbsp;•&nbsp;
+                QR + GPS Verification
+                &nbsp;•&nbsp;
+                Secure Attendance Management
+
+            </div>
+
+
+        </section>
+
+
+    </main>
+
+
+</div>
+
+
+</body>
+
+</html>

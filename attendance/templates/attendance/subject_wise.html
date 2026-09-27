@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Subject-wise Attendance | Smart Attendance</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        body {
+            background: #f4f7fb;
+            color: #1e293b;
+        }
+
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 245px;
+            background: #0b1f3a;
+            color: white;
+            padding: 24px 16px;
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+        }
+
+        .logo {
+            text-align: center;
+            padding-bottom: 25px;
+            border-bottom: 1px solid rgba(255,255,255,0.12);
+        }
+
+        .logo-icon {
+            width: 52px;
+            height: 52px;
+            margin: auto;
+            border-radius: 14px;
+            background: #2563eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 25px;
+            font-weight: bold;
+        }
+
+        .logo h2 {
+            font-size: 18px;
+            margin-top: 12px;
+            letter-spacing: 1px;
+        }
+
+        .logo p {
+            font-size: 11px;
+            color: #9fb0c8;
+            margin-top: 5px;
+        }
+
+        .menu {
+            margin-top: 25px;
+        }
+
+        .menu a {
+            display: block;
+            color: #c7d2e3;
+            text-decoration: none;
+            padding: 13px 15px;
+            border-radius: 9px;
+            margin-bottom: 7px;
+            font-size: 14px;
+        }
+
+        .menu a:hover,
+        .menu a.active {
+            background: #2563eb;
+            color: white;
+        }
+
+        .menu-title {
+            color: #6f83a1;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 22px 15px 10px;
+        }
+
+        /* MAIN */
+        .main {
+            margin-left: 245px;
+            width: calc(100% - 245px);
+            padding: 30px;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 28px;
+        }
+
+        .topbar h1 {
+            font-size: 26px;
+            color: #102a43;
+        }
+
+        .topbar p {
+            color: #718096;
+            margin-top: 6px;
+            font-size: 14px;
+        }
+
+        .back-btn {
+            text-decoration: none;
+            background: white;
+            border: 1px solid #dbe3ee;
+            color: #334e68;
+            padding: 11px 17px;
+            border-radius: 8px;
+            font-size: 13px;
+        }
+
+        .back-btn:hover {
+            background: #f1f5f9;
+        }
+
+        /* FILTER CARD */
+        .filter-card {
+            background: white;
+            border-radius: 14px;
+            padding: 22px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 3px 12px rgba(15, 23, 42, 0.04);
+            margin-bottom: 24px;
+        }
+
+        .filter-card h3 {
+            font-size: 16px;
+            margin-bottom: 15px;
+            color: #102a43;
+        }
+
+        .filter-form {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        select {
+            flex: 1;
+            max-width: 500px;
+            padding: 12px 14px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: white;
+            color: #334155;
+            font-size: 14px;
+            outline: none;
+        }
+
+        select:focus {
+            border-color: #2563eb;
+        }
+
+        .filter-btn {
+            border: none;
+            background: #2563eb;
+            color: white;
+            padding: 12px 22px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .filter-btn:hover {
+            background: #1d4ed8;
+        }
+
+        /* SELECTED SUBJECT */
+        .subject-banner {
+            background: linear-gradient(135deg, #0f2d52, #1e4f8a);
+            color: white;
+            padding: 24px;
+            border-radius: 14px;
+            margin-bottom: 24px;
+        }
+
+        .subject-banner small {
+            color: #b9d0ed;
+            font-size: 12px;
+        }
+
+        .subject-banner h2 {
+            margin-top: 7px;
+            font-size: 22px;
+        }
+
+        .subject-info {
+            display: flex;
+            gap: 25px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+
+        .subject-info span {
+            font-size: 13px;
+            color: #d8e5f5;
+        }
+
+        /* SUMMARY */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+            margin-bottom: 25px;
+        }
+
+        .summary-card {
+            background: white;
+            border-radius: 13px;
+            padding: 20px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .summary-card .label {
+            color: #718096;
+            font-size: 12px;
+        }
+
+        .summary-card .number {
+            font-size: 25px;
+            font-weight: bold;
+            margin-top: 7px;
+            color: #102a43;
+        }
+
+        /* TABLE CARD */
+        .table-card {
+            background: white;
+            border-radius: 14px;
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+            box-shadow: 0 3px 12px rgba(15, 23, 42, 0.04);
+        }
+
+        .table-header {
+            padding: 20px 22px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .table-header h3 {
+            font-size: 17px;
+            color: #102a43;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #f8fafc;
+            color: #64748b;
+            text-align: left;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            padding: 14px 18px;
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 15px 18px;
+            border-top: 1px solid #edf2f7;
+            font-size: 13px;
+            color: #334155;
+        }
+
+        tr:hover td {
+            background: #f8fafc;
+        }
+
+        .student-name {
+            font-weight: 600;
+            color: #102a43;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .present {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .absent {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .verified {
+            color: #15803d;
+            font-weight: 600;
+        }
+
+        .not-verified {
+            color: #b91c1c;
+            font-weight: 600;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 45px 20px;
+            color: #94a3b8;
+        }
+
+        /* STUDENT SUMMARY */
+        .summary-section {
+            margin-bottom: 25px;
+        }
+
+        .summary-section h3 {
+            margin-bottom: 15px;
+            color: #102a43;
+            font-size: 17px;
+        }
+
+        .percentage {
+            font-weight: bold;
+        }
+
+        /* MOBILE */
+        @media (max-width: 1000px) {
+            .summary-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 700px) {
+            .sidebar {
+                position: relative;
+                width: 100%;
+                height: auto;
+            }
+
+            .layout {
+                display: block;
+            }
+
+            .main {
+                margin-left: 0;
+                width: 100%;
+                padding: 18px;
+            }
+
+            .menu {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 5px;
+            }
+
+            .menu a {
+                margin-bottom: 0;
+            }
+
+            .filter-form {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            select {
+                max-width: none;
+            }
+
+            .summary-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .topbar {
+                align-items: flex-start;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+        <div class="logo">
+            <div class="logo-icon">QR</div>
+            <h2>SMART ATTENDANCE</h2>
+            <p>Teacher Management Panel</p>
+        </div>
+
+        <div class="menu">
+
+            <div class="menu-title">Main Menu</div>
+
+            <a href="{% url 'teacher_dashboard' %}">
+                🏠 Dashboard
+            </a>
+
+            <a href="{% url 'students_page' %}">
+                👨‍🎓 Students
+            </a>
+
+            <a href="{% url 'generate_qr' %}">
+                📱 Generate QR
+            </a>
+
+            <a href="{% url 'projector' %}">
+                📺 Projector
+            </a>
+
+            <div class="menu-title">Attendance</div>
+
+            <a href="{% url 'attendance_list' %}">
+                📋 Attendance List
+            </a>
+
+            <a href="{% url 'subject_wise_attendance' %}" class="active">
+                📚 Subject-wise
+            </a>
+
+            <a href="{% url 'student_history' %}">
+                🕒 Student History
+            </a>
+
+            <a href="{% url 'export_attendance_excel' %}">
+                📊 Export Excel
+            </a>
+
+        </div>
+
+    </aside>
+
+
+    <!-- MAIN CONTENT -->
+    <main class="main">
+
+        <div class="topbar">
+
+            <div>
+                <h1>Subject-wise Attendance</h1>
+                <p>View and analyze attendance subject by subject.</p>
+            </div>
+
+            <a href="{% url 'teacher_dashboard' %}" class="back-btn">
+                ← Dashboard
+            </a>
+
+        </div>
+
+
+        <!-- SUBJECT FILTER -->
+        <div class="filter-card">
+
+            <h3>📚 Select Subject</h3>
+
+            <form method="get" class="filter-form">
+
+                <select name="subject">
+
+                    <option value="">
+                        All Subjects
+                    </option>
+
+                    {% for subject in subjects %}
+
+                        <option value="{{ subject.id }}"
+                            {% if selected_subject and selected_subject.id == subject.id %}
+                                selected
+                            {% endif %}>
+
+                            {% if subject.code %}
+                                {{ subject.code }} -
+                            {% endif %}
+
+                            {{ subject.name }}
+
+                            {% if subject.branch %}
+                                | {{ subject.branch }}
+                            {% endif %}
+
+                            {% if subject.semester %}
+                                | Sem {{ subject.semester }}
+                            {% endif %}
+
+                        </option>
+
+                    {% endfor %}
+
+                </select>
+
+                <button type="submit" class="filter-btn">
+                    View Attendance
+                </button>
+
+            </form>
+
+        </div>
+
+
+        <!-- SELECTED SUBJECT -->
+        {% if selected_subject %}
+
+        <div class="subject-banner">
+
+            <small>SELECTED SUBJECT</small>
+
+            <h2>
+                {% if selected_subject.code %}
+                    {{ selected_subject.code }} -
+                {% endif %}
+                {{ selected_subject.name }}
+            </h2>
+
+            <div class="subject-info">
+
+                {% if selected_subject.branch %}
+                    <span>🎓 Branch: {{ selected_subject.branch }}</span>
+                {% endif %}
+
+                {% if selected_subject.semester %}
+                    <span>📖 Semester: {{ selected_subject.semester }}</span>
+                {% endif %}
+
+                <span>
+                    📅 Attendance Records: {{ records|length }}
+                </span>
+
+            </div>
+
+        </div>
+
+        {% endif %}
+
+
+        <!-- STUDENT SUMMARY -->
+        {% if student_summary %}
+
+        <div class="summary-section">
+
+            <h3>Student Attendance Summary</h3>
+
+            <div class="table-card">
+
+                <div class="table-wrapper">
+
+                    <table>
+
+                        <thead>
+                            <tr>
+                                <th>Student</th>
+                                <th>Roll No.</th>
+                                <th>Total</th>
+                                <th>Present</th>
+                                <th>Absent</th>
+                                <th>Attendance %</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                        {% for item in student_summary %}
+
+                            <tr>
+
+                                <td class="student-name">
+                                    {{ item.student.name }}
+                                </td>
+
+                                <td>
+                                    {{ item.student.roll_no }}
+                                </td>
+
+                                <td>
+                                    {{ item.total }}
+                                </td>
+
+                                <td>
+                                    {{ item.present }}
+                                </td>
+
+                                <td>
+                                    {{ item.absent }}
+                                </td>
+
+                                <td class="percentage">
+                                    {{ item.percentage }}%
+                                </td>
+
+                            </tr>
+
+                        {% empty %}
+
+                            <tr>
+                                <td colspan="6" class="empty">
+                                    No student attendance data available.
+                                </td>
+                            </tr>
+
+                        {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        {% endif %}
+
+
+        <!-- ATTENDANCE RECORDS -->
+        <div class="table-card">
+
+            <div class="table-header">
+
+                <h3>
+                    Attendance Records
+                </h3>
+
+            </div>
+
+            <div class="table-wrapper">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+                            <th>Student</th>
+                            <th>Roll No.</th>
+                            <th>Subject</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Status</th>
+                            <th>Location</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                    {% for record in records %}
+
+                        <tr>
+
+                            <td class="student-name">
+                                {{ record.student.name }}
+                            </td>
+
+                            <td>
+                                {{ record.student.roll_no }}
+                            </td>
+
+                            <td>
+
+                                {% if record.subject %}
+
+                                    {% if record.subject.code %}
+                                        {{ record.subject.code }} -
+                                    {% endif %}
+
+                                    {{ record.subject.name }}
+
+                                {% else %}
+
+                                    <span style="color:#94a3b8;">
+                                        No Subject
+
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+                            <td>
+                                {{ record.date }}
+                            </td>
+
+                            <td>
+                                {{ record.time|time:"h:i A" }}
+                            </td>
+
+                            <td>
+
+                                {% if record.status == "Present" %}
+
+                                    <span class="status present">
+                                        Present
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="status absent">
+                                        Absent
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+                            <td>
+
+                                {% if record.location_verified %}
+
+                                    <span class="verified">
+                                        ✓ Verified
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="not-verified">
+                                        ✕ Not Verified
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+                        </tr>
+
+                    {% empty %}
+
+                        <tr>
+
+                            <td colspan="7" class="empty">
+
+                                <div style="font-size:35px;margin-bottom:10px;">
+                                    📋
+                                </div>
+
+                                <strong>No attendance records found</strong>
+
+                                <p style="margin-top:7px;">
+                                    Select a subject or generate attendance first.
+                                </p>
+
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+</body>
+</html>

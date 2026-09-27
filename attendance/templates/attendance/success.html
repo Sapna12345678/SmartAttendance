@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+```
+<title>Attendance Marked | Smart Attendance</title>
+
+<style>
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+        min-height: 100vh;
+        background: #f4f7fb;
+        color: #1f2937;
+    }
+
+    .header {
+        background: #1e3a8a;
+        color: white;
+        padding: 18px 50px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .logo {
+        font-size: 24px;
+        font-weight: bold;
+    }
+
+    .subtitle {
+        font-size: 14px;
+        opacity: 0.85;
+    }
+
+    .container {
+        max-width: 850px;
+        margin: 50px auto;
+        padding: 20px;
+    }
+
+    .success-card {
+        background: white;
+        border-radius: 18px;
+        padding: 40px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+        text-align: center;
+    }
+
+    .success-icon {
+        width: 75px;
+        height: 75px;
+        margin: 0 auto 20px;
+        border-radius: 50%;
+        background: #dcfce7;
+        color: #16a34a;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 40px;
+        font-weight: bold;
+    }
+
+    h1 {
+        color: #16a34a;
+        margin-bottom: 8px;
+        font-size: 30px;
+    }
+
+    .message {
+        color: #6b7280;
+        margin-bottom: 30px;
+    }
+
+    .student-card {
+        text-align: left;
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        overflow: hidden;
+        margin-top: 20px;
+    }
+
+    .student-title {
+        background: #f8fafc;
+        padding: 16px 20px;
+        font-size: 18px;
+        font-weight: bold;
+        color: #1e3a8a;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .details {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .detail {
+        padding: 18px 20px;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .detail:nth-child(odd) {
+        border-right: 1px solid #e5e7eb;
+    }
+
+    .label {
+        font-size: 13px;
+        color: #6b7280;
+        margin-bottom: 5px;
+    }
+
+    .value {
+        font-size: 16px;
+        font-weight: bold;
+        color: #111827;
+    }
+
+    .status {
+        display: inline-block;
+        padding: 7px 16px;
+        border-radius: 20px;
+        background: #dcfce7;
+        color: #15803d;
+        font-size: 14px;
+        font-weight: bold;
+    }
+
+    .buttons {
+        margin-top: 30px;
+    }
+
+    .btn {
+        display: inline-block;
+        text-decoration: none;
+        padding: 13px 25px;
+        border-radius: 8px;
+        font-weight: bold;
+        margin: 5px;
+        transition: 0.2s;
+    }
+
+    .btn-primary {
+        background: #1e3a8a;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: #172554;
+    }
+
+    .btn-secondary {
+        background: #e5e7eb;
+        color: #374151;
+    }
+
+    .btn-secondary:hover {
+        background: #d1d5db;
+    }
+
+    .footer {
+        text-align: center;
+        color: #9ca3af;
+        font-size: 13px;
+        margin-top: 30px;
+    }
+
+    @media (max-width: 600px) {
+        .header {
+            padding: 16px 20px;
+        }
+
+        .container {
+            margin: 25px auto;
+        }
+
+        .success-card {
+            padding: 25px 18px;
+        }
+
+        .details {
+            grid-template-columns: 1fr;
+        }
+
+        .detail:nth-child(odd) {
+            border-right: none;
+        }
+
+        h1 {
+            font-size: 25px;
+        }
+    }
+</style>
+```
+
+</head>
+
+<body>
+
+```
+<header class="header">
+    <div class="logo">📚 Smart Attendance</div>
+    <div class="subtitle">QR Based Attendance System</div>
+</header>
+
+<main class="container">
+
+    <div class="success-card">
+
+        <div class="success-icon">✓</div>
+
+        <h1>Attendance Marked Successfully</h1>
+
+        <p class="message">
+            Student attendance has been recorded successfully.
+        </p>
+
+        <div class="student-card">
+
+            <div class="student-title">
+                Student Attendance Details
+            </div>
+
+            <div class="details">
+
+                <div class="detail">
+                    <div class="label">Student Name</div>
+                    <div class="value">{{ student.name }}</div>
+                </div>
+
+                <div class="detail">
+                    <div class="label">Roll Number</div>
+                    <div class="value">{{ student.roll_no }}</div>
+                </div>
+
+                <div class="detail">
+                    <div class="label">Course</div>
+                    <div class="value">{{ student.course }}</div>
+                </div>
+
+                <div class="detail">
+                    <div class="label">Year</div>
+                    <div class="value">{{ student.year }}</div>
+                </div>
+
+                <div class="detail">
+                    <div class="label">Date</div>
+                    <div class="value">{{ attendance.date|date:"d M Y" }}</div>
+                </div>
+
+                <div class="detail">
+                    <div class="label">Time</div>
+                    <div class="value">{{ attendance.time|time:"h:i A" }}</div>
+                </div>
+
+                <div class="detail">
+                    <div class="label">Attendance Status</div>
+                    <div class="value">
+                        <span class="status">✓ Present</span>
+                    </div>
+                </div>
+
+                <div class="detail">
+                    <div class="label">Attendance Method</div>
+                    <div class="value">QR Code Scan</div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="buttons">
+
+            <a href="/" class="btn btn-primary">
+                📷 Scan Another QR
+            </a>
+
+            <a href="/admin/" class="btn btn-secondary">
+                ⚙ Admin Panel
+            </a>
+
+        </div>
+
+    </div>
+
+    <div class="footer">
+        Smart Attendance System © 2026
+    </div>
+
+</main>
+```
+
+</body>
+</html>
