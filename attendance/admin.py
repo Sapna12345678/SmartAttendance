@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Student, AttendanceSession, Attendance
+from .models import Student, Subject, AttendanceSession, Attendance
 
 
 # ============================================================
@@ -14,6 +14,9 @@ class StudentAdmin(admin.ModelAdmin):
         "roll_no",
         "course",
         "year",
+        "branch",
+        "section",
+        "semester",
         "email",
         "phone",
     )
@@ -22,6 +25,8 @@ class StudentAdmin(admin.ModelAdmin):
         "name",
         "roll_no",
         "course",
+        "branch",
+        "section",
         "email",
         "phone",
     )
@@ -29,10 +34,47 @@ class StudentAdmin(admin.ModelAdmin):
     list_filter = (
         "course",
         "year",
+        "branch",
+        "section",
+        "semester",
     )
 
     ordering = (
         "roll_no",
+    )
+
+
+# ============================================================
+# SUBJECT ADMIN
+# ============================================================
+
+@admin.register(Subject)
+class SubjectAdmin(admin.ModelAdmin):
+
+    list_display = (
+        "code",
+        "name",
+        "branch",
+        "semester",
+        "active",
+        "created_at",
+    )
+
+    search_fields = (
+        "name",
+        "code",
+        "branch",
+    )
+
+    list_filter = (
+        "branch",
+        "semester",
+        "active",
+    )
+
+    ordering = (
+        "code",
+        "name",
     )
 
 
@@ -45,6 +87,11 @@ class AttendanceSessionAdmin(admin.ModelAdmin):
 
     list_display = (
         "session_id",
+        "subject",
+        "teacher",
+        "branch",
+        "section",
+        "semester",
         "created_at",
         "expires_at",
         "active",
@@ -52,10 +99,21 @@ class AttendanceSessionAdmin(admin.ModelAdmin):
 
     list_filter = (
         "active",
+        "branch",
+        "section",
+        "semester",
+        "subject",
     )
 
     search_fields = (
         "session_id",
+        "subject__name",
+        "subject__code",
+        "teacher__username",
+    )
+
+    ordering = (
+        "-created_at",
     )
 
 
@@ -68,6 +126,7 @@ class AttendanceAdmin(admin.ModelAdmin):
 
     list_display = (
         "student",
+        "subject",
         "date",
         "time",
         "status",
@@ -77,12 +136,15 @@ class AttendanceAdmin(admin.ModelAdmin):
     list_filter = (
         "status",
         "location_verified",
+        "subject",
         "date",
     )
 
     search_fields = (
         "student__name",
         "student__roll_no",
+        "subject__name",
+        "subject__code",
     )
 
     ordering = (
