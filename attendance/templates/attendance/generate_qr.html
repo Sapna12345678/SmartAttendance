@@ -620,8 +620,8 @@ html
                 <div class="mb-4">
 
                     <img
-                        src="{{ qr_image_url }}"
-                        alt="Attendance QR Code"
+                         src="{{ qr_image_base64 }}"   
+                         alt="Attendance QR Code"   
                         class="qr-image"
                         id="qrImage"
                     >
@@ -674,7 +674,7 @@ html
 
 
                     <a
-                        href="{{ qr_image_url }}"
+                        href="{{ qr_image_base64 }}"
                         download="{{ filename }}"
                         class="btn btn-outline-primary"
                     >

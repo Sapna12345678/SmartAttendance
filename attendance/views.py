@@ -1,11 +1,14 @@
 # =========================================================
 # SMART ATTENDANCE - VIEWS.PY
+# PART 1
 # =========================================================
 
 import os
+import base64
 import json
 import math
 import uuid
+from io import BytesIO
 
 import qrcode
 
@@ -31,7 +34,7 @@ from .models import (
 
 
 # =========================================================
-# TEACHER AUTHENTICATION
+# TEACHER LOGIN CHECK
 # =========================================================
 
 def teacher_required(view_func):
@@ -64,20 +67,10 @@ def home(request):
 
 def teacher_login(request):
 
-    if request.session.get("teacher_logged_in"):
-        return redirect("teacher_dashboard")
-
     if request.method == "POST":
 
-        username = request.POST.get(
-            "username",
-            ""
-        ).strip()
-
-        password = request.POST.get(
-            "password",
-            ""
-        )
+        username = request.POST.get("username", "").strip()
+        password = request.POST.get("password", "")
 
         user = authenticate(
             request,
@@ -87,18 +80,14 @@ def teacher_login(request):
 
         if user is not None:
 
+            request.session["teacher_logged_in"] = True
+
             login(
                 request,
                 user
             )
 
-            request.session[
-                "teacher_logged_in"
-            ] = True
-
-            return redirect(
-                "teacher_dashboard"
-            )
+            return redirect("teacher_dashboard")
 
         messages.error(
             request,
@@ -150,83 +139,70 @@ def teacher_dashboard(request):
         status="Absent"
     ).count()
 
-    total_today = (
-        present_today +
-        absent_today
+    if total_attendance > 0:
+
+        attendance_percentage = round(
+            (
+                Attendance.objects.filter(
+                    status="Present"
+                ).count()
+                / total_attendance
+            ) * 100,
+            2
+        )
+
+    else:
+
+        attendance_percentage = 0
+
+    active_sessions = AttendanceSession.objects.filter(
+        active=True
+    ).count()
+
+    recent_attendance = Attendance.objects.select_related(
+        "student",
+        "subject"
+    ).order_by(
+        "-date",
+        "-time"
+    )[:10]
+
+    active_subjects = Subject.objects.filter(
+        active=True
+    ).order_by(
+        "code"
     )
 
-    attendance_percentage = (
-        round(
-            (present_today / total_today) * 100,
-            1
-        )
-        if total_today > 0
-        else 0
+    students = Student.objects.all().order_by(
+        "roll_no"
     )
 
-    now = timezone.now()
+    context = {
 
-    active_sessions = (
-        AttendanceSession.objects
-        .filter(
-            active=True,
-            expires_at__gt=now
-        )
-        .select_related(
-            "subject",
-            "teacher"
-        )
-        .order_by(
-            "-created_at"
-        )
-    )
+        "total_students": total_students,
 
-    recent_attendance = (
-        Attendance.objects
-        .select_related(
-            "student",
-            "subject"
-        )
-        .order_by(
-            "-date",
-            "-time"
-        )[:10]
-    )
+        "total_attendance": total_attendance,
 
-    subjects = (
-        Subject.objects
-        .filter(
-            active=True
-        )
-        .order_by(
-            "name"
-        )
-    )
+        "present_today": present_today,
 
-    students = (
-        Student.objects
-        .all()
-        .order_by(
-            "roll_no"
-        )
-    )
+        "absent_today": absent_today,
+
+        "attendance_percentage": attendance_percentage,
+
+        "active_sessions": active_sessions,
+
+        "recent_attendance": recent_attendance,
+
+        "active_subjects": active_subjects,
+
+        "students": students,
+
+    }
 
     return render(
         request,
         "attendance/teacher_dashboard.html",
-        {
-            "total_students": total_students,
-            "total_attendance": total_attendance,
-            "present_today": present_today,
-            "absent_today": absent_today,
-            "attendance_percentage": attendance_percentage,
-            "active_sessions": active_sessions,
-            "active_qr_count": active_sessions.count(),
-            "recent_attendance": recent_attendance,
-            "subjects": subjects,
-            "students": students,
-            "today": today,
-        }
+        context
     )
 
 
@@ -237,12 +213,8 @@ def teacher_dashboard(request):
 @teacher_required
 def students_page(request):
 
-    students = (
-        Student.objects
-        .all()
-        .order_by(
-            "roll_no"
-        )
+    students = Student.objects.all().order_by(
+        "roll_no"
     )
 
     return render(
@@ -255,70 +227,59 @@ def students_page(request):
 
 
 # =========================================================
-# GET CURRENT PUBLIC CLOUDFLARE HOST
+# GET PUBLIC HOST
 # =========================================================
 
 def get_public_host():
 
-    url_file = os.path.join(
+    cloudflare_file = os.path.join(
         settings.BASE_DIR,
         "cloudflare_url.txt"
     )
 
-    try:
+    if os.path.exists(cloudflare_file):
 
-        with open(
-            url_file,
-            "r",
-            encoding="utf-8"
-        ) as file:
+        try:
 
-            host = file.read().strip()
+            with open(
+                cloudflare_file,
+                "r",
+                encoding="utf-8"
+            ) as f:
 
-        if host.startswith("https://"):
+                host = f.read().strip()
 
-            host = host[len("https://"):]
+            host = host.replace(
+                "https://",
+                ""
+            ).replace(
+                "http://",
+                ""
+            ).rstrip("/")
 
-        elif host.startswith("http://"):
+            if host:
 
-            host = host[len("http://"):]
+                return host
 
-        host = host.rstrip("/")
+        except Exception:
 
-        if host:
-            return host
+            pass
 
-    except (
-        FileNotFoundError,
-        OSError
-    ):
-
-        pass
-
-    fallback_host = getattr(
+    return getattr(
         settings,
         "SMART_ATTENDANCE_HOST",
         "127.0.0.1:8000"
-    )
-
-    fallback_host = (
-        fallback_host
-        .replace(
-            "https://",
-            ""
-        )
-        .replace(
-            "http://",
-            ""
-        )
-        .rstrip("/")
-    )
-
-    return fallback_host
+    ).replace(
+        "https://",
+        ""
+    ).replace(
+        "http://",
+        ""
+    ).rstrip("/")
 
 
 # =========================================================
-# CALCULATE GPS DISTANCE
+# CALCULATE DISTANCE
 # =========================================================
 
 def calculate_distance(
@@ -328,21 +289,7 @@ def calculate_distance(
     lon2
 ):
 
-    try:
-
-        lat1 = float(lat1)
-        lon1 = float(lon1)
-        lat2 = float(lat2)
-        lon2 = float(lon2)
-
-    except (
-        TypeError,
-        ValueError
-    ):
-
-        return None
-
-    earth_radius = 6371000
+    radius = 6371000
 
     phi1 = math.radians(lat1)
     phi2 = math.radians(lat2)
@@ -370,11 +317,11 @@ def calculate_distance(
         math.sqrt(1 - a)
     )
 
-    return earth_radius * c
+    return radius * c
 
 
 # =========================================================
-# REQUEST DATA
+# GET REQUEST DATA
 # =========================================================
 
 def get_request_data(request):
@@ -383,21 +330,13 @@ def get_request_data(request):
 
         try:
 
-            body = request.body.decode(
-                "utf-8"
+            return json.loads(
+                request.body.decode("utf-8")
             )
 
-            if body:
-                return json.loads(body)
-
-        except (
-            json.JSONDecodeError,
-            UnicodeDecodeError
-        ):
+        except Exception:
 
             return {}
-
-        return {}
 
     return request.POST
 
@@ -411,35 +350,35 @@ def generate_qr(request):
 
     if request.method != "GET":
 
-        return redirect(
-            "generate_qr"
+        return JsonResponse(
+            {
+                "error": "Only GET method is allowed."
+            },
+            status=405
         )
 
-    subjects = (
-        Subject.objects
-        .filter(
-            active=True
-        )
-        .order_by(
-            "name"
-        )
+    subjects = Subject.objects.filter(
+        active=True
+    ).order_by(
+        "code"
     )
 
-    subject_id = request.GET.get(
-        "subject"
-    )
+    selected_subject = request.GET.get(
+        "subject",
+        ""
+    ).strip()
 
-    branch = request.GET.get(
+    selected_branch = request.GET.get(
         "branch",
         ""
     ).strip()
 
-    section = request.GET.get(
+    selected_section = request.GET.get(
         "section",
         ""
     ).strip()
 
-    semester_raw = request.GET.get(
+    selected_semester = request.GET.get(
         "semester",
         ""
     ).strip()
@@ -449,55 +388,13 @@ def generate_qr(request):
         "60"
     ).strip()
 
-    # -----------------------------------------------------
-    # NO SUBJECT SELECTED
-    # -----------------------------------------------------
-
-    if not subject_id:
-
-        return render(
-            request,
-            "attendance/generate_qr.html",
-            {
-                "subjects": subjects,
-            }
-        )
-
-    # -----------------------------------------------------
-    # GET SUBJECT
-    # -----------------------------------------------------
-
-    try:
-
-        subject = subjects.get(
-            id=subject_id
-        )
-
-    except Subject.DoesNotExist:
-
-        return render(
-            request,
-            "attendance/generate_qr.html",
-            {
-                "subjects": subjects,
-                "error": "Invalid subject selected.",
-            }
-        )
-
-    # -----------------------------------------------------
-    # QR DURATION
-    # -----------------------------------------------------
-
     try:
 
         duration = int(
             duration_raw
         )
 
-    except (
-        ValueError,
-        TypeError
-    ):
+    except Exception:
 
         duration = 60
 
@@ -509,40 +406,62 @@ def generate_qr(request):
         )
     )
 
-    # -----------------------------------------------------
-    # SEMESTER
-    # -----------------------------------------------------
+    subject_obj = None
 
-    semester = None
-
-    if semester_raw:
+    if selected_subject:
 
         try:
 
-            semester = int(
-                semester_raw
+            subject_obj = Subject.objects.get(
+                id=int(selected_subject),
+                active=True
             )
 
         except (
             ValueError,
-            TypeError
+            TypeError,
+            Subject.DoesNotExist
         ):
 
-            semester = None
+            try:
 
-    if not branch:
+                subject_obj = Subject.objects.get(
+                    code=selected_subject,
+                    active=True
+                )
 
-        branch = (
-            subject.branch
-            or ""
-        )
+            except Subject.DoesNotExist:
 
-    if semester is None:
+                subject_obj = None
 
-        semester = subject.semester
+    if subject_obj:
+
+        if not selected_branch:
+
+            selected_branch = (
+                subject_obj.branch or ""
+            )
+
+        if not selected_semester:
+
+            selected_semester = (
+                subject_obj.semester or ""
+            )
+
+    if not selected_branch:
+
+        selected_branch = "mca"
+
+    if not selected_section:
+
+        selected_section = "b"
+
+    if not selected_semester:
+
+        selected_semester = "Semester 3"
 
     # -----------------------------------------------------
-    # DEACTIVATE PREVIOUS QR SESSIONS
+    # DEACTIVATE PREVIOUS ACTIVE SESSIONS
     # -----------------------------------------------------
 
     AttendanceSession.objects.filter(
@@ -555,26 +474,38 @@ def generate_qr(request):
     # CREATE NEW SESSION
     # -----------------------------------------------------
 
-    expires_at = (
-        timezone.now()
-        +
-        timedelta(
-            seconds=duration
-        )
+    now = timezone.now()
+
+    expires_at = now + timedelta(
+        seconds=duration
     )
 
     session = AttendanceSession.objects.create(
-        subject=subject,
-        teacher=request.user,
-        branch=branch or None,
-        section=section or None,
-        semester=semester,
+
+        subject=subject_obj,
+
+        teacher=(
+            request.user
+            if request.user.is_authenticated
+            else None
+        ),
+
+        branch=selected_branch,
+
+        section=selected_section,
+
+        semester=selected_semester,
+
+        created_at=now,
+
         expires_at=expires_at,
+
         active=True,
+
     )
 
     # -----------------------------------------------------
-    # PUBLIC CLOUDFLARE HOST
+    # PUBLIC SCAN URL
     # -----------------------------------------------------
 
     host = get_public_host()
@@ -585,38 +516,19 @@ def generate_qr(request):
     )
 
     # -----------------------------------------------------
-    # QR DIRECTORY
-    # -----------------------------------------------------
-
-    qr_dir = os.path.join(
-        settings.MEDIA_ROOT,
-        "qr_codes"
-    )
-
-    os.makedirs(
-        qr_dir,
-        exist_ok=True
-    )
-
-    filename = (
-        f"attendance_qr_"
-        f"{session.session_id}.png"
-    )
-
-    qr_file_path = os.path.join(
-        qr_dir,
-        filename
-    )
-
-    # -----------------------------------------------------
-    # CREATE QR
+    # QR CODE
     # -----------------------------------------------------
 
     qr = qrcode.QRCode(
+
         version=1,
+
         error_correction=qrcode.constants.ERROR_CORRECT_H,
+
         box_size=10,
+
         border=4,
+
     )
 
     qr.add_data(
@@ -629,45 +541,98 @@ def generate_qr(request):
 
     qr_image = qr.make_image()
 
+    # -----------------------------------------------------
+    # SAVE QR FILE
+    # -----------------------------------------------------
+
+    qr_directory = os.path.join(
+
+        settings.MEDIA_ROOT,
+
+        "qr_codes"
+
+    )
+
+    os.makedirs(
+        qr_directory,
+        exist_ok=True
+    )
+
+    filename = (
+        f"attendance_qr_"
+        f"{session.session_id}.png"
+    )
+
+    qr_file_path = os.path.join(
+
+        qr_directory,
+
+        filename
+
+    )
+
     qr_image.save(
         qr_file_path
     )
 
     # -----------------------------------------------------
-    # QR IMAGE URL
+    # BASE64 QR IMAGE
     # -----------------------------------------------------
 
-    qr_image_url = (
-        settings.MEDIA_URL
+    buffer = BytesIO()
+
+    qr_image.save(
+        buffer,
+        format="PNG"
+    )
+
+    qr_image_base64 = (
+
+        "data:image/png;base64,"
+
         +
-        "qr_codes/"
-        +
-        filename
+
+        base64.b64encode(
+            buffer.getvalue()
+        ).decode("utf-8")
+
     )
 
     # -----------------------------------------------------
-    # RETURN PAGE
+    # CONTEXT
     # -----------------------------------------------------
+
+    context = {
+
+        "subjects": subjects,
+
+        "session": session,
+
+        "scan_url": scan_url,
+
+        "qr_image_base64": qr_image_base64,
+
+        "duration": duration,
+
+        "selected_subject": selected_subject,
+
+        "selected_branch": selected_branch,
+
+        "selected_section": selected_section,
+
+        "selected_semester": selected_semester,
+
+    }
 
     return render(
-        request,
-        "attendance/generate_qr.html",
-        {
-            "session": session,
-            "subjects": subjects,
-            "scan_url": scan_url,
-            "qr_image_url": qr_image_url,
-            "filename": filename,
-            "selected_subject": str(
-                subject.id
-            ),
-            "selected_branch": branch,
-            "selected_section": section,
-            "selected_semester": semester,
-            "selected_duration": duration,
-        }
-    )
 
+        request,
+
+        "attendance/generate_qr.html",
+
+        context
+
+    )
 
 # =========================================================
 # PROJECTOR
@@ -676,40 +641,35 @@ def generate_qr(request):
 @teacher_required
 def projector(request):
 
-    now = timezone.now()
+    session_id = request.GET.get(
+        "session",
+        ""
+    ).strip()
 
-    session = (
-        AttendanceSession.objects
-        .filter(
-            active=True,
-            expires_at__gt=now
-        )
-        .select_related(
-            "subject"
-        )
-        .order_by(
-            "-created_at"
-        )
-        .first()
-    )
+    session = None
 
-    scan_url = None
+    if session_id:
 
-    if session:
+        try:
 
-        host = get_public_host()
+            session = AttendanceSession.objects.select_related(
+                "subject"
+            ).get(
+                session_id=uuid.UUID(session_id)
+            )
 
-        scan_url = (
-            f"https://{host}/scan/"
-            f"?session={session.session_id}"
-        )
+        except (
+            ValueError,
+            AttendanceSession.DoesNotExist
+        ):
+
+            session = None
 
     return render(
         request,
         "attendance/projector.html",
         {
-            "session": session,
-            "scan_url": scan_url,
+            "session": session
         }
     )
 
@@ -721,255 +681,132 @@ def projector(request):
 def scan_qr(request):
 
     session_id = request.GET.get(
-        "session"
-    )
-
-    wants_data = (
-        request.GET.get("data") == "1"
-    )
-
-    # -----------------------------------------------------
-    # SESSION ID REQUIRED
-    # -----------------------------------------------------
+        "session",
+        ""
+    ).strip()
 
     if not session_id:
 
-        if wants_data:
-
-            return JsonResponse(
-                {
-                    "success": False,
-                    "message": "Invalid Attendance QR.",
-                },
-                status=400
-            )
-
-        return render(
-            request,
-            "attendance/scan.html",
+        return JsonResponse(
             {
-                "error": "Invalid Attendance QR.",
-                "session_data": None,
-            }
+                "valid": False,
+                "error": "Session ID is missing."
+            },
+            status=400
         )
-
-    # -----------------------------------------------------
-    # UUID VALIDATION
-    # -----------------------------------------------------
 
     try:
 
         session_uuid = uuid.UUID(
-            str(session_id)
+            session_id
         )
 
-    except (
-        ValueError,
-        AttributeError
-    ):
+    except ValueError:
 
-        if wants_data:
-
-            return JsonResponse(
-                {
-                    "success": False,
-                    "message": "Invalid Attendance QR.",
-                },
-                status=400
-            )
-
-        return render(
-            request,
-            "attendance/scan.html",
+        return JsonResponse(
             {
-                "error": "Invalid Attendance QR.",
-                "session_data": None,
-            }
+                "valid": False,
+                "error": "Invalid session ID."
+            },
+            status=400
         )
-
-    # -----------------------------------------------------
-    # GET SESSION
-    # -----------------------------------------------------
 
     try:
 
-        session = (
-            AttendanceSession.objects
-            .select_related(
-                "subject"
-            )
-            .get(
-                session_id=session_uuid
-            )
+        session = AttendanceSession.objects.select_related(
+            "subject"
+        ).get(
+            session_id=session_uuid
         )
 
     except AttendanceSession.DoesNotExist:
 
-        if wants_data:
-
-            return JsonResponse(
-                {
-                    "success": False,
-                    "message": (
-                        "Attendance session not found."
-                    ),
-                },
-                status=404
-            )
-
-        return render(
-            request,
-            "attendance/scan.html",
+        return JsonResponse(
             {
-                "error": (
-                    "Attendance session not found."
-                ),
-                "session_data": None,
-            }
+                "valid": False,
+                "error": "Attendance session not found."
+            },
+            status=404
         )
 
-    # -----------------------------------------------------
-    # ACTIVE CHECK
-    # -----------------------------------------------------
+    now = timezone.now()
 
     if not session.active:
 
-        if wants_data:
-
-            return JsonResponse(
-                {
-                    "success": False,
-                    "message": (
-                        "This attendance QR "
-                        "is no longer active."
-                    ),
-                },
-                status=400
-            )
-
-        return render(
-            request,
-            "attendance/scan.html",
+        return JsonResponse(
             {
-                "error": (
-                    "This attendance QR "
-                    "is no longer active."
-                ),
-                "session": session,
-                "session_data": None,
-            }
+                "valid": False,
+                "error": "Attendance session is no longer active."
+            },
+            status=400
         )
 
-    # -----------------------------------------------------
-    # EXPIRY CHECK
-    # -----------------------------------------------------
-
-    if timezone.now() >= session.expires_at:
+    if session.expires_at <= now:
 
         session.active = False
-
         session.save(
-            update_fields=[
-                "active"
-            ]
+            update_fields=["active"]
         )
-
-        if wants_data:
-
-            return JsonResponse(
-                {
-                    "success": False,
-                    "message": (
-                        "QR expired. "
-                        "Please scan a fresh QR."
-                    ),
-                },
-                status=400
-            )
-
-        return render(
-            request,
-            "attendance/scan.html",
-            {
-                "error": (
-                    "QR expired. "
-                    "Please scan a fresh QR."
-                ),
-                "session": session,
-                "session_data": None,
-            }
-        )
-
-    # =====================================================
-    # SESSION DATA FOR JAVASCRIPT
-    # =====================================================
-
-    subject_name = "General"
-
-    if session.subject:
-
-        subject_name = (
-            session.subject.name
-        )
-
-    session_data = {
-        "success": True,
-        "session_id": str(
-            session.session_id
-        ),
-        "subject": subject_name,
-        "branch": (
-            session.branch
-            or ""
-        ),
-        "section": (
-            session.section
-            or ""
-        ),
-        "semester": (
-            session.semester
-            if session.semester is not None
-            else ""
-        ),
-        "created_at": (
-            session.created_at.isoformat()
-            if session.created_at
-            else ""
-        ),
-        "expires_at": (
-            session.expires_at.isoformat()
-            if session.expires_at
-            else ""
-        ),
-        "active": session.active,
-    }
-
-    # =====================================================
-    # JSON DATA REQUEST
-    #
-    # /scan/?session=UUID&data=1
-    # =====================================================
-
-    if wants_data:
 
         return JsonResponse(
-            session_data
+            {
+                "valid": False,
+                "error": "Attendance QR has expired."
+            },
+            status=400
         )
 
     # -----------------------------------------------------
-    # LOGIN CHECK
+    # JSON CHECK
+    # -----------------------------------------------------
+
+    if request.GET.get("data") == "1":
+
+        remaining = int(
+            max(
+                0,
+                (
+                    session.expires_at - now
+                ).total_seconds()
+            )
+        )
+
+        return JsonResponse(
+            {
+                "valid": True,
+
+                "session_id": str(
+                    session.session_id
+                ),
+
+                "subject": (
+                    str(session.subject)
+                    if session.subject
+                    else ""
+                ),
+
+                "branch": session.branch,
+
+                "section": session.section,
+
+                "semester": session.semester,
+
+                "expires_at": session.expires_at.isoformat(),
+
+                "remaining_seconds": remaining,
+
+            }
+        )
+
+    # -----------------------------------------------------
+    # STUDENT LOGIN
     # -----------------------------------------------------
 
     if not request.user.is_authenticated:
 
-        login_url = (
-            "/accounts/login/"
-            f"?next=/scan/"
-            f"?session={session.session_id}"
-        )
-
         return redirect(
-            login_url
+            "/accounts/login/?next="
+            + request.get_full_path()
         )
 
     # -----------------------------------------------------
@@ -978,9 +815,7 @@ def scan_qr(request):
 
     try:
 
-        student = (
-            request.user.student_profile
-        )
+        student = request.user.student_profile
 
     except Student.DoesNotExist:
 
@@ -989,26 +824,19 @@ def scan_qr(request):
             "attendance/scan.html",
             {
                 "session": session,
-                "student": None,
-                "session_data": session_data,
                 "error": (
-                    "Student profile not found."
-                ),
+                    "Student profile is not connected "
+                    "with this account."
+                )
             }
         )
-
-    # -----------------------------------------------------
-    # RENDER SCAN PAGE
-    # -----------------------------------------------------
 
     return render(
         request,
         "attendance/scan.html",
         {
             "session": session,
-            "student": student,
-            "session_data": session_data,
-            "error": None,
+            "student": student
         }
     )
 
@@ -1025,7 +853,7 @@ def mark_attendance(request):
         return JsonResponse(
             {
                 "success": False,
-                "message": "POST request required."
+                "error": "Only POST method is allowed."
             },
             status=405
         )
@@ -1034,75 +862,48 @@ def mark_attendance(request):
         request
     )
 
-    session_id = data.get(
-        "session_id"
-    )
-
-    latitude = data.get(
-        "latitude"
-    )
-
-    longitude = data.get(
-        "longitude"
-    )
-
-    accuracy = data.get(
-        "accuracy"
-    )
-
-    # -----------------------------------------------------
-    # SESSION ID
-    # -----------------------------------------------------
+    session_id = str(
+        data.get(
+            "session",
+            data.get(
+                "session_id",
+                ""
+            )
+        )
+    ).strip()
 
     if not session_id:
 
         return JsonResponse(
             {
                 "success": False,
-                "message": (
-                    "Session ID is required."
-                )
+                "error": "Session ID is required."
             },
             status=400
         )
-
-    # -----------------------------------------------------
-    # UUID
-    # -----------------------------------------------------
 
     try:
 
         session_uuid = uuid.UUID(
-            str(session_id)
+            session_id
         )
 
-    except (
-        ValueError,
-        AttributeError
-    ):
+    except ValueError:
 
         return JsonResponse(
             {
                 "success": False,
-                "message": "Invalid session ID."
+                "error": "Invalid session ID."
             },
             status=400
         )
 
-    # -----------------------------------------------------
-    # GET SESSION
-    # -----------------------------------------------------
-
     try:
 
-        session = (
-            AttendanceSession.objects
-            .select_related(
-                "subject"
-            )
-            .get(
-                session_id=session_uuid
-            )
+        session = AttendanceSession.objects.select_related(
+            "subject"
+        ).get(
+            session_id=session_uuid
         )
 
     except AttendanceSession.DoesNotExist:
@@ -1110,206 +911,230 @@ def mark_attendance(request):
         return JsonResponse(
             {
                 "success": False,
-                "message": (
-                    "Attendance session not found."
-                )
+                "error": "Attendance session not found."
             },
             status=404
         )
 
     # -----------------------------------------------------
-    # ACTIVE CHECK
+    # SESSION VALIDATION
     # -----------------------------------------------------
+
+    now = timezone.now()
 
     if not session.active:
 
         return JsonResponse(
             {
                 "success": False,
-                "message": (
-                    "This QR session is inactive."
-                )
+                "error": "Attendance session is inactive."
             },
             status=400
         )
 
-    # -----------------------------------------------------
-    # EXPIRY CHECK
-    # -----------------------------------------------------
-
-    if timezone.now() >= session.expires_at:
+    if session.expires_at <= now:
 
         session.active = False
 
         session.save(
-            update_fields=[
-                "active"
-            ]
+            update_fields=["active"]
         )
 
         return JsonResponse(
             {
                 "success": False,
-                "message": (
-                    "QR expired. "
-                    "Please scan a fresh QR."
-                )
+                "error": "Attendance QR has expired."
             },
             status=400
         )
 
     # -----------------------------------------------------
-    # STUDENT
+    # STUDENT PROFILE
     # -----------------------------------------------------
 
     try:
 
-        student = (
-            request.user.student_profile
-        )
+        student = request.user.student_profile
 
     except Student.DoesNotExist:
 
         return JsonResponse(
             {
                 "success": False,
-                "message": (
-                    "Student profile not found."
-                )
+                "error": "Student profile not found."
             },
             status=400
         )
 
-    # =====================================================
+    # -----------------------------------------------------
     # BRANCH CHECK
-    # =====================================================
+    # -----------------------------------------------------
 
-    if session.branch:
+    if (
+        session.branch
+        and student.branch
+        and session.branch.lower()
+        != student.branch.lower()
+    ):
 
-        if (
-            not student.branch
-            or
-            student.branch.lower()
-            != session.branch.lower()
-        ):
+        Attendance.objects.create(
 
-            return JsonResponse(
-                {
-                    "success": False,
-                    "message": (
-                        "Your branch does not "
-                        "match this attendance session."
-                    )
-                },
-                status=403
-            )
-
-    # =====================================================
-    # SECTION CHECK
-    # =====================================================
-
-    if session.section:
-
-        if (
-            not student.section
-            or
-            student.section.lower()
-            != session.section.lower()
-        ):
-
-            return JsonResponse(
-                {
-                    "success": False,
-                    "message": (
-                        "Your section does not "
-                        "match this attendance session."
-                    )
-                },
-                status=403
-            )
-
-    # =====================================================
-    # SEMESTER CHECK
-    # =====================================================
-
-    if session.semester is not None:
-
-        if student.semester != session.semester:
-
-            return JsonResponse(
-                {
-                    "success": False,
-                    "message": (
-                        "Your semester does not "
-                        "match this attendance session."
-                    )
-                },
-                status=403
-            )
-
-    # =====================================================
-    # DUPLICATE CHECK
-    # =====================================================
-
-    already_marked = (
-        Attendance.objects
-        .filter(
             student=student,
-            session_id=session.session_id
+
+            session_id=session.session_id,
+
+            subject=session.subject,
+
+            date=timezone.localdate(),
+
+            time=timezone.localtime().time(),
+
+            status="Absent",
+
+            location_verified=False,
+
         )
-        .exists()
-    )
+
+        return JsonResponse(
+            {
+                "success": False,
+                "status": "Absent",
+                "error": "Branch does not match."
+            },
+            status=403
+        )
+
+    # -----------------------------------------------------
+    # SECTION CHECK
+    # -----------------------------------------------------
+
+    if (
+        session.section
+        and student.section
+        and session.section.lower()
+        != student.section.lower()
+    ):
+
+        Attendance.objects.create(
+
+            student=student,
+
+            session_id=session.session_id,
+
+            subject=session.subject,
+
+            date=timezone.localdate(),
+
+            time=timezone.localtime().time(),
+
+            status="Absent",
+
+            location_verified=False,
+
+        )
+
+        return JsonResponse(
+            {
+                "success": False,
+                "status": "Absent",
+                "error": "Section does not match."
+            },
+            status=403
+        )
+
+    # -----------------------------------------------------
+    # SEMESTER CHECK
+    # -----------------------------------------------------
+
+    if (
+        session.semester
+        and student.semester
+        and session.semester.lower()
+        != student.semester.lower()
+    ):
+
+        Attendance.objects.create(
+
+            student=student,
+
+            session_id=session.session_id,
+
+            subject=session.subject,
+
+            date=timezone.localdate(),
+
+            time=timezone.localtime().time(),
+
+            status="Absent",
+
+            location_verified=False,
+
+        )
+
+        return JsonResponse(
+            {
+                "success": False,
+                "status": "Absent",
+                "error": "Semester does not match."
+            },
+            status=403
+        )
+
+    # -----------------------------------------------------
+    # DUPLICATE ATTENDANCE CHECK
+    # -----------------------------------------------------
+
+    already_marked = Attendance.objects.filter(
+        student=student,
+        session_id=session.session_id
+    ).exists()
 
     if already_marked:
 
         return JsonResponse(
             {
                 "success": False,
-                "message": (
-                    "Attendance already marked "
-                    "for this session."
-                )
-            },
-            status=409
-        )
-
-    # =====================================================
-    # GPS DATA
-    # =====================================================
-
-    try:
-
-        latitude = float(
-            latitude
-        )
-
-        longitude = float(
-            longitude
-        )
-
-    except (
-        TypeError,
-        ValueError
-    ):
-
-        return JsonResponse(
-            {
-                "success": False,
-                "message": (
-                    "Unable to detect your location."
-                )
+                "error": "Attendance already marked."
             },
             status=400
         )
 
     # -----------------------------------------------------
-    # GPS ACCURACY
+    # GET GPS DATA
     # -----------------------------------------------------
+
+    latitude_raw = data.get(
+        "latitude",
+        data.get(
+            "lat",
+            ""
+        )
+    )
+
+    longitude_raw = data.get(
+        "longitude",
+        data.get(
+            "lon",
+            data.get(
+                "lng",
+                ""
+            )
+        )
+    )
+
+    accuracy_raw = data.get(
+        "accuracy",
+        ""
+    )
 
     try:
 
-        accuracy_value = float(
-            accuracy
+        latitude = float(
+            latitude_raw
+        )
+
+        longitude = float(
+            longitude_raw
         )
 
     except (
@@ -1317,371 +1142,264 @@ def mark_attendance(request):
         ValueError
     ):
 
-        accuracy_value = None
+        return JsonResponse(
+            {
+                "success": False,
+                "error": (
+                    "Location could not be detected. "
+                    "Please allow GPS permission."
+                )
+            },
+            status=400
+        )
 
-    # -----------------------------------------------------
-    # ACCURACY LIMIT
-    # -----------------------------------------------------
+    accuracy = None
 
-    if (
-        accuracy_value is not None
-        and
-        accuracy_value > 500
+    if accuracy_raw not in (
+        "",
+        None
     ):
+
+        try:
+
+            accuracy = float(
+                accuracy_raw
+            )
+
+        except (
+            TypeError,
+            ValueError
+        ):
+
+            accuracy = None
+
+    # -----------------------------------------------------
+    # GPS ACCURACY CHECK
+    # -----------------------------------------------------
+
+    if accuracy is not None and accuracy > 500:
 
         return JsonResponse(
             {
                 "success": False,
-                "message": (
+                "error": (
                     "GPS accuracy is too low. "
-                    "Please enable precise location "
+                    "Please move to an open area "
                     "and try again."
                 )
             },
             status=400
         )
 
-    # =====================================================
-    # COLLEGE GPS SETTINGS
-    # =====================================================
+    # -----------------------------------------------------
+    # COLLEGE LOCATION
+    # -----------------------------------------------------
 
-    college_latitude = getattr(
-        settings,
-        "ATTENDANCE_LATITUDE",
-        None
-    )
-
-    college_longitude = getattr(
-        settings,
-        "ATTENDANCE_LONGITUDE",
-        None
-    )
-
-    allowed_radius = getattr(
-        settings,
-        "ATTENDANCE_RADIUS_METERS",
-        300
-    )
-
-    if (
-        college_latitude is None
-        or
-        college_longitude is None
-    ):
-
-        return JsonResponse(
-            {
-                "success": False,
-                "message": (
-                    "College GPS location "
-                    "is not configured."
-                )
-            },
-            status=500
+    college_latitude = float(
+        getattr(
+            settings,
+            "ATTENDANCE_LATITUDE",
+            25.342787
         )
+    )
 
-    # =====================================================
-    # CALCULATE DISTANCE
-    # =====================================================
+    college_longitude = float(
+        getattr(
+            settings,
+            "ATTENDANCE_LONGITUDE",
+            81.902116
+        )
+    )
+
+    allowed_radius = float(
+        getattr(
+            settings,
+            "ATTENDANCE_RADIUS_METERS",
+            300
+        )
+    )
+
+    # -----------------------------------------------------
+    # DISTANCE
+    # -----------------------------------------------------
 
     distance = calculate_distance(
+
         latitude,
+
         longitude,
+
         college_latitude,
+
         college_longitude
+
     )
 
-    if distance is None:
-
-        return JsonResponse(
-            {
-                "success": False,
-                "message": (
-                    "Unable to calculate location."
-                )
-            },
-            status=400
-        )
-
-    # =====================================================
-    # OUTSIDE COLLEGE = ABSENT
-    # =====================================================
+    # -----------------------------------------------------
+    # OUTSIDE COLLEGE
+    # -----------------------------------------------------
 
     if distance > allowed_radius:
 
-        attendance = (
-            Attendance.objects.create(
-                student=student,
-                session_id=session.session_id,
-                subject=session.subject,
-                status="Absent",
-                latitude=latitude,
-                longitude=longitude,
-                location_verified=False,
-            )
+        Attendance.objects.create(
+
+            student=student,
+
+            session_id=session.session_id,
+
+            subject=session.subject,
+
+            date=timezone.localdate(),
+
+            time=timezone.localtime().time(),
+
+            status="Absent",
+
+            latitude=latitude,
+
+            longitude=longitude,
+
+            location_verified=False,
+
         )
 
         return JsonResponse(
             {
                 "success": False,
-                "message": (
+
+                "status": "Absent",
+
+                "error": (
                     "You are outside the college "
-                    "attendance area. "
-                    "Attendance marked Absent."
+                    "attendance area."
                 ),
-                "attendance_id": attendance.id,
+
                 "distance": round(
                     distance,
                     2
                 ),
+
                 "allowed_radius": allowed_radius,
-                "location_verified": False,
-                "status": "Absent",
+
             },
             status=403
         )
 
-    # =====================================================
-    # INSIDE COLLEGE = PRESENT
-    # =====================================================
+    # -----------------------------------------------------
+    # PRESENT
+    # -----------------------------------------------------
 
-    attendance = (
-        Attendance.objects.create(
-            student=student,
-            session_id=session.session_id,
-            subject=session.subject,
-            status="Present",
-            latitude=latitude,
-            longitude=longitude,
-            location_verified=True,
-        )
+    attendance = Attendance.objects.create(
+
+        student=student,
+
+        session_id=session.session_id,
+
+        subject=session.subject,
+
+        date=timezone.localdate(),
+
+        time=timezone.localtime().time(),
+
+        status="Present",
+
+        latitude=latitude,
+
+        longitude=longitude,
+
+        location_verified=True,
+
     )
 
     return JsonResponse(
         {
             "success": True,
+
+            "status": "Present",
+
             "message": (
                 "Attendance marked successfully."
             ),
+
             "attendance_id": attendance.id,
+
             "distance": round(
                 distance,
                 2
             ),
-            "allowed_radius": allowed_radius,
-            "location_verified": True,
-            "status": "Present",
+
         }
     )
 
 
 # =========================================================
-# ATTENDANCE LIST / REPORT
+# ATTENDANCE LIST
 # =========================================================
 
 @teacher_required
 def attendance_list(request):
 
-    records = (
-        Attendance.objects
-        .select_related(
-            "student",
-            "subject"
-        )
-        .order_by(
-            "-date",
-            "-time"
-        )
+    attendance_records = Attendance.objects.select_related(
+        "student",
+        "subject"
+    ).order_by(
+        "-date",
+        "-time"
     )
 
-    subject_id = request.GET.get(
-        "subject",
-        ""
-    ).strip()
-
-    student_id = request.GET.get(
-        "student",
-        ""
-    ).strip()
-
-    date_value = request.GET.get(
+    date_filter = request.GET.get(
         "date",
         ""
     ).strip()
 
-    status = request.GET.get(
+    subject_filter = request.GET.get(
+        "subject",
+        ""
+    ).strip()
+
+    status_filter = request.GET.get(
         "status",
         ""
     ).strip()
 
-    search = request.GET.get(
-        "search",
-        ""
-    ).strip()
+    if date_filter:
 
-    # -----------------------------------------------------
-    # SUBJECT FILTER
-    # -----------------------------------------------------
-
-    if subject_id:
-
-        try:
-
-            records = records.filter(
-                subject_id=int(
-                    subject_id
-                )
-            )
-
-        except (
-            ValueError,
-            TypeError
-        ):
-
-            pass
-
-    # -----------------------------------------------------
-    # STUDENT FILTER
-    # -----------------------------------------------------
-
-    if student_id:
-
-        try:
-
-            records = records.filter(
-                student_id=int(
-                    student_id
-                )
-            )
-
-        except (
-            ValueError,
-            TypeError
-        ):
-
-            pass
-
-    # -----------------------------------------------------
-    # DATE FILTER
-    # -----------------------------------------------------
-
-    if date_value:
-
-        records = records.filter(
-            date=date_value
+        attendance_records = attendance_records.filter(
+            date=date_filter
         )
 
-    # -----------------------------------------------------
-    # STATUS FILTER
-    # -----------------------------------------------------
+    if subject_filter:
 
-    if status in [
-        "Present",
-        "Absent"
-    ]:
-
-        records = records.filter(
-            status=status
+        attendance_records = attendance_records.filter(
+            subject_id=subject_filter
         )
 
-    # -----------------------------------------------------
-    # SEARCH
-    # -----------------------------------------------------
+    if status_filter:
 
-    if search:
-
-        records = records.filter(
-            Q(
-                student__name__icontains=search
-            )
-            |
-            Q(
-                student__roll_no__icontains=search
-            )
+        attendance_records = attendance_records.filter(
+            status=status_filter
         )
 
-    # -----------------------------------------------------
-    # STATISTICS
-    # -----------------------------------------------------
-
-    total_students = (
-        records
-        .values(
-            "student_id"
-        )
-        .distinct()
-        .count()
-    )
-
-    present_count = (
-        records
-        .filter(
-            status="Present"
-        )
-        .count()
-    )
-
-    absent_count = (
-        records
-        .filter(
-            status="Absent"
-        )
-        .count()
-    )
-
-    total_records = (
-        present_count +
-        absent_count
-    )
-
-    attendance_percentage = (
-        round(
-            (
-                present_count
-                /
-                total_records
-            ) * 100,
-            1
-        )
-        if total_records > 0
-        else 0
-    )
-
-    subjects = (
-        Subject.objects
-        .filter(
-            active=True
-        )
-        .order_by(
-            "name"
-        )
-    )
-
-    students = (
-        Student.objects
-        .all()
-        .order_by(
-            "roll_no"
-        )
+    subjects = Subject.objects.filter(
+        active=True
+    ).order_by(
+        "code"
     )
 
     return render(
         request,
         "attendance/attendance_list.html",
         {
-            "attendances": records,
-            "records": records,
+            "attendance_records": attendance_records,
+
             "subjects": subjects,
-            "students": students,
-            "selected_subject": subject_id,
-            "selected_student": student_id,
-            "selected_date": date_value,
-            "selected_status": status,
-            "search": search,
-            "total_students": total_students,
-            "present_count": present_count,
-            "absent_count": absent_count,
-            "attendance_percentage": attendance_percentage,
+
+            "selected_date": date_filter,
+
+            "selected_subject": subject_filter,
+
+            "selected_status": status_filter,
+
         }
     )
 
@@ -1695,238 +1413,67 @@ def today_attendance(request):
 
     today = timezone.localdate()
 
-    records = (
-        Attendance.objects
-        .select_related(
-            "student",
-            "subject"
-        )
-        .filter(
-            date=today
-        )
-        .order_by(
-            "-time"
-        )
-    )
-
-    present_count = (
-        records
-        .filter(
-            status="Present"
-        )
-        .count()
-    )
-
-    absent_count = (
-        records
-        .filter(
-            status="Absent"
-        )
-        .count()
-    )
-
-    total_students = (
-        records
-        .values(
-            "student_id"
-        )
-        .distinct()
-        .count()
-    )
-
-    total_records = (
-        present_count +
-        absent_count
-    )
-
-    attendance_percentage = (
-        round(
-            (
-                present_count
-                /
-                total_records
-            ) * 100,
-            1
-        )
-        if total_records > 0
-        else 0
+    records = Attendance.objects.select_related(
+        "student",
+        "subject"
+    ).filter(
+        date=today
+    ).order_by(
+        "-time"
     )
 
     return render(
         request,
-        "attendance/attendance_list.html",
+        "attendance/today_attendance.html",
         {
-            "attendances": records,
             "records": records,
-            "present_count": present_count,
-            "absent_count": absent_count,
-            "total_students": total_students,
-            "attendance_percentage": attendance_percentage,
-            "selected_date": str(
-                today
-            ),
             "today": today,
-            "subjects": (
-                Subject.objects
-                .filter(
-                    active=True
-                )
-                .order_by(
-                    "name"
-                )
-            ),
-            "students": (
-                Student.objects
-                .all()
-                .order_by(
-                    "roll_no"
-                )
-            ),
-            "selected_subject": "",
-            "selected_student": "",
-            "selected_status": "",
-            "search": "",
         }
     )
 
 
 # =========================================================
-# SUBJECT-WISE ATTENDANCE
+# SUBJECT WISE ATTENDANCE
 # =========================================================
 
 @teacher_required
 def subject_wise_attendance(request):
 
-    subjects = (
-        Subject.objects
-        .filter(
-            active=True
-        )
-        .order_by(
-            "name"
-        )
+    subjects = Subject.objects.filter(
+        active=True
+    ).order_by(
+        "code"
     )
 
-    selected_subject_id = (
-        request.GET.get(
+    selected_subject = request.GET.get(
+        "subject",
+        ""
+    ).strip()
+
+    records = Attendance.objects.none()
+
+    if selected_subject:
+
+        records = Attendance.objects.select_related(
+            "student",
             "subject"
+        ).filter(
+            subject_id=selected_subject
+        ).order_by(
+            "-date",
+            "-time"
         )
-    )
-
-    subject = None
-
-    records = (
-        Attendance.objects.none()
-    )
-
-    student_summary = []
-
-    # -----------------------------------------------------
-    # SELECT SUBJECT
-    # -----------------------------------------------------
-
-    if selected_subject_id:
-
-        try:
-
-            subject = subjects.get(
-                id=selected_subject_id
-            )
-
-        except Subject.DoesNotExist:
-
-            subject = None
-
-    # -----------------------------------------------------
-    # SUBJECT RECORDS
-    # -----------------------------------------------------
-
-    if subject:
-
-        records = (
-            Attendance.objects
-            .select_related(
-                "student",
-                "subject"
-            )
-            .filter(
-                subject=subject
-            )
-            .order_by(
-                "student__roll_no",
-                "-date",
-                "-time"
-            )
-        )
-
-        students = (
-            Student.objects
-            .all()
-            .order_by(
-                "roll_no"
-            )
-        )
-
-        for student in students:
-
-            student_records = (
-                records.filter(
-                    student=student
-                )
-            )
-
-            total = (
-                student_records.count()
-            )
-
-            present = (
-                student_records
-                .filter(
-                    status="Present"
-                )
-                .count()
-            )
-
-            absent = (
-                student_records
-                .filter(
-                    status="Absent"
-                )
-                .count()
-            )
-
-            percentage = (
-                round(
-                    (
-                        present
-                        /
-                        total
-                    ) * 100,
-                    1
-                )
-                if total > 0
-                else 0
-            )
-
-            student_summary.append(
-                {
-                    "student": student,
-                    "total": total,
-                    "present": present,
-                    "absent": absent,
-                    "percentage": percentage,
-                }
-            )
 
     return render(
         request,
         "attendance/subject_wise.html",
         {
             "subjects": subjects,
-            "selected_subject": subject,
-            "subject": subject,
+
             "records": records,
-            "student_summary": student_summary,
+
+            "selected_subject": selected_subject,
+
         }
     )
 
@@ -1938,89 +1485,40 @@ def subject_wise_attendance(request):
 @teacher_required
 def student_history(request):
 
-    students = (
-        Student.objects
-        .all()
-        .order_by(
-            "roll_no"
-        )
+    students = Student.objects.all().order_by(
+        "roll_no"
     )
 
-    selected_student_id = (
-        request.GET.get(
-            "student"
-        )
-    )
+    selected_student = request.GET.get(
+        "student",
+        ""
+    ).strip()
+
+    records = Attendance.objects.none()
 
     student = None
 
-    records = (
-        Attendance.objects.none()
-    )
-
-    total = 0
-    present = 0
-    absent = 0
-    percentage = 0
-
-    # -----------------------------------------------------
-    # SELECT STUDENT
-    # -----------------------------------------------------
-
-    if selected_student_id:
+    if selected_student:
 
         try:
 
             student = Student.objects.get(
-                id=selected_student_id
+                id=selected_student
             )
 
-            records = (
-                Attendance.objects
-                .select_related(
-                    "subject"
-                )
-                .filter(
-                    student=student
-                )
-                .order_by(
-                    "-date",
-                    "-time"
-                )
+            records = Attendance.objects.select_related(
+                "subject"
+            ).filter(
+                student=student
+            ).order_by(
+                "-date",
+                "-time"
             )
 
-            total = records.count()
-
-            present = (
-                records
-                .filter(
-                    status="Present"
-                )
-                .count()
-            )
-
-            absent = (
-                records
-                .filter(
-                    status="Absent"
-                )
-                .count()
-            )
-
-            percentage = (
-                round(
-                    (
-                        present
-                        /
-                        total
-                    ) * 100,
-                    1
-                )
-                if total > 0
-                else 0
-            )
-
-        except Student.DoesNotExist:
+        except (
+            Student.DoesNotExist,
+            ValueError
+        ):
 
             student = None
 
@@ -2029,145 +1527,53 @@ def student_history(request):
         "attendance/student_history.html",
         {
             "students": students,
+
             "student": student,
+
             "records": records,
-            "attendances": records,
-            "total": total,
-            "present": present,
-            "absent": absent,
-            "percentage": percentage,
+
+            "selected_student": selected_student,
+
         }
     )
 
 
 # =========================================================
-# EXCEL EXPORT
+# EXPORT ATTENDANCE EXCEL
 # =========================================================
 
 @teacher_required
 def export_attendance_excel(request):
 
-    records = (
-        Attendance.objects
-        .select_related(
-            "student",
-            "subject"
-        )
-        .order_by(
-            "-date",
-            "-time"
-        )
+    records = Attendance.objects.select_related(
+        "student",
+        "subject"
+    ).order_by(
+        "-date",
+        "-time"
     )
 
-    subject_id = request.GET.get(
-        "subject",
-        ""
-    ).strip()
-
-    student_id = request.GET.get(
-        "student",
-        ""
-    ).strip()
-
-    date_value = request.GET.get(
+    date_filter = request.GET.get(
         "date",
         ""
     ).strip()
 
-    status = request.GET.get(
-        "status",
+    subject_filter = request.GET.get(
+        "subject",
         ""
     ).strip()
 
-    search = request.GET.get(
-        "search",
-        ""
-    ).strip()
-
-    # -----------------------------------------------------
-    # SUBJECT FILTER
-    # -----------------------------------------------------
-
-    if subject_id:
-
-        try:
-
-            records = records.filter(
-                subject_id=int(
-                    subject_id
-                )
-            )
-
-        except (
-            ValueError,
-            TypeError
-        ):
-
-            pass
-
-    # -----------------------------------------------------
-    # STUDENT FILTER
-    # -----------------------------------------------------
-
-    if student_id:
-
-        try:
-
-            records = records.filter(
-                student_id=int(
-                    student_id
-                )
-            )
-
-        except (
-            ValueError,
-            TypeError
-        ):
-
-            pass
-
-    # -----------------------------------------------------
-    # DATE FILTER
-    # -----------------------------------------------------
-
-    if date_value:
+    if date_filter:
 
         records = records.filter(
-            date=date_value
+            date=date_filter
         )
 
-    # -----------------------------------------------------
-    # STATUS FILTER
-    # -----------------------------------------------------
-
-    if status in [
-        "Present",
-        "Absent"
-    ]:
+    if subject_filter:
 
         records = records.filter(
-            status=status
+            subject_id=subject_filter
         )
-
-    # -----------------------------------------------------
-    # SEARCH
-    # -----------------------------------------------------
-
-    if search:
-
-        records = records.filter(
-            Q(
-                student__name__icontains=search
-            )
-            |
-            Q(
-                student__roll_no__icontains=search
-            )
-        )
-
-    # =====================================================
-    # CREATE EXCEL
-    # =====================================================
 
     workbook = Workbook()
 
@@ -2176,21 +1582,35 @@ def export_attendance_excel(request):
     worksheet.title = "Attendance"
 
     headers = [
-        "ID",
+
         "Student Name",
-        "Roll No",
+
+        "Roll Number",
+
+        "Course",
+
+        "Year",
+
         "Branch",
+
         "Section",
+
         "Semester",
+
         "Subject",
-        "Subject Code",
+
         "Date",
+
         "Time",
+
         "Status",
+
         "Latitude",
+
         "Longitude",
+
         "Location Verified",
-        "Session ID",
+
     ]
 
     worksheet.append(
@@ -2200,109 +1620,58 @@ def export_attendance_excel(request):
     for record in records:
 
         worksheet.append(
+
             [
-                record.id,
+
                 record.student.name,
+
                 record.student.roll_no,
-                record.student.branch or "",
-                record.student.section or "",
-                record.student.semester or "",
+
+                record.student.course,
+
+                record.student.year,
+
+                record.student.branch,
+
+                record.student.section,
+
+                record.student.semester,
+
                 (
-                    record.subject.name
+                    str(record.subject)
                     if record.subject
-                    else "General"
-                ),
-                (
-                    record.subject.code
-                    if (
-                        record.subject
-                        and
-                        record.subject.code
-                    )
                     else ""
                 ),
+
                 record.date,
+
                 record.time,
+
                 record.status,
-                (
-                    record.latitude
-                    if record.latitude is not None
-                    else ""
-                ),
-                (
-                    record.longitude
-                    if record.longitude is not None
-                    else ""
-                ),
-                (
-                    "Yes"
-                    if record.location_verified
-                    else "No"
-                ),
-                (
-                    str(record.session_id)
-                    if record.session_id
-                    else ""
-                ),
+
+                record.latitude,
+
+                record.longitude,
+
+                record.location_verified,
+
             ]
+
         )
-
-    # -----------------------------------------------------
-    # COLUMN WIDTH
-    # -----------------------------------------------------
-
-    for column in worksheet.columns:
-
-        max_length = 0
-
-        column_letter = (
-            column[0].column_letter
-        )
-
-        for cell in column:
-
-            try:
-
-                value_length = len(
-                    str(cell.value)
-                )
-
-                max_length = max(
-                    max_length,
-                    value_length
-                )
-
-            except Exception:
-
-                pass
-
-        worksheet.column_dimensions[
-            column_letter
-        ].width = min(
-            max_length + 2,
-            40
-        )
-
-    # -----------------------------------------------------
-    # RESPONSE
-    # -----------------------------------------------------
 
     response = HttpResponse(
-        content_type=(
-            "application/vnd.openxmlformats-officedocument."
-            "spreadsheetml.sheet"
-        )
-    )
 
-    filename = (
-        f"attendance_report_"
-        f"{timezone.localdate()}.xlsx"
+        content_type=(
+            "application/vnd.openxmlformats-"
+            "officedocument.spreadsheetml.sheet"
+        )
+
     )
 
     response[
         "Content-Disposition"
     ] = (
-        f'attachment; filename="{filename}"'
+        'attachment; filename="attendance_report.xlsx"'
     )
 
     workbook.save(
@@ -2324,68 +1693,46 @@ def mark_absent_students(request):
         return JsonResponse(
             {
                 "success": False,
-                "message": (
-                    "POST request required."
-                )
+                "error": "Only POST method is allowed."
             },
             status=405
         )
 
     session_id = request.POST.get(
-        "session_id"
-    )
+        "session",
+        ""
+    ).strip()
 
     if not session_id:
 
         return JsonResponse(
             {
                 "success": False,
-                "message": (
-                    "Session ID is required."
-                )
+                "error": "Session ID is required."
             },
             status=400
         )
-
-    # -----------------------------------------------------
-    # UUID
-    # -----------------------------------------------------
 
     try:
 
         session_uuid = uuid.UUID(
-            str(session_id)
+            session_id
         )
 
-    except (
-        ValueError,
-        AttributeError
-    ):
+    except ValueError:
 
         return JsonResponse(
             {
                 "success": False,
-                "message": (
-                    "Invalid session ID."
-                )
+                "error": "Invalid session ID."
             },
             status=400
         )
 
-    # -----------------------------------------------------
-    # SESSION
-    # -----------------------------------------------------
-
     try:
 
-        session = (
-            AttendanceSession.objects
-            .select_related(
-                "subject"
-            )
-            .get(
-                session_id=session_uuid
-            )
+        session = AttendanceSession.objects.get(
+            session_id=session_uuid
         )
 
     except AttendanceSession.DoesNotExist:
@@ -2393,82 +1740,58 @@ def mark_absent_students(request):
         return JsonResponse(
             {
                 "success": False,
-                "message": (
-                    "Attendance session not found."
-                )
+                "error": "Attendance session not found."
             },
             status=404
         )
 
-    # =====================================================
-    # ELIGIBLE STUDENTS
-    # =====================================================
-
     students = Student.objects.all()
 
-    if session.semester is not None:
-
-        students = students.filter(
-            semester=session.semester
-        )
-
-    if session.branch:
-
-        students = students.filter(
-            branch__iexact=session.branch
-        )
-
-    if session.section:
-
-        students = students.filter(
-            section__iexact=session.section
-        )
-
-    marked_count = 0
+    created_count = 0
 
     for student in students:
 
-        exists = (
-            Attendance.objects
-            .filter(
-                student=student,
-                session_id=session.session_id
-            )
-            .exists()
-        )
+        exists = Attendance.objects.filter(
+
+            student=student,
+
+            session_id=session.session_id
+
+        ).exists()
 
         if not exists:
 
             Attendance.objects.create(
+
                 student=student,
+
                 session_id=session.session_id,
+
                 subject=session.subject,
+
+                date=timezone.localdate(),
+
+                time=timezone.localtime().time(),
+
                 status="Absent",
+
                 location_verified=False,
+
             )
 
-            marked_count += 1
-
-    # -----------------------------------------------------
-    # CLOSE SESSION
-    # -----------------------------------------------------
-
-    session.active = False
-
-    session.save(
-        update_fields=[
-            "active"
-        ]
-    )
+            created_count += 1
 
     return JsonResponse(
         {
             "success": True,
+
             "message": (
-                f"{marked_count} absent "
-                "students marked successfully."
+                f"{created_count} students "
+                "marked absent."
             ),
-            "marked_count": marked_count,
+
+            "created": created_count,
+
         }
     )
 
@@ -2482,20 +1805,34 @@ def clean_expired_sessions(request):
 
     now = timezone.now()
 
-    updated = (
-        AttendanceSession.objects
-        .filter(
-            active=True,
-            expires_at__lte=now
-        )
-        .update(
-            active=False
-        )
+    updated = AttendanceSession.objects.filter(
+
+        active=True,
+
+        expires_at__lte=now
+
+    ).update(
+
+        active=False
+
     )
 
     return JsonResponse(
         {
             "success": True,
-            "cleaned_sessions": updated,
+
+            "updated": updated,
+
+            "message": (
+                f"{updated} expired session(s) "
+                "deactivated."
+            ),
+
         }
     )
+
+
+# =========================================================
+# END OF VIEWS.PY
+# =========================================================
+
