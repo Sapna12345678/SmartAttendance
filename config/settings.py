@@ -1,4 +1,6 @@
 from pathlib import Path
+import os
+import dj_database_url
 
 
 # ============================================================
@@ -12,9 +14,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY
 # ============================================================
 
-SECRET_KEY = "django-insecure-@ocbzi@o3r#!nf-knj20$6s%s-p0d0l_$-c(7&=ywad))vbg9h8"
+SECRET_KEY = os.environ.get(
+    "DJANGO_SECRET_KEY",
+    "django-insecure-local-development-key"
+)
 
-DEBUG = True
+DEBUG = os.environ.get("DEBUG", "True").lower() == "true"
 
 
 # ============================================================
@@ -57,52 +62,72 @@ CURRENT_CLOUDFLARE_HOST = get_cloudflare_host()
 ALLOWED_HOSTS = [
     "127.0.0.1",
     "localhost",
-
-    # Current laptop Wi-Fi IP
-    "10.11.120.160",
-
     "testserver",
-
-    # All Cloudflare Quick Tunnel subdomains
+    "10.11.120.160",
     ".trycloudflare.com",
 ]
 
 
+# Render public host
+RENDER_HOST = os.environ.get("RENDER_EXTERNAL_HOSTNAME")
+
+if RENDER_HOST:
+    ALLOWED_HOSTS.append(RENDER_HOST)
+
+
+# Additional hosts from environment
+EXTRA_ALLOWED_HOSTS = os.environ.get(
+    "ALLOWED_HOSTS",
+    ""
+)
+
+if EXTRA_ALLOWED_HOSTS:
+    ALLOWED_HOSTS.extend(
+        host.strip()
+        for host in EXTRA_ALLOWED_HOSTS.split(",")
+        if host.strip()
+    )
+
+
 # ============================================================
 # CSRF TRUSTED ORIGINS
-# ============================================================
-#
-# Required for POST requests coming through Cloudflare HTTPS.
-#
-# Example:
-# https://deaths-walking-european-these.trycloudflare.com
-#
-# The wildcard allows changing Quick Tunnel hostnames.
 # ============================================================
 
 CSRF_TRUSTED_ORIGINS = [
     "http://127.0.0.1:8000",
     "http://localhost:8000",
     "http://10.11.120.160:8000",
-
-    # Cloudflare Quick Tunnel
     "https://*.trycloudflare.com",
 ]
+
+
+if RENDER_HOST:
+    CSRF_TRUSTED_ORIGINS.append(
+        f"https://{RENDER_HOST}"
+    )
+
+
+EXTRA_CSRF_ORIGINS = os.environ.get(
+    "CSRF_TRUSTED_ORIGINS",
+    ""
+)
+
+if EXTRA_CSRF_ORIGINS:
+    CSRF_TRUSTED_ORIGINS.extend(
+        origin.strip()
+        for origin in EXTRA_CSRF_ORIGINS.split(",")
+        if origin.strip()
+    )
 
 
 # ============================================================
 # CSRF COOKIE
 # ============================================================
 
-# JavaScript/fetch() attendance requests need access to the
-# CSRF cookie.
 CSRF_COOKIE_HTTPONLY = False
 
-# Cloudflare terminates HTTPS and forwards the request to the
-# local Django HTTP server during development.
-CSRF_COOKIE_SECURE = False
+CSRF_COOKIE_SECURE = not DEBUG
 
-# Allow CSRF cookie on the complete application.
 CSRF_COOKIE_PATH = "/"
 
 
@@ -110,17 +135,15 @@ CSRF_COOKIE_PATH = "/"
 # SESSION COOKIE
 # ============================================================
 
-# Development setup behind Cloudflare Quick Tunnel.
-SESSION_COOKIE_SECURE = False
+SESSION_COOKIE_SECURE = not DEBUG
 
-# Keep Django session cookie protected from JavaScript.
 SESSION_COOKIE_HTTPONLY = True
 
 SESSION_COOKIE_PATH = "/"
 
 
 # ============================================================
-# CLOUDFLARE HTTPS PROXY
+# HTTPS / PROXY
 # ============================================================
 
 SECURE_PROXY_SSL_HEADER = (
@@ -133,8 +156,17 @@ SECURE_PROXY_SSL_HEADER = (
 # SMART ATTENDANCE PUBLIC HOST
 # ============================================================
 
-if CURRENT_CLOUDFLARE_HOST:
+if os.environ.get("SMART_ATTENDANCE_HOST"):
+    SMART_ATTENDANCE_HOST = os.environ.get(
+        "SMART_ATTENDANCE_HOST"
+    )
+
+elif RENDER_HOST:
+    SMART_ATTENDANCE_HOST = RENDER_HOST
+
+elif CURRENT_CLOUDFLARE_HOST:
     SMART_ATTENDANCE_HOST = CURRENT_CLOUDFLARE_HOST
+
 else:
     SMART_ATTENDANCE_HOST = "127.0.0.1:8000"
 
@@ -147,7 +179,6 @@ ATTENDANCE_LATITUDE = 25.342787
 
 ATTENDANCE_LONGITUDE = 81.902116
 
-# Allowed attendance radius in meters
 ATTENDANCE_RADIUS_METERS = 300
 
 
@@ -156,8 +187,6 @@ ATTENDANCE_RADIUS_METERS = 300
 # ============================================================
 
 INSTALLED_APPS = [
-
-    # Django built-in apps
 
     "django.contrib.admin",
 
@@ -170,8 +199,6 @@ INSTALLED_APPS = [
     "django.contrib.messages",
 
     "django.contrib.staticfiles",
-
-    # Smart Attendance application
 
     "attendance.apps.AttendanceConfig",
 ]
@@ -247,17 +274,32 @@ WSGI_APPLICATION = "config.wsgi.application"
 # DATABASE
 # ============================================================
 
-DATABASES = {
+DATABASE_URL = os.environ.get("DATABASE_URL")
 
-    "default": {
 
-        "ENGINE":
-            "django.db.backends.sqlite3",
+if DATABASE_URL:
 
-        "NAME":
-            BASE_DIR / "db.sqlite3",
+    DATABASES = {
+        "default": dj_database_url.parse(
+            DATABASE_URL,
+            conn_max_age=600,
+            conn_health_checks=True,
+        )
     }
-}
+
+else:
+
+    DATABASES = {
+
+        "default": {
+
+            "ENGINE":
+                "django.db.backends.sqlite3",
+
+            "NAME":
+                BASE_DIR / "db.sqlite3",
+        }
+    }
 
 
 # ============================================================
@@ -310,7 +352,9 @@ USE_TZ = True
 # STATIC FILES
 # ============================================================
 
-STATIC_URL = "static/"
+STATIC_URL = "/static/"
+
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 
 # ============================================================
@@ -324,11 +368,6 @@ MEDIA_ROOT = BASE_DIR / "media"
 
 # ============================================================
 # EMAIL
-# ============================================================
-#
-# Development mode:
-# Password-reset emails etc. appear in the Django terminal.
-#
 # ============================================================
 
 EMAIL_BACKEND = (
@@ -354,3 +393,24 @@ LOGOUT_REDIRECT_URL = "/accounts/login/"
 DEFAULT_AUTO_FIELD = (
     "django.db.models.BigAutoField"
 )
+
+
+# ============================================================
+# PRODUCTION SECURITY
+# ============================================================
+
+if not DEBUG:
+
+    SECURE_SSL_REDIRECT = True
+
+    SECURE_HSTS_SECONDS = 31536000
+
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+
+    SECURE_HSTS_PRELOAD = True
+
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+
+    SECURE_REFERRER_POLICY = "same-origin"
+
+    X_FRAME_OPTIONS = "DENY"
