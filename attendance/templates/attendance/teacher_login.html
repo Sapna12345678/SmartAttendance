@@ -1,171 +1,609 @@
-html
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Teacher Login | Smart Attendance</title>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+```
+<title>Teacher Login | Smart Attendance</title>
 
-    <style>
+<!-- Bootstrap -->
+<link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+>
+
+<!-- Bootstrap Icons -->
+<link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+>
+
+<style>
+
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: Inter, "Segoe UI", Arial, sans-serif;
+        background:
+            radial-gradient(circle at 15% 20%, rgba(37, 99, 235, 0.20), transparent 30%),
+            radial-gradient(circle at 85% 80%, rgba(14, 165, 233, 0.16), transparent 30%),
+            linear-gradient(135deg, #07152f 0%, #0b1f42 50%, #102d5c 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 30px 18px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* Background decoration */
+
+    body::before,
+    body::after {
+        content: "";
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(2px);
+        pointer-events: none;
+    }
+
+    body::before {
+        width: 330px;
+        height: 330px;
+        background: rgba(59, 130, 246, 0.10);
+        top: -140px;
+        left: -100px;
+    }
+
+    body::after {
+        width: 420px;
+        height: 420px;
+        background: rgba(14, 165, 233, 0.08);
+        bottom: -200px;
+        right: -130px;
+    }
+
+    .page-wrapper {
+        width: 100%;
+        max-width: 1080px;
+        position: relative;
+        z-index: 2;
+    }
+
+    .login-layout {
+        display: grid;
+        grid-template-columns: 1fr 460px;
+        min-height: 650px;
+        border-radius: 28px;
+        overflow: hidden;
+        background: rgba(255, 255, 255, 0.98);
+        box-shadow:
+            0 30px 80px rgba(0, 0, 0, 0.35),
+            0 8px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    /* LEFT PANEL */
+
+    .brand-panel {
+        position: relative;
+        padding: 65px 55px;
+        color: white;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        background:
+            linear-gradient(
+                145deg,
+                #0b1b3a 0%,
+                #102b58 55%,
+                #12396d 100%
+            );
+    }
+
+    .brand-panel::before {
+        content: "";
+        position: absolute;
+        width: 320px;
+        height: 320px;
+        border: 1px solid rgba(255,255,255,.08);
+        border-radius: 50%;
+        right: -130px;
+        top: -100px;
+    }
+
+    .brand-panel::after {
+        content: "";
+        position: absolute;
+        width: 220px;
+        height: 220px;
+        border: 1px solid rgba(255,255,255,.07);
+        border-radius: 50%;
+        left: -100px;
+        bottom: -80px;
+    }
+
+    .brand-content {
+        position: relative;
+        z-index: 2;
+    }
+
+    .brand-logo {
+        width: 70px;
+        height: 70px;
+        border-radius: 18px;
+        background: rgba(255,255,255,.12);
+        border: 1px solid rgba(255,255,255,.18);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 32px;
+        margin-bottom: 30px;
+    }
+
+    .brand-title {
+        font-size: 36px;
+        line-height: 1.15;
+        font-weight: 800;
+        letter-spacing: -0.8px;
+        margin-bottom: 18px;
+    }
+
+    .brand-title span {
+        color: #60a5fa;
+    }
+
+    .brand-description {
+        max-width: 440px;
+        color: rgba(255,255,255,.72);
+        font-size: 15px;
+        line-height: 1.8;
+        margin-bottom: 35px;
+    }
+
+    .feature-list {
+        display: grid;
+        gap: 14px;
+    }
+
+    .feature-item {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+        color: rgba(255,255,255,.88);
+        font-size: 14px;
+    }
+
+    .feature-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        background: rgba(96,165,250,.12);
+        border: 1px solid rgba(96,165,250,.18);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #60a5fa;
+        flex-shrink: 0;
+    }
+
+    .brand-footer {
+        position: relative;
+        z-index: 2;
+        color: rgba(255,255,255,.42);
+        font-size: 12px;
+    }
+
+    /* RIGHT LOGIN PANEL */
+
+    .login-panel {
+        padding: 55px 48px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        background: #ffffff;
+    }
+
+    .login-header {
+        margin-bottom: 30px;
+    }
+
+    .login-icon {
+        width: 58px;
+        height: 58px;
+        border-radius: 16px;
+        background: #eef5ff;
+        color: #155eef;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 26px;
+        margin-bottom: 20px;
+    }
+
+    .login-title {
+        margin: 0;
+        color: #101828;
+        font-size: 29px;
+        font-weight: 750;
+        letter-spacing: -0.5px;
+    }
+
+    .login-subtitle {
+        margin-top: 8px;
+        color: #667085;
+        font-size: 14px;
+        line-height: 1.6;
+    }
+
+    .form-label {
+        color: #344054;
+        font-size: 13px;
+        font-weight: 650;
+        margin-bottom: 8px;
+    }
+
+    .input-wrapper {
+        position: relative;
+    }
+
+    .input-icon {
+        position: absolute;
+        left: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #98a2b3;
+        font-size: 17px;
+        pointer-events: none;
+    }
+
+    .form-control {
+        height: 52px;
+        border: 1px solid #d0d5dd;
+        border-radius: 11px;
+        padding-left: 46px;
+        padding-right: 15px;
+        color: #101828;
+        font-size: 14px;
+        transition: all .2s ease;
+        box-shadow: none;
+    }
+
+    .form-control::placeholder {
+        color: #98a2b3;
+    }
+
+    .form-control:focus {
+        border-color: #155eef;
+        box-shadow: 0 0 0 4px rgba(21,94,239,.10);
+    }
+
+    .login-btn {
+        width: 100%;
+        height: 52px;
+        border: 0;
+        border-radius: 11px;
+        background: linear-gradient(135deg, #155eef, #1749b8);
+        color: white;
+        font-size: 14px;
+        font-weight: 700;
+        letter-spacing: .1px;
+        transition: all .2s ease;
+        box-shadow: 0 8px 18px rgba(21,94,239,.20);
+    }
+
+    .login-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 12px 24px rgba(21,94,239,.26);
+    }
+
+    .login-btn:active {
+        transform: translateY(0);
+    }
+
+    .security-note {
+        margin-top: 22px;
+        padding: 12px 14px;
+        border-radius: 10px;
+        background: #f8fafc;
+        border: 1px solid #eaecf0;
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        color: #667085;
+        font-size: 12px;
+    }
+
+    .security-note i {
+        color: #12b76a;
+        font-size: 15px;
+    }
+
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        margin-top: 25px;
+        color: #475467;
+        font-size: 13px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: color .2s ease;
+    }
+
+    .back-link:hover {
+        color: #155eef;
+    }
+
+    .footer {
+        text-align: center;
+        color: #98a2b3;
+        font-size: 11px;
+        margin-top: 28px;
+    }
+
+    /* ERROR */
+
+    .alert {
+        border-radius: 10px;
+        font-size: 13px;
+        border: 0;
+    }
+
+    /* RESPONSIVE */
+
+    @media (max-width: 900px) {
+
+        .login-layout {
+            grid-template-columns: 1fr;
+            max-width: 500px;
+        }
+
+        .brand-panel {
+            display: none;
+        }
+
+        .login-panel {
+            min-height: 620px;
+            padding: 45px 38px;
+        }
+    }
+
+    @media (max-width: 480px) {
+
         body {
-            margin: 0;
-            min-height: 100vh;
-            font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #182848, #4b6cb7);
-            display: flex;
-            align-items: center;
-            justify-content: center;122233344455555666777788899999999000---	qqwweerrrttyyyyuuiioopp[[]]\\AASSSDDDDFFFFFFFFGGGGHHJJJKKLL;;;;;;;;'
-
-ZZZXXCCVVVBBBBNNNMMM,,,,..//@@@@@@@//////**--++9877777777744555555561222300.
-
-
-
-
+            padding: 15px;
         }
 
-        .login-card {
-            width: 100%;
-            max-width: 430px;
-            background: white;
-            border-radius: 22px;
-            padding: 40px;
-            box-shadow: 0 15px 45px rgba(0,0,0,.25);
-        }
-
-        .logo {
-            width: 75px;
-            height: 75px;
-            margin: auto;
+        .login-layout {
             border-radius: 20px;
-            background: #182848;
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 38px;
         }
 
-        .title {
-            font-weight: 700;
-            color: #182848;
+        .login-panel {
+            padding: 35px 24px;
         }
 
-        .subtitle {
-            color: #777;
+        .login-title {
+            font-size: 25px;
         }
+    }
 
-        .form-control {
-            height: 50px;
-            border-radius: 10px;
-        }
+</style>
+```
 
-        .login-btn {
-            height: 50px;
-            width: 100%;
-            border: none;
-            border-radius: 10px;
-            background: #182848;
-            color: white;
-            font-weight: 600;
-        }
-
-        .login-btn:hover {
-            background: #101b32;
-        }
-
-        .back-link {
-            text-decoration: none;
-            color: #182848;
-        }
-
-        .footer {
-            text-align: center;
-            color: #999;
-            font-size: 12px;
-            margin-top: 25px;
-        }
-    </style>
 </head>
 
 <body>
 
-<div class="login-card">
+<div class="page-wrapper">
 
-    <div class="text-center">
+```
+<div class="login-layout">
 
-        <div class="logo">
-            <i class="bi bi-person-lock"></i>
+    <!-- =====================================================
+         LEFT BRAND PANEL
+    ====================================================== -->
+
+    <section class="brand-panel">
+
+        <div class="brand-content">
+
+            <div class="brand-logo">
+                <i class="bi bi-qr-code-scan"></i>
+            </div>
+
+            <h1 class="brand-title">
+                Smart<br>
+                <span>Attendance</span>
+            </h1>
+
+            <p class="brand-description">
+                Manage classroom attendance securely using
+                time-limited QR codes, student verification,
+                GPS-based location validation and detailed
+                attendance reports.
+            </p>
+
+            <div class="feature-list">
+
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="bi bi-qr-code"></i>
+                    </div>
+                    <span>Secure time-limited QR attendance</span>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="bi bi-geo-alt"></i>
+                    </div>
+                    <span>GPS-based location verification</span>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="bi bi-bar-chart"></i>
+                    </div>
+                    <span>Attendance reports and history</span>
+                </div>
+
+            </div>
+
         </div>
 
-        <h2 class="title mt-4">
-            Teacher Login
-        </h2>
+        <div class="brand-footer">
+            Smart Attendance Management System
+        </div>
 
-        <p class="subtitle">
-            Sign in to manage Smart Attendance
-        </p>
+    </section>
 
-    </div>
 
-    {% if error %}
-    <div class="alert alert-danger mt-4">
-        <i class="bi bi-exclamation-circle"></i>
-        {{ error }}
-    </div>
-    {% endif %}
+    <!-- =====================================================
+         LOGIN PANEL
+    ====================================================== -->
 
-    <form method="POST" class="mt-4">
+    <section class="login-panel">
 
-        {% csrf_token %}
+        <div class="login-header">
 
-        <div class="mb-3">
-            <label class="form-label fw-semibold">
-                Username
-            </label>
+            <div class="login-icon">
+                <i class="bi bi-person-lock"></i>
+            </div>
 
-            <input
-                type="text"
-                name="username"
-                class="form-control"
-                placeholder="Enter teacher username"
-                required
+            <h2 class="login-title">
+                Teacher Login
+            </h2>
+
+            <p class="login-subtitle">
+                Sign in to manage your attendance sessions,
+                students and reports.
+            </p>
+
+        </div>
+
+
+        {% if error %}
+
+        <div class="alert alert-danger mb-4">
+            <i class="bi bi-exclamation-circle me-2"></i>
+            {{ error }}
+        </div>
+
+        {% endif %}
+
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+            <!-- USERNAME -->
+
+            <div class="mb-4">
+
+                <label class="form-label">
+                    Teacher Username
+                </label>
+
+                <div class="input-wrapper">
+
+                    <i class="bi bi-person input-icon"></i>
+
+                    <input
+                        type="text"
+                        name="username"
+                        class="form-control"
+                        placeholder="Enter your username"
+                        autocomplete="username"
+                        required
+                    >
+
+                </div>
+
+            </div>
+
+
+            <!-- PASSWORD -->
+
+            <div class="mb-4">
+
+                <label class="form-label">
+                    Password
+                </label>
+
+                <div class="input-wrapper">
+
+                    <i class="bi bi-lock input-icon"></i>
+
+                    <input
+                        type="password"
+                        name="password"
+                        class="form-control"
+                        placeholder="Enter your password"
+                        autocomplete="current-password"
+                        required
+                    >
+
+                </div>
+
+            </div>
+
+
+            <!-- LOGIN -->
+
+            <button
+                type="submit"
+                class="login-btn"
             >
+                <i class="bi bi-box-arrow-in-right me-2"></i>
+                Login as Teacher
+            </button>
+
+        </form>
+
+
+        <!-- SECURITY -->
+
+        <div class="security-note">
+
+            <i class="bi bi-shield-check"></i>
+
+            <span>
+                Your teacher account and attendance data
+                are protected by secure authentication.
+            </span>
+
         </div>
 
-        <div class="mb-4">
-            <label class="form-label fw-semibold">
-                Password
-            </label>
 
-            <input
-                type="password"
-                name="password"
-                class="form-control"
-                placeholder="Enter password"
-                required
-            >
+        <!-- BACK -->
+
+        <div class="text-center">
+
+            <a href="/" class="back-link">
+
+                <i class="bi bi-arrow-left"></i>
+
+                Back to Smart Attendance
+
+            </a>
+
         </div>
 
-        <button type="submit" class="login-btn">
-            <i class="bi bi-box-arrow-in-right"></i>
-            Login as Teacher
-        </button>
 
-    </form>
+        <div class="footer">
+            © 2026 Smart Attendance System
+        </div>
 
-    <div class="text-center mt-4">
-        <a href="/" class="back-link">
-            <i class="bi bi-arrow-left"></i>
-            Back to Smart Attendance
-        </a>
-    </div>
+    </section>
 
-    <div class="footer">
-        © 2026 Smart Attendance System
-    </div>
+</div>
+```
 
 </div>
 
