@@ -1,0 +1,532 @@
+{% extends "admin/change_form.html" %}
+
+{% block extrastyle %}
+{{ block.super }}
+
+<style>
+    /* =========================================================
+       SMART ATTENDANCE - STUDENT FORM
+       ========================================================= */
+
+    :root {
+        --sa-primary: #2563eb;
+        --sa-primary-dark: #1d4ed8;
+        --sa-bg: #f5f7fb;
+        --sa-card: #ffffff;
+        --sa-border: #e5e7eb;
+        --sa-text: #172033;
+        --sa-muted: #6b7280;
+        --sa-soft-blue: #eff6ff;
+        --sa-green: #059669;
+    }
+
+    body {
+        background: var(--sa-bg) !important;
+    }
+
+    #content {
+        max-width: 1250px !important;
+        margin: 0 auto !important;
+    }
+
+    /* Main form container */
+    .module.aligned {
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+    }
+
+    .smart-form-wrapper {
+        margin-top: 18px;
+    }
+
+    /* Header */
+    .smart-form-header {
+        background: linear-gradient(135deg, #0f172a, #1e3a8a);
+        border-radius: 16px;
+        padding: 26px 30px;
+        margin-bottom: 22px;
+        color: white;
+        box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
+    }
+
+    .smart-form-header h1 {
+        margin: 0 0 7px 0;
+        font-size: 28px;
+        font-weight: 700;
+        color: #ffffff;
+    }
+
+    .smart-form-header p {
+        margin: 0;
+        color: #dbeafe;
+        font-size: 14px;
+    }
+
+    /* Cards */
+    .smart-card {
+        background: var(--sa-card);
+        border: 1px solid var(--sa-border);
+        border-radius: 16px;
+        margin-bottom: 22px;
+        overflow: hidden;
+        box-shadow: 0 5px 18px rgba(15, 23, 42, 0.05);
+    }
+
+    .smart-card-header {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+        padding: 18px 24px;
+        background: #fafbff;
+        border-bottom: 1px solid var(--sa-border);
+    }
+
+    .smart-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 11px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--sa-soft-blue);
+        color: var(--sa-primary);
+        font-size: 20px;
+        font-weight: 700;
+    }
+
+    .smart-card-header h2 {
+        margin: 0;
+        font-size: 17px;
+        color: var(--sa-text);
+        font-weight: 700;
+    }
+
+    .smart-card-header span {
+        display: block;
+        margin-top: 3px;
+        color: var(--sa-muted);
+        font-size: 12px;
+    }
+
+    .smart-card-body {
+        padding: 25px;
+    }
+
+    /* Django field rows */
+    .smart-card-body .form-row {
+        border: none !important;
+        padding: 0 !important;
+        margin: 0 0 21px 0 !important;
+        display: block !important;
+    }
+
+    .smart-card-body .form-row:last-child {
+        margin-bottom: 0 !important;
+    }
+
+    .smart-card-body .form-row label {
+        display: block !important;
+        width: auto !important;
+        float: none !important;
+        text-align: left !important;
+        padding: 0 !important;
+        margin-bottom: 7px !important;
+        color: #374151 !important;
+        font-size: 13px !important;
+        font-weight: 650 !important;
+    }
+
+    .smart-card-body .form-row label.required:after {
+        color: #ef4444 !important;
+    }
+
+    .smart-card-body .form-row > div {
+        width: auto !important;
+        margin-left: 0 !important;
+    }
+
+    /* Inputs */
+    .smart-card-body input[type="text"],
+    .smart-card-body input[type="email"],
+    .smart-card-body input[type="tel"],
+    .smart-card-body input[type="number"],
+    .smart-card-body input[type="password"],
+    .smart-card-body select,
+    .smart-card-body textarea {
+        width: 100% !important;
+        box-sizing: border-box !important;
+        min-height: 46px;
+        padding: 11px 13px !important;
+        border: 1px solid #d1d5db !important;
+        border-radius: 9px !important;
+        background: #ffffff !important;
+        color: #111827 !important;
+        font-size: 14px !important;
+        outline: none !important;
+        transition: all .2s ease;
+    }
+
+    .smart-card-body input:focus,
+    .smart-card-body select:focus,
+    .smart-card-body textarea:focus {
+        border-color: var(--sa-primary) !important;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, .10) !important;
+    }
+
+    .smart-card-body select {
+        cursor: pointer;
+    }
+
+    .smart-card-body .help,
+    .smart-card-body p.help {
+        margin: 6px 0 0 0 !important;
+        color: var(--sa-muted) !important;
+        font-size: 12px !important;
+    }
+
+    /* Put academic fields in grid */
+    .academic-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+    }
+
+    .account-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+
+    .full-width {
+        grid-column: 1 / -1;
+    }
+
+    /* User select */
+    .smart-card-body .related-widget-wrapper {
+        width: 100% !important;
+    }
+
+    .smart-card-body .related-widget-wrapper select {
+        width: 100% !important;
+    }
+
+    /* Buttons at bottom */
+    .submit-row {
+        background: white !important;
+        border: 1px solid var(--sa-border) !important;
+        border-radius: 16px !important;
+        padding: 18px 22px !important;
+        margin-top: 22px !important;
+        box-shadow: 0 5px 18px rgba(15, 23, 42, .05);
+    }
+
+    .submit-row input[type="submit"] {
+        border: none !important;
+        border-radius: 9px !important;
+        padding: 11px 22px !important;
+        font-size: 13px !important;
+        font-weight: 650 !important;
+        cursor: pointer !important;
+        transition: .2s ease !important;
+    }
+
+    .submit-row input[type="submit"]:hover {
+        transform: translateY(-1px);
+    }
+
+    .submit-row input[name="_save"] {
+        background: var(--sa-primary) !important;
+        color: white !important;
+    }
+
+    .submit-row input[name="_save"]:hover {
+        background: var(--sa-primary-dark) !important;
+    }
+
+    .submit-row input[name="_addanother"],
+    .submit-row input[name="_continue"] {
+        background: #eef2ff !important;
+        color: #3730a3 !important;
+    }
+
+    .submit-row a.deletelink {
+        border-radius: 9px !important;
+        padding: 10px 18px !important;
+    }
+
+    /* Error messages */
+    .errorlist {
+        border-radius: 8px !important;
+        margin: 6px 0 0 !important;
+        padding: 8px 12px !important;
+        font-size: 12px !important;
+    }
+
+    /* Breadcrumb spacing */
+    .breadcrumbs {
+        margin-bottom: 12px !important;
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+        .academic-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 650px) {
+        #content {
+            padding: 10px !important;
+        }
+
+        .smart-form-header {
+            padding: 20px;
+            border-radius: 12px;
+        }
+
+        .smart-form-header h1 {
+            font-size: 22px;
+        }
+
+        .account-grid,
+        .academic-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .smart-card-body {
+            padding: 18px;
+        }
+
+        .smart-card-header {
+            padding: 16px 18px;
+        }
+    }
+</style>
+{% endblock %}
+
+
+{% block content %}
+
+<div class="smart-form-wrapper">
+
+    <!-- =====================================================
+         HEADER
+         ===================================================== -->
+
+    <div class="smart-form-header">
+
+        <h1>
+            {% if add %}
+                Add New Student
+            {% else %}
+                Edit Student
+            {% endif %}
+        </h1>
+
+        <p>
+            Create and manage student profile, account and academic information.
+        </p>
+
+    </div>
+
+
+    <!-- =====================================================
+         ACCOUNT INFORMATION
+         ===================================================== -->
+
+    <div class="smart-card">
+
+        <div class="smart-card-header">
+
+            <div class="smart-icon">
+                👤
+            </div>
+
+            <div>
+                <h2>Account Information</h2>
+                <span>
+                    Connect the student with their login account and contact details.
+                </span>
+            </div>
+
+        </div>
+
+        <div class="smart-card-body">
+
+            <div class="account-grid">
+
+                {% for fieldset in adminform %}
+                    {% for line in fieldset %}
+                        {% for field in line %}
+
+                            {% if field.field.name == "user" %}
+                                <div>
+                                    {{ field.errors }}
+                                    {{ field.label_tag }}
+                                    {{ field.field }}
+                                    {% if field.help_text %}
+                                        <p class="help">{{ field.help_text|safe }}</p>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+
+                            {% if field.field.name == "name" %}
+                                <div>
+                                    {{ field.errors }}
+                                    {{ field.label_tag }}
+                                    {{ field.field }}
+                                    {% if field.help_text %}
+                                        <p class="help">{{ field.help_text|safe }}</p>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+
+                            {% if field.field.name == "email" %}
+                                <div>
+                                    {{ field.errors }}
+                                    {{ field.label_tag }}
+                                    {{ field.field }}
+                                    {% if field.help_text %}
+                                        <p class="help">{{ field.help_text|safe }}</p>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+
+                            {% if field.field.name == "phone" %}
+                                <div>
+                                    {{ field.errors }}
+                                    {{ field.label_tag }}
+                                    {{ field.field }}
+                                    {% if field.help_text %}
+                                        <p class="help">{{ field.help_text|safe }}</p>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+
+                        {% endfor %}
+                    {% endfor %}
+                {% endfor %}
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         ACADEMIC INFORMATION
+         ===================================================== -->
+
+    <div class="smart-card">
+
+        <div class="smart-card-header">
+
+            <div class="smart-icon">
+                🎓
+            </div>
+
+            <div>
+                <h2>Academic Information</h2>
+                <span>
+                    Enter the student's course, class and semester details.
+                </span>
+            </div>
+
+        </div>
+
+        <div class="smart-card-body">
+
+            <div class="academic-grid">
+
+                {% for fieldset in adminform %}
+                    {% for line in fieldset %}
+                        {% for field in line %}
+
+                            {% if field.field.name == "roll_no" %}
+                                <div>
+                                    {{ field.errors }}
+                                    {{ field.label_tag }}
+                                    {{ field.field }}
+                                    {% if field.help_text %}
+                                        <p class="help">{{ field.help_text|safe }}</p>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+
+                            {% if field.field.name == "course" %}
+                                <div>
+                                    {{ field.errors }}
+                                    {{ field.label_tag }}
+                                    {{ field.field }}
+                                    {% if field.help_text %}
+                                        <p class="help">{{ field.help_text|safe }}</p>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+
+                            {% if field.field.name == "year" %}
+                                <div>
+                                    {{ field.errors }}
+                                    {{ field.label_tag }}
+                                    {{ field.field }}
+                                    {% if field.help_text %}
+                                        <p class="help">{{ field.help_text|safe }}</p>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+
+                            {% if field.field.name == "branch" %}
+                                <div>
+                                    {{ field.errors }}
+                                    {{ field.label_tag }}
+                                    {{ field.field }}
+                                    {% if field.help_text %}
+                                        <p class="help">{{ field.help_text|safe }}</p>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+
+                            {% if field.field.name == "section" %}
+                                <div>
+                                    {{ field.errors }}
+                                    {{ field.label_tag }}
+                                    {{ field.field }}
+                                    {% if field.help_text %}
+                                        <p class="help">{{ field.help_text|safe }}</p>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+
+                            {% if field.field.name == "semester" %}
+                                <div>
+                                    {{ field.errors }}
+                                    {{ field.label_tag }}
+                                    {{ field.field }}
+                                    {% if field.help_text %}
+                                        <p class="help">{{ field.help_text|safe }}</p>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+
+                        {% endfor %}
+                    {% endfor %}
+                {% endfor %}
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         DJANGO SAVE BUTTONS
+         ===================================================== -->
+
+    {{ block.super }}
+
+</div>
+
+{% endblock %}
