@@ -9,6 +9,9 @@ from .models import Student, Subject, AttendanceSession, Attendance
 @admin.register(Student)
 class StudentAdmin(admin.ModelAdmin):
 
+    # -------------------------
+    # STUDENT LIST PAGE
+    # -------------------------
     list_display = (
         "name",
         "roll_no",
@@ -41,6 +44,46 @@ class StudentAdmin(admin.ModelAdmin):
 
     ordering = (
         "roll_no",
+    )
+
+    # -------------------------
+    # ADD / EDIT STUDENT FORM
+    # -------------------------
+    fieldsets = (
+
+        (
+            "👤 Account Information",
+            {
+                "fields": (
+                    "user",
+                    "name",
+                    "email",
+                    "phone",
+                ),
+                "description": (
+                    "Link the student with a login account and "
+                    "enter the student's basic contact information."
+                ),
+            },
+        ),
+
+        (
+            "🎓 Academic Information",
+            {
+                "fields": (
+                    "roll_no",
+                    "course",
+                    "year",
+                    "branch",
+                    "section",
+                    "semester",
+                ),
+                "description": (
+                    "Enter the student's academic and class details."
+                ),
+            },
+        ),
+
     )
 
 
