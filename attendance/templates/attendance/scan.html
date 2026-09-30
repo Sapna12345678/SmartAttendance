@@ -3,520 +3,760 @@
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Attendance Verification | Smart Attendance</title>
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Attendance Verification
+    </title>
 
     <style>
+
         * {
             box-sizing: border-box;
-            margin: 0;
-            padding: 0;
         }
 
         body {
+            margin: 0;
+            padding: 0;
+
             font-family:
-                -apple-system,
-                BlinkMacSystemFont,
-                "Segoe UI",
-                Roboto,
                 Arial,
+                Helvetica,
                 sans-serif;
-            min-height: 100vh;
+
             background:
                 linear-gradient(
                     135deg,
-                    #eef4ff 0%,
-                    #f8fbff 50%,
-                    #eef8f5 100%
+                    #eef4ff,
+                    #f8fbff
                 );
-            padding: 20px;
+
             color: #172033;
+
+            min-height: 100vh;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            padding: 20px;
         }
+
 
         .container {
-            width: 100%;
-            max-width: 600px;
-            margin: 0 auto;
-        }
 
-        .card {
+            width: 100%;
+
+            max-width: 520px;
+
             background: #ffffff;
+
             border-radius: 22px;
+
             box-shadow:
-                0 15px 40px
-                rgba(31, 51, 73, 0.12);
+                0 20px 60px
+                rgba(15, 23, 42, 0.12);
+
             overflow: hidden;
         }
 
+
         .header {
+
             background:
                 linear-gradient(
                     135deg,
-                    #14213d,
-                    #1d3557
+                    #0f172a,
+                    #1e3a8a
                 );
+
             color: white;
-            padding: 28px 22px;
+
             text-align: center;
+
+            padding: 28px 20px;
         }
+
 
         .logo {
-            width: 70px;
-            height: 70px;
-            margin: 0 auto 15px;
-            border-radius: 18px;
-            background:
-                rgba(255,255,255,0.12);
+
+            width: 64px;
+
+            height: 64px;
+
+            border-radius: 16px;
+
+            margin: 0 auto 14px;
+
             display: flex;
+
             align-items: center;
+
             justify-content: center;
-            font-size: 32px;
-            font-weight: 800;
-            letter-spacing: -1px;
+
+            background:
+                rgba(255,255,255,0.15);
+
+            font-size: 30px;
+
+            font-weight: bold;
         }
+
 
         .header h1 {
-            font-size: 24px;
+
+            margin: 0;
+
+            font-size: 25px;
+
             font-weight: 700;
-            margin-bottom: 7px;
         }
+
 
         .header p {
-            font-size: 14px;
+
+            margin: 8px 0 0;
+
             opacity: 0.85;
+
+            font-size: 14px;
         }
+
 
         .content {
-            padding: 25px 22px 28px;
+
+            padding: 25px;
         }
 
-        .status-box {
-            padding: 16px;
+
+        .status {
+
             border-radius: 14px;
+
+            padding: 15px;
+
             margin-bottom: 20px;
+
             text-align: center;
+
+            font-weight: 600;
+
+            font-size: 15px;
         }
 
-        .status-valid {
-            background: #eaf8ef;
-            color: #187a43;
-            border: 1px solid #bce8cc;
+
+        .status.valid {
+
+            background: #ecfdf3;
+
+            color: #047857;
+
+            border:
+                1px solid #a7f3d0;
         }
 
-        .status-invalid {
-            background: #fff0f0;
-            color: #b42318;
-            border: 1px solid #f3c0c0;
+
+        .status.error {
+
+            background: #fef2f2;
+
+            color: #b91c1c;
+
+            border:
+                1px solid #fecaca;
         }
 
-        .status-icon {
-            font-size: 28px;
-            margin-bottom: 7px;
+
+        .status.loading {
+
+            background: #eff6ff;
+
+            color: #1d4ed8;
+
+            border:
+                1px solid #bfdbfe;
         }
 
-        .status-title {
-            font-size: 17px;
-            font-weight: 700;
-        }
-
-        .status-text {
-            font-size: 13px;
-            margin-top: 4px;
-            line-height: 1.5;
-        }
-
-        .details {
-            background: #f7f9fc;
-            border-radius: 16px;
-            padding: 18px;
-            margin-bottom: 20px;
-        }
 
         .details-title {
-            font-size: 16px;
+
+            font-size: 17px;
+
             font-weight: 700;
-            margin-bottom: 15px;
-            color: #172033;
+
+            margin-bottom: 12px;
         }
 
-        .detail-row {
+
+        .details {
+
+            border:
+                1px solid #e5e7eb;
+
+            border-radius: 15px;
+
+            overflow: hidden;
+
+            margin-bottom: 22px;
+        }
+
+
+        .row {
+
             display: flex;
+
             justify-content: space-between;
-            align-items: center;
+
             gap: 15px;
-            padding: 11px 0;
-            border-bottom: 1px solid #e6eaf0;
+
+            padding: 13px 15px;
+
+            border-bottom:
+                1px solid #edf0f4;
+
+            font-size: 14px;
         }
 
-        .detail-row:last-child {
+
+        .row:last-child {
+
             border-bottom: none;
         }
 
-        .detail-label {
-            color: #697586;
-            font-size: 13px;
-            flex-shrink: 0;
-        }
 
-        .detail-value {
-            font-size: 13px;
-            font-weight: 600;
-            text-align: right;
-            word-break: break-word;
-        }
+        .label {
 
-        .loading {
-            color: #8a94a6;
+            color: #64748b;
+
             font-weight: 500;
         }
 
-        .timer-box {
-            background: #fff8e7;
-            border: 1px solid #f5d98b;
-            color: #8a5a00;
-            border-radius: 14px;
-            padding: 15px;
-            text-align: center;
-            margin-bottom: 20px;
-        }
 
-        .timer-label {
-            font-size: 12px;
-            margin-bottom: 4px;
-        }
+        .value {
 
-        .timer {
-            font-size: 26px;
-            font-weight: 800;
-        }
-
-        .timer.expired {
-            color: #b42318;
-        }
-
-        .gps-box {
-            background: #eef6ff;
-            border: 1px solid #c8def7;
-            border-radius: 16px;
-            padding: 18px;
-            margin-bottom: 20px;
-        }
-
-        .gps-title {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 16px;
             font-weight: 700;
-            margin-bottom: 14px;
+
+            text-align: right;
+
+            word-break: break-word;
         }
+
+
+        .location-box {
+
+            border:
+                1px solid #dbeafe;
+
+            background:
+                #f8fbff;
+
+            border-radius: 16px;
+
+            padding: 18px;
+
+            margin-bottom: 20px;
+        }
+
+
+        .location-title {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 10px;
+
+            font-weight: 700;
+
+            color: #1e3a8a;
+
+            margin-bottom: 15px;
+        }
+
+
+        .location-icon {
+
+            width: 38px;
+
+            height: 38px;
+
+            border-radius: 10px;
+
+            background: #dbeafe;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            font-size: 20px;
+        }
+
 
         .gps-status {
-            font-size: 14px;
-            color: #4b5b70;
-            margin-bottom: 12px;
-            line-height: 1.5;
-        }
 
-        .location-data {
-            display: none;
-            background: #ffffff;
-            border-radius: 12px;
             padding: 12px;
-        }
 
-        .location-row {
-            display: flex;
-            justify-content: space-between;
-            gap: 10px;
-            padding: 7px 0;
-            font-size: 12px;
-        }
+            border-radius: 10px;
 
-        .location-row span:first-child {
-            color: #697586;
-        }
+            background: #ecfdf5;
 
-        .location-row span:last-child {
+            color: #047857;
+
+            font-size: 14px;
+
+            margin-bottom: 15px;
+
             font-weight: 600;
-            text-align: right;
         }
 
-        .btn {
+
+        .gps-status.error {
+
+            background: #fef2f2;
+
+            color: #b91c1c;
+        }
+
+
+        .gps-status.loading {
+
+            background: #eff6ff;
+
+            color: #1d4ed8;
+        }
+
+
+        .gps-data {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(3, 1fr);
+
+            gap: 10px;
+        }
+
+
+        .gps-card {
+
+            background: white;
+
+            border:
+                1px solid #e5e7eb;
+
+            border-radius: 10px;
+
+            padding: 10px;
+
+            text-align: center;
+        }
+
+
+        .gps-card small {
+
+            display: block;
+
+            color: #64748b;
+
+            font-size: 11px;
+
+            margin-bottom: 5px;
+        }
+
+
+        .gps-card strong {
+
+            display: block;
+
+            font-size: 12px;
+
+            word-break: break-word;
+        }
+
+
+        .verify-btn {
+
             width: 100%;
+
             border: none;
+
             border-radius: 14px;
-            padding: 15px 18px;
-            font-size: 15px;
-            font-weight: 700;
-            cursor: pointer;
-            transition:
-                transform 0.15s ease,
-                opacity 0.15s ease;
-        }
 
-        .btn:active {
-            transform: scale(0.98);
-        }
+            padding: 16px;
 
-        .btn-primary {
             background:
                 linear-gradient(
                     135deg,
-                    #1d4ed8,
-                    #2563eb
+                    #2563eb,
+                    #1d4ed8
                 );
-            color: #ffffff;
+
+            color: white;
+
+            font-size: 16px;
+
+            font-weight: 700;
+
+            cursor: pointer;
+
+            transition: 0.2s;
+
             box-shadow:
                 0 8px 20px
-                rgba(37, 99, 235, 0.22);
+                rgba(37, 99, 235, 0.25);
         }
 
-        .btn-primary:disabled {
-            opacity: 0.55;
+
+        .verify-btn:hover {
+
+            transform: translateY(-1px);
+
+            box-shadow:
+                0 10px 25px
+                rgba(37, 99, 235, 0.32);
+        }
+
+
+        .verify-btn:disabled {
+
+            background: #94a3b8;
+
             cursor: not-allowed;
+
+            transform: none;
+
             box-shadow: none;
         }
 
+
         .message {
+
             display: none;
-            padding: 14px 15px;
-            border-radius: 13px;
-            margin-top: 15px;
-            font-size: 13px;
+
+            margin-top: 18px;
+
+            padding: 16px;
+
+            border-radius: 14px;
+
+            font-size: 14px;
+
             line-height: 1.5;
+
+            text-align: center;
+
+            font-weight: 600;
         }
 
-        .message.error {
-            background: #fff0f0;
-            border: 1px solid #f1c1c1;
-            color: #a51d1d;
-        }
 
         .message.success {
-            background: #eaf8ef;
-            border: 1px solid #bce8cc;
-            color: #187a43;
+
+            background: #ecfdf5;
+
+            border:
+                1px solid #a7f3d0;
+
+            color: #047857;
         }
 
-        .message.info {
-            background: #eef6ff;
-            border: 1px solid #c8def7;
-            color: #245a91;
+
+        .message.absent {
+
+            background: #fff7ed;
+
+            border:
+                1px solid #fed7aa;
+
+            color: #c2410c;
         }
+
+
+        .message.error {
+
+            background: #fef2f2;
+
+            border:
+                1px solid #fecaca;
+
+            color: #b91c1c;
+        }
+
 
         .footer {
+
             text-align: center;
-            color: #7a8699;
+
+            padding: 18px 20px;
+
+            border-top:
+                1px solid #edf0f4;
+
+            color: #64748b;
+
             font-size: 12px;
-            margin-top: 18px;
-            line-height: 1.6;
         }
+
+
+        .hidden {
+
+            display: none !important;
+        }
+
 
         .spinner {
+
             width: 18px;
+
             height: 18px;
-            border: 3px solid rgba(255,255,255,0.4);
-            border-top-color: #ffffff;
+
+            border:
+                2px solid
+                rgba(255,255,255,0.4);
+
+            border-top-color: white;
+
             border-radius: 50%;
+
             display: inline-block;
-            animation: spin 0.8s linear infinite;
+
             vertical-align: middle;
-            margin-right: 7px;
+
+            margin-right: 8px;
+
+            animation:
+                spin 0.8s linear infinite;
         }
 
+
         @keyframes spin {
+
             to {
                 transform: rotate(360deg);
             }
         }
 
-        @media (max-width: 480px) {
-            body {
-                padding: 12px;
-            }
 
-            .header {
-                padding: 24px 18px;
+        @media (max-width: 480px) {
+
+            body {
+                padding: 10px;
             }
 
             .content {
-                padding: 20px 16px 22px;
+                padding: 18px;
+            }
+
+            .header {
+                padding: 23px 15px;
             }
 
             .header h1 {
-                font-size: 21px;
+                font-size: 22px;
             }
 
-            .detail-row {
+            .gps-data {
+                grid-template-columns: 1fr;
+            }
+
+            .row {
                 align-items: flex-start;
+                flex-direction: column;
+                gap: 5px;
             }
 
-            .detail-value {
-                max-width: 62%;
+            .value {
+                text-align: left;
             }
         }
+
     </style>
+
 </head>
+
 
 <body>
 
 <div class="container">
 
-    <div class="card">
 
-        <div class="header">
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
 
-            <div class="logo">
-                QR
-            </div>
+    <div class="header">
 
-            <h1>
-                Attendance Verification
-            </h1>
-
-            <p>
-                Smart Attendance System
-            </p>
-
+        <div class="logo">
+            QR
         </div>
 
-        <div class="content">
+        <h1>
+            Attendance Verification
+        </h1>
 
-            <div
-                id="statusBox"
-                class="status-box status-valid"
-            >
+        <p>
+            Smart Attendance System
+        </p>
 
-                <div
-                    id="statusIcon"
-                    class="status-icon"
-                >
-                    ✓
-                </div>
+    </div>
 
-                <div
-                    id="statusTitle"
-                    class="status-title"
-                >
-                    QR Code Valid
-                </div>
 
-                <div
-                    id="statusText"
-                    class="status-text"
-                >
-                    Please verify your location to mark attendance.
-                </div>
+    <!-- =====================================================
+         CONTENT
+    ====================================================== -->
 
+    <div class="content">
+
+
+        <!-- =================================================
+             STATUS
+        ================================================== -->
+
+        <div
+            id="statusBox"
+            class="status loading"
+        >
+            Checking attendance session...
+        </div>
+
+
+        <!-- =================================================
+             ATTENDANCE DETAILS
+        ================================================== -->
+
+        <div
+            id="attendanceContent"
+            class="hidden"
+        >
+
+            <div class="details-title">
+                Attendance Details
             </div>
+
 
             <div class="details">
 
-                <div class="details-title">
-                    Attendance Details
-                </div>
 
-                <div class="detail-row">
+                <div class="row">
 
-                    <span class="detail-label">
+                    <span class="label">
                         Session
                     </span>
 
                     <span
+                        class="value"
                         id="sessionDisplay"
-                        class="detail-value"
                     >
-                        Loading...
+                        -
                     </span>
 
                 </div>
 
-                <div class="detail-row">
 
-                    <span class="detail-label">
+                <div class="row">
+
+                    <span class="label">
                         Subject
                     </span>
 
                     <span
+                        class="value"
                         id="subjectDisplay"
-                        class="detail-value loading"
                     >
-                        Loading...
+                        -
                     </span>
 
                 </div>
 
-                <div class="detail-row">
 
-                    <span class="detail-label">
+                <div class="row">
+
+                    <span class="label">
                         Branch
                     </span>
 
                     <span
+                        class="value"
                         id="branchDisplay"
-                        class="detail-value loading"
                     >
-                        Loading...
+                        -
                     </span>
 
                 </div>
 
-                <div class="detail-row">
 
-                    <span class="detail-label">
+                <div class="row">
+
+                    <span class="label">
                         Section
                     </span>
 
                     <span
+                        class="value"
                         id="sectionDisplay"
-                        class="detail-value loading"
                     >
-                        Loading...
+                        -
                     </span>
 
                 </div>
 
-                <div class="detail-row">
 
-                    <span class="detail-label">
+                <div class="row">
+
+                    <span class="label">
                         Semester
                     </span>
 
                     <span
+                        class="value"
                         id="semesterDisplay"
-                        class="detail-value loading"
                     >
-                        Loading...
+                        -
                     </span>
 
                 </div>
 
-            </div>
 
-            <div class="timer-box">
+                <div class="row">
 
-                <div class="timer-label">
-                    QR Time Left
+                    <span class="label">
+                        QR Time Left
+                    </span>
+
+                    <span
+                        class="value"
+                        id="timeDisplay"
+                    >
+                        -
+                    </span>
+
                 </div>
 
-                <div
-                    id="timer"
-                    class="timer"
-                >
-                    Loading...
-                </div>
 
             </div>
 
-            <div class="gps-box">
 
-                <div class="gps-title">
+            <!-- =============================================
+                 LOCATION
+            ============================================== -->
 
-                    <span>
+            <div class="location-box">
+
+
+                <div class="location-title">
+
+                    <div class="location-icon">
                         📍
-                    </span>
+                    </div>
 
                     <span>
                         Location Verification
@@ -524,70 +764,90 @@
 
                 </div>
 
+
                 <div
                     id="gpsStatus"
-                    class="gps-status"
+                    class="gps-status loading"
                 >
-                    Waiting for location permission...
+                    Detecting your location...
                 </div>
 
-                <div
-                    id="locationData"
-                    class="location-data"
-                >
 
-                    <div class="location-row">
+                <div class="gps-data">
 
-                        <span>
+
+                    <div class="gps-card">
+
+                        <small>
                             Latitude
-                        </span>
+                        </small>
 
-                        <span id="latitude">
-                            --
-                        </span>
+                        <strong
+                            id="latitudeDisplay"
+                        >
+                            -
+                        </strong>
 
                     </div>
 
-                    <div class="location-row">
 
-                        <span>
+                    <div class="gps-card">
+
+                        <small>
                             Longitude
-                        </span>
+                        </small>
 
-                        <span id="longitude">
-                            --
-                        </span>
+                        <strong
+                            id="longitudeDisplay"
+                        >
+                            -
+                        </strong>
 
                     </div>
 
-                    <div class="location-row">
 
-                        <span>
+                    <div class="gps-card">
+
+                        <small>
                             Accuracy
-                        </span>
+                        </small>
 
-                        <span id="accuracy">
-                            --
-                        </span>
+                        <strong
+                            id="accuracyDisplay"
+                        >
+                            -
+                        </strong>
 
                     </div>
+
 
                 </div>
+
 
             </div>
 
+
+            <!-- =============================================
+                 VERIFY BUTTON
+            ============================================== -->
+
             <button
                 id="verifyButton"
-                class="btn btn-primary"
+                class="verify-btn"
                 type="button"
                 disabled
-                onclick="verifyLocation()"
             >
-                Verify Location &amp; Mark Attendance
+                Verify Location &amp;
+                Mark Attendance
             </button>
 
+
+            <!-- =============================================
+                 MESSAGE
+            ============================================== -->
+
             <div
-                id="message"
+                id="resultMessage"
                 class="message"
             ></div>
 
@@ -595,10 +855,14 @@
 
     </div>
 
+
+    <!-- =====================================================
+         FOOTER
+    ====================================================== -->
+
     <div class="footer">
 
-        Smart Attendance System
-        <br>
+        Smart Attendance System<br>
 
         QR + GPS Based Attendance
 
@@ -606,650 +870,596 @@
 
 </div>
 
+
 <script>
 
-    const urlParams =
-        new URLSearchParams(
-            window.location.search
+
+// ==========================================================
+// SESSION ID
+// ==========================================================
+
+const urlParams =
+    new URLSearchParams(
+        window.location.search
+    );
+
+
+const sessionId =
+    urlParams.get(
+        "session"
+    );
+
+
+// ==========================================================
+// ELEMENTS
+// ==========================================================
+
+const statusBox =
+    document.getElementById(
+        "statusBox"
+    );
+
+
+const attendanceContent =
+    document.getElementById(
+        "attendanceContent"
+    );
+
+
+const sessionDisplay =
+    document.getElementById(
+        "sessionDisplay"
+    );
+
+
+const subjectDisplay =
+    document.getElementById(
+        "subjectDisplay"
+    );
+
+
+const branchDisplay =
+    document.getElementById(
+        "branchDisplay"
+    );
+
+
+const sectionDisplay =
+    document.getElementById(
+        "sectionDisplay"
+    );
+
+
+const semesterDisplay =
+    document.getElementById(
+        "semesterDisplay"
+    );
+
+
+const timeDisplay =
+    document.getElementById(
+        "timeDisplay"
+    );
+
+
+const gpsStatus =
+    document.getElementById(
+        "gpsStatus"
+    );
+
+
+const latitudeDisplay =
+    document.getElementById(
+        "latitudeDisplay"
+    );
+
+
+const longitudeDisplay =
+    document.getElementById(
+        "longitudeDisplay"
+    );
+
+
+const accuracyDisplay =
+    document.getElementById(
+        "accuracyDisplay"
+    );
+
+
+const verifyButton =
+    document.getElementById(
+        "verifyButton"
+    );
+
+
+const resultMessage =
+    document.getElementById(
+        "resultMessage"
+    );
+
+
+// ==========================================================
+// GLOBAL GPS DATA
+// ==========================================================
+
+let currentLatitude = null;
+
+let currentLongitude = null;
+
+let currentAccuracy = null;
+
+let sessionValid = false;
+
+
+// ==========================================================
+// STATUS HELPER
+// ==========================================================
+
+function setStatus(
+    message,
+    type
+) {
+
+    statusBox.textContent =
+        message;
+
+    statusBox.className =
+        "status " + type;
+}
+
+
+// ==========================================================
+// RESULT MESSAGE
+// ==========================================================
+
+function showMessage(
+    message,
+    type
+) {
+
+    resultMessage.textContent =
+        message;
+
+    resultMessage.className =
+        "message " + type;
+
+    resultMessage.style.display =
+        "block";
+}
+
+
+// ==========================================================
+// LOAD SESSION
+// ==========================================================
+
+async function loadSession() {
+
+    if (!sessionId) {
+
+        setStatus(
+            "✕ Attendance session is missing.",
+            "error"
         );
 
-    const sessionId =
-        urlParams.get("session");
-
-    let latitude = null;
-    let longitude = null;
-    let accuracy = null;
-    let sessionExpiresAt = null;
-    let timerInterval = null;
-    let locationReady = false;
-    let sessionLoaded = false;
-
-    const sessionDisplay =
-        document.getElementById("sessionDisplay");
-
-    const subjectDisplay =
-        document.getElementById("subjectDisplay");
-
-    const branchDisplay =
-        document.getElementById("branchDisplay");
-
-    const sectionDisplay =
-        document.getElementById("sectionDisplay");
-
-    const semesterDisplay =
-        document.getElementById("semesterDisplay");
-
-    const timerElement =
-        document.getElementById("timer");
-
-    const gpsStatus =
-        document.getElementById("gpsStatus");
-
-    const locationData =
-        document.getElementById("locationData");
-
-    const verifyButton =
-        document.getElementById("verifyButton");
-
-    const messageElement =
-        document.getElementById("message");
-
-    const statusBox =
-        document.getElementById("statusBox");
-
-    const statusIcon =
-        document.getElementById("statusIcon");
-
-    const statusTitle =
-        document.getElementById("statusTitle");
-
-    const statusText =
-        document.getElementById("statusText");
-
-
-    function showMessage(text, type = "info") {
-
-        messageElement.textContent = text;
-
-        messageElement.className =
-            "message " + type;
-
-        messageElement.style.display =
-            "block";
+        return;
     }
 
 
-    function hideMessage() {
+    try {
 
-        messageElement.style.display =
-            "none";
-    }
-
-
-    function showError(text) {
-
-        showMessage(text, "error");
-    }
-
-
-    function showSuccess(text) {
-
-        showMessage(text, "success");
-    }
+        const requestUrl =
+            window.location.pathname
+            +
+            "?session="
+            +
+            encodeURIComponent(
+                sessionId
+            )
+            +
+            "&data=1";
 
 
-    function showInfo(text) {
-
-        showMessage(text, "info");
-    }
-
-
-    function invalidQR(text) {
-
-        statusBox.className =
-            "status-box status-invalid";
-
-        statusIcon.textContent =
-            "✕";
-
-        statusTitle.textContent =
-            "Invalid Attendance QR";
-
-        statusText.textContent =
-            text ||
-            "Please scan a fresh QR code.";
-
-        verifyButton.disabled =
-            true;
-    }
+        const response =
+            await fetch(
+                requestUrl,
+                {
+                    method: "GET",
+                    cache: "no-store"
+                }
+            );
 
 
-    function validQR() {
+        if (!response.ok) {
 
-        statusBox.className =
-            "status-box status-valid";
-
-        statusIcon.textContent =
-            "✓";
-
-        statusTitle.textContent =
-            "QR Code Valid";
-
-        statusText.textContent =
-            "Please verify your location to mark attendance.";
-    }
+            throw new Error(
+                "HTTP " +
+                response.status
+            );
+        }
 
 
-    async function loadSession() {
+        const data =
+            await response.json();
 
-        if (!sessionId) {
 
-            invalidQR(
-                "Attendance session is missing."
+        if (
+            data.valid !== true
+        ) {
+
+            setStatus(
+                "✕ " +
+                (
+                    data.error
+                    ||
+                    "Attendance session not found."
+                ),
+                "error"
             );
 
             return;
         }
 
 
+        // ==============================================
+        // SESSION VALID
+        // ==============================================
+
+        sessionValid = true;
+
+
+        setStatus(
+            "✓ QR Code Valid",
+            "valid"
+        );
+
+
+        attendanceContent.classList.remove(
+            "hidden"
+        );
+
+
         sessionDisplay.textContent =
+            data.session_id
+            ||
             sessionId;
 
 
-        try {
-
-            const requestUrl =
-                window.location.pathname +
-                "?session=" +
-                encodeURIComponent(sessionId) +
-                "&data=1";
+        subjectDisplay.textContent =
+            data.subject
+            ||
+            "General";
 
 
-            const response =
-                await fetch(
-                    requestUrl,
-                    {
-                        method: "GET",
-
-                        credentials: "same-origin",
-
-                        cache: "no-store",
-
-                        headers: {
-                            "Accept":
-                                "application/json"
-                        }
-                    }
-                );
+        branchDisplay.textContent =
+            data.branch
+            ||
+            "Not specified";
 
 
-            const contentType =
-                response.headers.get(
-                    "content-type"
-                ) || "";
+        sectionDisplay.textContent =
+            data.section
+            ||
+            "Not specified";
 
 
-            console.log(
-                "Session response:",
-                response.status,
-                contentType
+        semesterDisplay.textContent =
+            "Semester "
+            +
+            (
+                data.semester
+                ||
+                "-"
             );
 
 
-            if (!response.ok) {
+        // ==============================================
+        // QR TIME
+        // ==============================================
 
-                let errorMessage =
-                    "Unable to load attendance session.";
-
-
-                if (
-                    contentType.includes(
-                        "application/json"
-                    )
-                ) {
-
-                    try {
-
-                        const errorData =
-                            await response.json();
-
-                        errorMessage =
-                            errorData.error ||
-                            errorData.message ||
-                            errorMessage;
-
-                    } catch (e) {
-
-                        console.error(e);
-                    }
-                }
-
-
-                invalidQR(errorMessage);
-
-                return;
-            }
-
-
-            if (
-                !contentType.includes(
-                    "application/json"
-                )
-            ) {
-
-                invalidQR(
-                    "Attendance session data could not be loaded."
-                );
-
-                return;
-            }
-
-
-            const data =
-                await response.json();
-
-
-            console.log(
-                "Attendance Session:",
-                data
+        let seconds =
+            Number(
+                data.time_left
             );
 
 
-            /*
-             * IMPORTANT:
-             * views.py returns:
-             * valid: true
-             *
-             * Therefore we check data.valid,
-             * not data.success.
-             */
+        if (
+            Number.isFinite(seconds)
+            &&
+            seconds >= 0
+        ) {
 
-            if (
-                data.valid !== true
-            ) {
-
-                invalidQR(
-                    data.error ||
-                    data.message ||
-                    "Invalid attendance QR."
-                );
-
-                return;
-            }
-
-
-            sessionDisplay.textContent =
-                data.session_id ||
-                sessionId;
-
-
-            subjectDisplay.textContent =
-                data.subject ||
-                "General";
-
-            subjectDisplay.classList.remove(
-                "loading"
+            updateTime(
+                seconds
             );
 
-
-            branchDisplay.textContent =
-                data.branch ||
-                "Not specified";
-
-            branchDisplay.classList.remove(
-                "loading"
+            startCountdown(
+                seconds
             );
 
+        } else {
 
-            sectionDisplay.textContent =
-                data.section ||
-                "Not specified";
-
-            sectionDisplay.classList.remove(
-                "loading"
-            );
-
-
-            if (
-                data.semester !== undefined &&
-                data.semester !== null &&
-                data.semester !== ""
-            ) {
-
-                semesterDisplay.textContent =
-                    "Semester " + data.semester;
-
-            } else {
-
-                semesterDisplay.textContent =
-                    "Not specified";
-            }
-
-
-            semesterDisplay.classList.remove(
-                "loading"
-            );
-
-
-            if (data.expires_at) {
-
-                const expiryDate =
-                    new Date(
-                        data.expires_at
-                    );
-
-
-                if (
-                    !isNaN(
-                        expiryDate.getTime()
-                    )
-                ) {
-
-                    sessionExpiresAt =
-                        expiryDate.getTime();
-
-                    startTimer();
-
-                } else {
-
-                    timerElement.textContent =
-                        "Invalid time";
-                }
-
-            } else {
-
-                timerElement.textContent =
-                    "Unavailable";
-            }
-
-
-            sessionLoaded = true;
-
-            validQR();
-
-            initializeGPS();
-
+            timeDisplay.textContent =
+                "Unavailable";
         }
 
 
-        catch (error) {
+        // ==============================================
+        // GPS
+        // ==============================================
+
+        detectLocation();
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Session error:",
+            error
+        );
+
+
+        setStatus(
+            "✕ Unable to load attendance session.",
+            "error"
+        );
+    }
+}
+
+
+// ==========================================================
+// COUNTDOWN
+// ==========================================================
+
+let countdownTimer = null;
+
+
+function updateTime(
+    seconds
+) {
+
+    if (seconds <= 0) {
+
+        timeDisplay.textContent =
+            "Expired";
+
+        return;
+    }
+
+
+    timeDisplay.textContent =
+        seconds +
+        " seconds";
+}
+
+
+function startCountdown(
+    seconds
+) {
+
+    if (countdownTimer) {
+
+        clearInterval(
+            countdownTimer
+        );
+    }
+
+
+    let remaining =
+        Number(seconds);
+
+
+    updateTime(
+        remaining
+    );
+
+
+    countdownTimer =
+        setInterval(
+            function () {
+
+                remaining--;
+
+                if (
+                    remaining <= 0
+                ) {
+
+                    clearInterval(
+                        countdownTimer
+                    );
+
+                    timeDisplay.textContent =
+                        "Expired";
+
+                    verifyButton.disabled =
+                        true;
+
+                    sessionValid =
+                        false;
+
+                    setStatus(
+                        "✕ QR Code Expired",
+                        "error"
+                    );
+
+                    return;
+                }
+
+
+                updateTime(
+                    remaining
+                );
+
+            },
+            1000
+        );
+}
+
+
+// ==========================================================
+// GPS DETECTION
+// ==========================================================
+
+function detectLocation() {
+
+
+    if (
+        !navigator.geolocation
+    ) {
+
+        gpsStatus.textContent =
+            "✕ Geolocation is not supported by this browser.";
+
+        gpsStatus.className =
+            "gps-status error";
+
+        return;
+    }
+
+
+    gpsStatus.textContent =
+        "Detecting your location...";
+
+    gpsStatus.className =
+        "gps-status loading";
+
+
+    navigator.geolocation.getCurrentPosition(
+
+        function(position) {
+
+            currentLatitude =
+                position.coords.latitude;
+
+
+            currentLongitude =
+                position.coords.longitude;
+
+
+            currentAccuracy =
+                position.coords.accuracy;
+
+
+            latitudeDisplay.textContent =
+                currentLatitude.toFixed(
+                    6
+                );
+
+
+            longitudeDisplay.textContent =
+                currentLongitude.toFixed(
+                    6
+                );
+
+
+            accuracyDisplay.textContent =
+                Math.round(
+                    currentAccuracy
+                )
+                +
+                " meters";
+
+
+            gpsStatus.textContent =
+                "✓ Location detected successfully.";
+
+            gpsStatus.className =
+                "gps-status";
+
+
+            if (
+                sessionValid
+            ) {
+
+                verifyButton.disabled =
+                    false;
+            }
+
+        },
+
+        function(error) {
 
             console.error(
-                "Session loading error:",
+                "GPS Error:",
                 error
             );
 
 
-            invalidQR(
-                "Unable to load attendance session. Please scan a fresh QR."
-            );
-        }
-    }
+            verifyButton.disabled =
+                true;
 
 
-    function startTimer() {
-
-        if (!sessionExpiresAt) {
-            return;
-        }
-
-
-        if (timerInterval) {
-
-            clearInterval(
-                timerInterval
-            );
-        }
-
-
-        function updateTimer() {
-
-            const remaining =
-                Math.max(
-                    0,
-                    Math.ceil(
-                        (
-                            sessionExpiresAt -
-                            Date.now()
-                        ) / 1000
-                    )
-                );
-
-
-            if (remaining <= 0) {
-
-                timerElement.textContent =
-                    "Expired";
-
-                timerElement.classList.add(
-                    "expired"
-                );
-
-                verifyButton.disabled =
-                    true;
-
-                invalidQR(
-                    "QR expired. Please scan a fresh QR."
-                );
-
-                clearInterval(
-                    timerInterval
-                );
-
-                return;
-            }
-
-
-            timerElement.classList.remove(
-                "expired"
-            );
-
-
-            timerElement.textContent =
-                remaining + " seconds";
-        }
-
-
-        updateTimer();
-
-
-        timerInterval =
-            setInterval(
-                updateTimer,
-                1000
-            );
-    }
-
-
-    function initializeGPS() {
-
-        if (!navigator.geolocation) {
-
-            gpsStatus.textContent =
-                "GPS is not supported on this device.";
-
-            showError(
-                "Your browser does not support location services."
-            );
-
-            return;
-        }
-
-
-        gpsStatus.textContent =
-            "Requesting your location permission...";
-
-
-        showInfo(
-            "Please allow location access when your browser asks."
-        );
-
-
-        navigator.geolocation.getCurrentPosition(
-
-            function(position) {
-
-                latitude =
-                    position.coords.latitude;
-
-                longitude =
-                    position.coords.longitude;
-
-                accuracy =
-                    position.coords.accuracy;
-
-
-                document.getElementById(
-                    "latitude"
-                ).textContent =
-                    latitude.toFixed(6);
-
-
-                document.getElementById(
-                    "longitude"
-                ).textContent =
-                    longitude.toFixed(6);
-
-
-                document.getElementById(
-                    "accuracy"
-                ).textContent =
-                    Math.round(
-                        accuracy
-                    ) + " meters";
-
-
-                locationData.style.display =
-                    "block";
-
-
-                locationReady = true;
-
-
-                gpsStatus.textContent =
-                    "✓ Location detected successfully.";
-
-
-                if (
-                    sessionLoaded &&
-                    sessionExpiresAt &&
-                    Date.now() < sessionExpiresAt
-                ) {
-
-                    verifyButton.disabled =
-                        false;
-                }
-
-
-                showInfo(
-                    "Your location has been detected. You can now verify attendance."
-                );
-            },
-
-
-            function(error) {
-
-                console.error(
-                    "GPS Error:",
-                    error
-                );
-
-
-                locationReady = false;
-
-                verifyButton.disabled = true;
-
-
-                let errorMessage =
-                    "Unable to detect your location.";
-
-
-                if (
-                    error.code ===
-                    error.PERMISSION_DENIED
-                ) {
-
-                    errorMessage =
-                        "Location permission denied. Please allow location access for this website and reload the page.";
-
-                } else if (
-                    error.code ===
-                    error.POSITION_UNAVAILABLE
-                ) {
-
-                    errorMessage =
-                        "Location information is unavailable. Please turn on Location/GPS and try again.";
-
-                } else if (
-                    error.code ===
-                    error.TIMEOUT
-                ) {
-
-                    errorMessage =
-                        "Location request timed out. Please try again.";
-                }
-
-
-                gpsStatus.textContent =
-                    errorMessage;
-
-
-                showError(
-                    errorMessage
-                );
-            },
-
-
-            {
-                enableHighAccuracy: true,
-                timeout: 20000,
-                maximumAge: 0
-            }
-        );
-    }
-
-
-    function getCookie(name) {
-
-        const cookies =
-            document.cookie.split(";");
-
-
-        for (
-            let i = 0;
-            i < cookies.length;
-            i++
-        ) {
-
-            const cookie =
-                cookies[i].trim();
+            let message =
+                "Unable to detect your location.";
 
 
             if (
-                cookie.startsWith(
-                    name + "="
-                )
+                error.code ===
+                error.PERMISSION_DENIED
             ) {
 
-                return decodeURIComponent(
-                    cookie.substring(
-                        name.length + 1
-                    )
-                );
+                message =
+                    "Location permission denied. Please allow location access and try again.";
+
             }
+            else if (
+                error.code ===
+                error.POSITION_UNAVAILABLE
+            ) {
+
+                message =
+                    "Location information is unavailable.";
+
+            }
+            else if (
+                error.code ===
+                error.TIMEOUT
+            ) {
+
+                message =
+                    "Location request timed out. Please try again.";
+            }
+
+
+            gpsStatus.textContent =
+                "✕ " +
+                message;
+
+
+            gpsStatus.className =
+                "gps-status error";
+
+        },
+
+        {
+            enableHighAccuracy:
+                true,
+
+            timeout:
+                15000,
+
+            maximumAge:
+                0
         }
+    );
+}
 
 
-        return null;
-    }
+// ==========================================================
+// VERIFY ATTENDANCE
+// ==========================================================
 
+verifyButton.addEventListener(
+    "click",
+    async function() {
 
-    async function verifyLocation() {
+        if (
+            !sessionValid
+        ) {
 
-        if (!sessionId) {
-
-            showError(
-                "Attendance session is missing."
+            showMessage(
+                "QR session is no longer valid.",
+                "error"
             );
 
             return;
@@ -1257,215 +1467,248 @@
 
 
         if (
-            latitude === null ||
-            longitude === null
+            currentLatitude === null
+            ||
+            currentLongitude === null
         ) {
 
-            showError(
-                "Please allow GPS location first."
+            showMessage(
+                "Location has not been detected yet. Please allow GPS access.",
+                "error"
             );
+
+            detectLocation();
 
             return;
         }
 
 
-        if (
-            !sessionExpiresAt ||
-            Date.now() >= sessionExpiresAt
-        ) {
+        verifyButton.disabled =
+            true;
 
-            invalidQR(
-                "QR expired. Please scan a fresh QR."
-            );
-
-            return;
-        }
-
-
-        verifyButton.disabled = true;
 
         verifyButton.innerHTML =
-            '<span class="spinner"></span>' +
-            'Verifying Location...';
+            '<span class="spinner"></span>Verifying Attendance...';
 
-        hideMessage();
+
+        resultMessage.style.display =
+            "none";
 
 
         try {
-
-            const csrfToken =
-                getCookie("csrftoken");
-
-
-            if (!csrfToken) {
-
-                throw new Error(
-                    "CSRF token is missing. Please reload the page and try again."
-                );
-            }
-
 
             const response =
                 await fetch(
                     "/mark-attendance/",
                     {
-
                         method: "POST",
 
-                        credentials:
-                            "same-origin",
-
                         headers: {
-
                             "Content-Type":
                                 "application/json",
-
-                            "Accept":
-                                "application/json",
-
-                            "X-CSRFToken":
-                                csrfToken,
 
                             "X-Requested-With":
                                 "XMLHttpRequest"
                         },
 
-
                         body:
-                            JSON.stringify({
+                            JSON.stringify(
+                                {
+                                    session_id:
+                                        sessionId,
 
-                                session_id:
-                                    sessionId,
+                                    latitude:
+                                        currentLatitude,
 
-                                latitude:
-                                    latitude,
-
-                                longitude:
-                                    longitude,
-
-                                accuracy:
-                                    accuracy
-                            })
+                                    longitude:
+                                        currentLongitude
+                                }
+                            )
                     }
                 );
 
 
-            const responseText =
+            const text =
                 await response.text();
 
 
-            console.log(
-                "Attendance server response:",
-                response.status,
-                responseText
-            );
-
-
-            let data = null;
+            let data;
 
 
             try {
 
                 data =
                     JSON.parse(
-                        responseText
+                        text
                     );
 
-            } catch (jsonError) {
+            }
+            catch (
+                jsonError
+            ) {
 
                 console.error(
-                    "Response is not JSON:",
-                    responseText
+                    "Invalid JSON:",
+                    text
+                );
+
+                throw new Error(
+                    "Server returned an invalid response."
                 );
             }
 
 
-            if (!response.ok) {
+            // ==========================================
+            // SERVER ERROR
+            // ==========================================
 
-                const backendMessage =
-                    data &&
-                    (
-                        data.error ||
-                        data.message ||
-                        data.detail
-                    );
-
+            if (
+                !response.ok
+            ) {
 
                 throw new Error(
-                    backendMessage ||
-                    "Attendance request failed. HTTP " +
+                    data.error
+                    ||
+                    data.message
+                    ||
+                    "Attendance request failed. HTTP "
+                    +
                     response.status
                 );
             }
 
 
+            // ==========================================
+            // BACKEND FAILURE
+            // ==========================================
+
             if (
-                data &&
-                data.success === true
+                data.success !== true
             ) {
 
-                statusBox.className =
-                    "status-box status-valid";
+                throw new Error(
+                    data.error
+                    ||
+                    "Unable to mark attendance."
+                );
+            }
 
 
-                statusIcon.textContent =
-                    "✓";
+            // ==========================================
+            // ATTENDANCE RESULT
+            // ==========================================
+
+            const status =
+                data.status
+                ||
+                "Unknown";
 
 
-                statusTitle.textContent =
-                    "Attendance Marked Successfully";
+            const distance =
+                data.distance;
 
 
-                statusText.textContent =
-                    data.message ||
-                    "Your attendance has been marked successfully.";
+            if (
+                status === "Present"
+            ) {
+
+                let message =
+                    "✓ Attendance marked PRESENT successfully.";
+
+                if (
+                    distance !== undefined
+                ) {
+
+                    message +=
+                        " Distance from attendance area: "
+                        +
+                        distance
+                        +
+                        " meters.";
+                }
 
 
-                showSuccess(
-                    data.message ||
-                    "Your attendance has been marked successfully."
+                showMessage(
+                    message,
+                    "success"
                 );
 
 
                 verifyButton.innerHTML =
-                    "✓ Attendance Marked";
+                    "✓ Attendance Marked Present";
 
 
                 verifyButton.disabled =
                     true;
 
-
-                return;
             }
+            else if (
+                status === "Absent"
+            ) {
+
+                let message =
+                    "Attendance marked ABSENT because you are outside the attendance area.";
+
+                if (
+                    distance !== undefined
+                ) {
+
+                    message +=
+                        " Distance: "
+                        +
+                        distance
+                        +
+                        " meters.";
+                }
 
 
-            const failureMessage =
-                data &&
-                (
-                    data.error ||
-                    data.message ||
-                    data.detail
+                showMessage(
+                    message,
+                    "absent"
                 );
 
 
-            throw new Error(
-                failureMessage ||
-                "Unable to mark attendance."
-            );
+                verifyButton.innerHTML =
+                    "Attendance Marked Absent";
+
+
+                verifyButton.disabled =
+                    true;
+
+            }
+            else {
+
+                showMessage(
+                    "Attendance response received: "
+                    +
+                    status,
+                    "success"
+                );
+
+
+                verifyButton.innerHTML =
+                    "Attendance Recorded";
+
+
+                verifyButton.disabled =
+                    true;
+            }
+
+
         }
-
-
         catch (error) {
 
             console.error(
-                "Attendance Error:",
+                "Attendance error:",
                 error
             );
 
 
-            showError(
-                error.message ||
-                "Unable to mark attendance. Please try again."
+            showMessage(
+                error.message
+                ||
+                "Attendance request failed.",
+                "error"
             );
 
 
@@ -1474,15 +1717,23 @@
 
 
             verifyButton.innerHTML =
-                "Verify Location &amp; Mark Attendance";
+                "Verify Location & Mark Attendance";
         }
+
     }
+);
 
 
-    loadSession();
+// ==========================================================
+// START
+// ==========================================================
+
+loadSession();
+
 
 </script>
 
 </body>
+
 </html>
 
