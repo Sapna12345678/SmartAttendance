@@ -33,6 +33,9 @@ def get_cloudflare_host():
     """
     Read the current Cloudflare Quick Tunnel hostname
     from cloudflare_url.txt.
+
+    This is kept only for local/tunnel-related configuration.
+    It is NOT used for Smart Attendance QR links.
     """
 
     try:
@@ -65,6 +68,7 @@ ALLOWED_HOSTS = [
     "testserver",
     "10.11.120.160",
     ".trycloudflare.com",
+    "smartattendance-edd1.onrender.com",
 ]
 
 
@@ -98,6 +102,7 @@ CSRF_TRUSTED_ORIGINS = [
     "http://localhost:8000",
     "http://10.11.120.160:8000",
     "https://*.trycloudflare.com",
+    "https://smartattendance-edd1.onrender.com",
 ]
 
 
@@ -155,20 +160,14 @@ SECURE_PROXY_SSL_HEADER = (
 # ============================================================
 # SMART ATTENDANCE PUBLIC HOST
 # ============================================================
+#
+# IMPORTANT:
+# QR attendance links always use the stable Render URL.
+#
+# Cloudflare Quick Tunnel will NOT override this value.
+#
 
-if os.environ.get("SMART_ATTENDANCE_HOST"):
-    SMART_ATTENDANCE_HOST = os.environ.get(
-        "SMART_ATTENDANCE_HOST"
-    )
-
-elif RENDER_HOST:
-    SMART_ATTENDANCE_HOST = RENDER_HOST
-
-elif CURRENT_CLOUDFLARE_HOST:
-    SMART_ATTENDANCE_HOST = CURRENT_CLOUDFLARE_HOST
-
-else:
-    SMART_ATTENDANCE_HOST = "127.0.0.1:8000"
+SMART_ATTENDANCE_HOST = "smartattendance-edd1.onrender.com"
 
 
 # ============================================================

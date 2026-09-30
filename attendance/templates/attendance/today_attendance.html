@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Today's Attendance</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f4f7fb;
+            color: #111827;
+        }
+
+        .page {
+            padding: 30px;
+            max-width: 1500px;
+            margin: auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 30px;
+            color: #111827;
+        }
+
+        .header p {
+            margin-top: 8px;
+            color: #6b7280;
+        }
+
+        .btn {
+            text-decoration: none;
+            padding: 12px 18px;
+            border-radius: 8px;
+            background: #111827;
+            color: white;
+            font-weight: 600;
+        }
+
+        .btn:hover {
+            background: #1f2937;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+            margin-bottom: 25px;
+        }
+
+        .card {
+            background: white;
+            padding: 22px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,.06);
+        }
+
+        .card-title {
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .card-value {
+            margin: 8px 0 0;
+            font-size: 28px;
+        }
+
+        .green {
+            color: #16a34a;
+        }
+
+        .red {
+            color: #dc2626;
+        }
+
+        .table-box {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,.06);
+            overflow: hidden;
+        }
+
+        .table-header {
+            padding: 20px 22px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .table-header h2 {
+            margin: 0;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 900px;
+        }
+
+        th {
+            padding: 14px;
+            text-align: left;
+            background: #f8fafc;
+            color: #374151;
+            font-size: 14px;
+        }
+
+        td {
+            padding: 14px;
+            border-top: 1px solid #e5e7eb;
+            font-size: 14px;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .present {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .absent {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .verified {
+            color: #15803d;
+            font-weight: 600;
+        }
+
+        .not-verified {
+            color: #dc2626;
+            font-weight: 600;
+        }
+
+        .empty {
+            padding: 60px 20px;
+            text-align: center;
+            color: #6b7280;
+        }
+
+        .empty-icon {
+            font-size: 45px;
+            margin-bottom: 15px;
+        }
+
+        .empty h3 {
+            color: #374151;
+        }
+
+        @media (max-width: 900px) {
+
+            .page {
+                padding: 18px;
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+        }
+
+        @media (max-width: 550px) {
+
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="page">
+
+    <!-- HEADER -->
+
+    <div class="header">
+
+        <div>
+            <h1>Today's Attendance</h1>
+
+            <p>
+                Attendance records for {{ today }}
+            </p>
+        </div>
+
+        <a href="{% url 'attendance_list' %}" class="btn">
+            View All Attendance
+        </a>
+
+    </div>
+
+
+    <!-- STATISTICS -->
+
+    <div class="stats">
+
+        <div class="card">
+
+            <div class="card-title">
+                Total Records
+            </div>
+
+            <div class="card-value">
+                {{ records|length }}
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="card-title">
+                Present
+            </div>
+
+            <div class="card-value green">
+                {{ present_count|default:"0" }}
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="card-title">
+                Absent
+            </div>
+
+            <div class="card-value red">
+                {{ absent_count|default:"0" }}
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="card-title">
+                Date
+            </div>
+
+            <div class="card-value" style="font-size:20px;">
+                {{ today }}
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ATTENDANCE TABLE -->
+
+    <div class="table-box">
+
+        <div class="table-header">
+
+            <h2>
+                Attendance Records
+            </h2>
+
+        </div>
+
+
+        {% if records %}
+
+        <div class="table-container">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>Student</th>
+                        <th>Roll No.</th>
+                        <th>Subject</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Status</th>
+                        <th>Location</th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                {% for attendance in records %}
+
+                    <tr>
+
+                        <td>
+                            <strong>
+                                {{ attendance.student.name }}
+                            </strong>
+                        </td>
+
+
+                        <td>
+                            {{ attendance.student.roll_no }}
+                        </td>
+
+
+                        <td>
+
+                            {% if attendance.subject %}
+
+                                {{ attendance.subject.code }}
+                                -
+                                {{ attendance.subject.name }}
+
+                            {% else %}
+
+                                General
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <td>
+                            {{ attendance.date }}
+                        </td>
+
+
+                        <td>
+                            {{ attendance.time }}
+                        </td>
+
+
+                        <td>
+
+                            {% if attendance.status == "Present" %}
+
+                                <span class="status present">
+                                    Present
+                                </span>
+
+                            {% else %}
+
+                                <span class="status absent">
+                                    Absent
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <td>
+
+                            {% if attendance.location_verified %}
+
+                                <span class="verified">
+                                    ✓ Verified
+                                </span>
+
+                            {% else %}
+
+                                <span class="not-verified">
+                                    ✕ Not Verified
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+                    </tr>
+
+                {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        {% else %}
+
+        <div class="empty">
+
+            <div class="empty-icon">
+                📋
+            </div>
+
+            <h3>
+                No attendance records found
+            </h3>
+
+            <p>
+                There are no attendance records for today.
+            </p>
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+</body>
+</html>
