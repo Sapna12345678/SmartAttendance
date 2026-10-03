@@ -1,0 +1,909 @@
+html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Student Dashboard | Smart Attendance</title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+        rel="stylesheet"
+    >
+
+    <style>
+
+        body {
+            background: #f5f7fb;
+            font-family: Arial, sans-serif;
+        }
+
+        .navbar {
+            box-shadow: 0 3px 15px rgba(0,0,0,0.08);
+        }
+
+        .hero {
+            background: linear-gradient(
+                135deg,
+                #0d6efd,
+                #6610f2
+            );
+
+            color: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-top: 30px;
+
+            box-shadow: 0 10px 30px rgba(13,110,253,0.25);
+        }
+
+        .profile-card,
+        .stat-card,
+        .attendance-card,
+        .info-card {
+            border: none;
+            border-radius: 18px;
+            background: white;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.07);
+        }
+
+        .profile-card {
+            padding: 25px;
+        }
+
+        .profile-icon {
+            width: 80px;
+            height: 80px;
+
+            border-radius: 50%;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background: #0d6efd;
+            color: white;
+
+            font-size: 32px;
+            font-weight: bold;
+        }
+
+        .stat-card {
+            padding: 25px;
+            height: 100%;
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+
+            border-radius: 12px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background: #eef4ff;
+            color: #0d6efd;
+
+            font-size: 23px;
+        }
+
+        .stat-number {
+            font-size: 30px;
+            font-weight: 700;
+        }
+
+        .scan-card {
+            background: linear-gradient(
+                135deg,
+                #198754,
+                #20c997
+            );
+
+            color: white;
+
+            border-radius: 18px;
+
+            padding: 30px;
+
+            box-shadow: 0 10px 25px rgba(25,135,84,0.20);
+        }
+
+        .scan-btn {
+            background: white;
+            color: #198754;
+
+            border: none;
+
+            font-weight: 700;
+
+            padding: 12px 25px;
+
+            border-radius: 10px;
+        }
+
+        .scan-btn:hover {
+            background: #f1f1f1;
+            color: #157347;
+        }
+
+        .progress {
+            height: 14px;
+            border-radius: 20px;
+        }
+
+        .table {
+            margin-bottom: 0;
+        }
+
+        .verified {
+            color: #198754;
+            font-weight: 600;
+        }
+
+        .present {
+            color: #198754;
+            font-weight: 700;
+        }
+
+        .absent {
+            color: #dc3545;
+            font-weight: 700;
+        }
+
+        footer {
+            margin-top: 50px;
+            padding: 25px;
+            background: #212529;
+            color: #adb5bd;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- =====================================================
+     NAVBAR
+===================================================== -->
+
+<nav class="navbar navbar-expand-lg bg-white">
+
+    <div class="container">
+
+        <a
+            class="navbar-brand fw-bold text-primary"
+            href="/"
+        >
+
+            <i class="bi bi-qr-code-scan"></i>
+
+            Smart Attendance
+
+        </a>
+
+
+        <div class="d-flex align-items-center">
+
+            <span class="me-3 text-muted">
+
+                <i class="bi bi-person-circle"></i>
+
+                {{ student.name }}
+
+            </span>
+
+
+            <a
+                href="/accounts/logout/"
+                class="btn btn-outline-danger btn-sm"
+            >
+
+                <i class="bi bi-box-arrow-right"></i>
+
+                Logout
+
+            </a>
+
+        </div>
+
+    </div>
+
+</nav>
+
+
+
+<div class="container">
+
+
+<!-- =====================================================
+     WELCOME
+===================================================== -->
+
+<div class="hero">
+
+    <div class="row align-items-center">
+
+        <div class="col-md-8">
+
+            <h2 class="fw-bold">
+
+                Welcome, {{ student.name }} 👋
+
+            </h2>
+
+            <p class="mb-0">
+
+                Manage your attendance and view your attendance history.
+
+            </p>
+
+        </div>
+
+
+        <div class="col-md-4 text-md-end mt-3 mt-md-0">
+
+            <div class="fs-5">
+
+                <i class="bi bi-calendar3"></i>
+
+                {{ today|default:"Today" }}
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- =====================================================
+     PROFILE + SCAN
+===================================================== -->
+
+<div class="row g-4 mt-1">
+
+
+    <!-- PROFILE -->
+
+    <div class="col-lg-5">
+
+        <div class="profile-card h-100">
+
+            <div class="d-flex align-items-center mb-4">
+
+                <div class="profile-icon me-3">
+
+                    {{ student.name|first|upper }}
+
+                </div>
+
+                <div>
+
+                    <h4 class="mb-1 fw-bold">
+
+                        {{ student.name }}
+
+                    </h4>
+
+                    <span class="text-muted">
+
+                        Student Profile
+
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="row">
+
+                <div class="col-6 mb-3">
+
+                    <small class="text-muted">
+                        Roll Number
+                    </small>
+
+                    <div class="fw-bold">
+                        {{ student.roll_no }}
+                    </div>
+
+                </div>
+
+
+                <div class="col-6 mb-3">
+
+                    <small class="text-muted">
+                        Course
+                    </small>
+
+                    <div class="fw-bold">
+                        {{ student.course }}
+                    </div>
+
+                </div>
+
+
+                <div class="col-6 mb-3">
+
+                    <small class="text-muted">
+                        Year
+                    </small>
+
+                    <div class="fw-bold">
+                        {{ student.year }}
+                    </div>
+
+                </div>
+
+
+                <div class="col-6 mb-3">
+
+                    <small class="text-muted">
+                        Email
+                    </small>
+
+                    <div
+                        class="fw-bold text-truncate"
+                        title="{{ student.email }}"
+                    >
+
+                        {{ student.email }}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- SCAN ATTENDANCE -->
+
+    <div class="col-lg-7">
+
+        <div class="scan-card h-100">
+
+            <div class="row align-items-center">
+
+                <div class="col-md-8">
+
+                    <h3 class="fw-bold">
+
+                        <i class="bi bi-qr-code-scan"></i>
+
+                        Mark Attendance
+
+                    </h3>
+
+                    <p>
+
+                        Scan the attendance QR code displayed by your teacher.
+
+                    </p>
+
+                    <p class="mb-4">
+
+                        <i class="bi bi-geo-alt-fill"></i>
+
+                        Your location will be verified automatically.
+
+                    </p>
+
+
+                    <a
+                        href="/scan/"
+                        class="btn scan-btn"
+                    >
+
+                        <i class="bi bi-camera"></i>
+
+                        Scan Attendance QR
+
+                    </a>
+
+                </div>
+
+
+                <div class="col-md-4 text-center mt-4 mt-md-0">
+
+                    <i
+                        class="bi bi-qr-code"
+                        style="font-size: 110px;"
+                    ></i>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- =====================================================
+     STATISTICS
+===================================================== -->
+
+<div class="row g-4 mt-2">
+
+
+    <!-- TOTAL -->
+
+    <div class="col-md-3">
+
+        <div class="stat-card">
+
+            <div class="stat-icon mb-3">
+
+                <i class="bi bi-calendar-check"></i>
+
+            </div>
+
+            <div class="text-muted">
+                Total Records
+            </div>
+
+            <div class="stat-number">
+
+                {{ total_days }}
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- PRESENT -->
+
+    <div class="col-md-3">
+
+        <div class="stat-card">
+
+            <div class="stat-icon mb-3">
+
+                <i class="bi bi-check-circle"></i>
+
+            </div>
+
+            <div class="text-muted">
+                Present
+            </div>
+
+            <div class="stat-number text-success">
+
+                {{ present_days }}
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- ABSENT -->
+
+    <div class="col-md-3">
+
+        <div class="stat-card">
+
+            <div class="stat-icon mb-3">
+
+                <i class="bi bi-x-circle"></i>
+
+            </div>
+
+            <div class="text-muted">
+                Absent
+            </div>
+
+            <div class="stat-number text-danger">
+
+                {{ absent_days }}
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- PERCENTAGE -->
+
+    <div class="col-md-3">
+
+        <div class="stat-card">
+
+            <div class="stat-icon mb-3">
+
+                <i class="bi bi-graph-up-arrow"></i>
+
+            </div>
+
+            <div class="text-muted">
+                Attendance
+            </div>
+
+            <div class="stat-number text-primary">
+
+                {{ attendance_percentage }}%
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- =====================================================
+     ATTENDANCE PROGRESS
+===================================================== -->
+
+<div class="attendance-card p-4 mt-4">
+
+    <div class="d-flex justify-content-between mb-2">
+
+        <h5 class="fw-bold mb-0">
+
+            Attendance Percentage
+
+        </h5>
+
+        <strong>
+
+            {{ attendance_percentage }}%
+
+        </strong>
+
+    </div>
+
+
+    <div class="progress">
+
+        <div
+            class="progress-bar"
+            role="progressbar"
+            style="width: {{ attendance_percentage }}%;"
+        >
+
+        </div>
+
+    </div>
+
+
+    <div class="mt-3 text-muted">
+
+        {% if attendance_percentage >= 75 %}
+
+            <i class="bi bi-check-circle-fill text-success"></i>
+
+            Your attendance is above the required 75%.
+
+        {% elif attendance_percentage > 0 %}
+
+            <i class="bi bi-exclamation-triangle-fill text-warning"></i>
+
+            Your attendance is below the required 75%.
+
+        {% else %}
+
+            No attendance records available yet.
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+
+
+<!-- =====================================================
+     ATTENDANCE HISTORY
+===================================================== -->
+
+<div class="attendance-card mt-4">
+
+    <div class="p-4 border-bottom">
+
+        <h4 class="fw-bold mb-1">
+
+            <i class="bi bi-clock-history"></i>
+
+            Attendance History
+
+        </h4>
+
+        <p class="text-muted mb-0">
+
+            Your recent attendance records
+
+        </p>
+
+    </div>
+
+
+    <div class="table-responsive">
+
+        <table class="table table-hover align-middle">
+
+            <thead class="table-light">
+
+                <tr>
+
+                    <th>
+                        Date
+                    </th>
+
+                    <th>
+                        Time
+                    </th>
+
+                    <th>
+                        Status
+                    </th>
+
+                    <th>
+                        Location
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                {% for attendance in attendances %}
+
+                <tr>
+
+                    <td>
+
+                        {{ attendance.date|date:"d M Y" }}
+
+                    </td>
+
+
+                    <td>
+
+                        {{ attendance.time|time:"h:i A" }}
+
+                    </td>
+
+
+                    <td>
+
+                        {% if attendance.status == "Present" %}
+
+                            <span class="present">
+
+                                <i class="bi bi-check-circle-fill"></i>
+
+                                Present
+
+                            </span>
+
+                        {% else %}
+
+                            <span class="absent">
+
+                                <i class="bi bi-x-circle-fill"></i>
+
+                                Absent
+
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+
+                    <td>
+
+                        {% if attendance.location_verified %}
+
+                            <span class="verified">
+
+                                <i class="bi bi-geo-alt-fill"></i>
+
+                                Verified
+
+                            </span>
+
+                        {% else %}
+
+                            <span class="text-muted">
+
+                                Not Verified
+
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+                </tr>
+
+                {% empty %}
+
+                <tr>
+
+                    <td
+                        colspan="4"
+                        class="text-center py-5 text-muted"
+                    >
+
+                        <i
+                            class="bi bi-calendar-x"
+                            style="font-size: 35px;"
+                        ></i>
+
+                        <div class="mt-2">
+
+                            No attendance records found.
+
+                        </div>
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+
+
+<!-- =====================================================
+     HOW IT WORKS
+===================================================== -->
+
+<div class="info-card p-4 mt-4">
+
+    <h4 class="fw-bold mb-4">
+
+        <i class="bi bi-info-circle"></i>
+
+        How Attendance Works
+
+    </h4>
+
+
+    <div class="row text-center">
+
+        <div class="col-md-4 mb-3">
+
+            <i
+                class="bi bi-qr-code"
+                style="font-size: 40px;"
+            ></i>
+
+            <h6 class="fw-bold mt-2">
+
+                1. Scan QR
+
+            </h6>
+
+            <p class="text-muted small">
+
+                Scan the QR code displayed by your teacher.
+
+            </p>
+
+        </div>
+
+
+        <div class="col-md-4 mb-3">
+
+            <i
+                class="bi bi-geo-alt"
+                style="font-size: 40px;"
+            ></i>
+
+            <h6 class="fw-bold mt-2">
+
+                2. Verify Location
+
+            </h6>
+
+            <p class="text-muted small">
+
+                Your GPS location is checked automatically.
+
+            </p>
+
+        </div>
+
+
+        <div class="col-md-4 mb-3">
+
+            <i
+                class="bi bi-check-circle"
+                style="font-size: 40px;"
+            ></i>
+
+            <h6 class="fw-bold mt-2">
+
+                3. Attendance Marked
+
+            </h6>
+
+            <p class="text-muted small">
+
+                Your attendance is saved securely.
+
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+</div>
+
+
+
+<!-- =====================================================
+     FOOTER
+===================================================== -->
+
+<footer>
+
+    <div class="container text-center">
+
+        Smart Attendance System © 2026
+
+        <br>
+
+        <small>
+
+            QR Code Based Attendance with Location Verification
+
+        </small>
+
+    </div>
+
+</footer>
+
+
+</body>
+
+</html>
+

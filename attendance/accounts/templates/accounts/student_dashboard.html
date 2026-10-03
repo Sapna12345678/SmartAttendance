@@ -1,4 +1,3 @@
-html
 <!DOCTYPE html>
 <html lang="en">
 
@@ -8,10 +7,35 @@ html
 
     <meta
         name="viewport"
-        content="width=device-width, initial-scale=1.0"
+        content="width=device-width, initial-scale=1.0, viewport-fit=cover"
     >
 
-    <title>Student Dashboard - Smart Attendance</title>
+    <meta
+        name="theme-color"
+        content="#0b1f3a"
+    >
+
+    <meta
+        name="apple-mobile-web-app-capable"
+        content="yes"
+    >
+
+    <meta
+        name="apple-mobile-web-app-status-bar-style"
+        content="black-translucent"
+    >
+
+    <meta
+        name="apple-mobile-web-app-title"
+        content="Smart Attendance"
+    >
+
+    <title>Student Dashboard | Smart Attendance</title>
+
+    <link
+        rel="manifest"
+        href="/static/attendance/manifest.json"
+    >
 
     <link
         href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
@@ -23,135 +47,1021 @@ html
         href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
     >
 
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
     <style>
 
+        * {
+            box-sizing: border-box;
+        }
+
         body {
-            background: #f4f7fb;
-            font-family: Arial, sans-serif;
+            margin: 0;
+            background: #f5f7fb;
+            color: #182848;
+            font-family: "Inter", sans-serif;
         }
 
-        .navbar {
-            background: #182848;
+        a {
+            text-decoration: none;
         }
 
-        .navbar-brand {
-            font-weight: 700;
-            font-size: 21px;
+        /* =====================================================
+           NAVBAR
+        ===================================================== */
+
+        .topbar {
+            background:
+                linear-gradient(
+                    135deg,
+                    #071a33,
+                    #123b6d
+                );
+
+            min-height: 72px;
+
+            box-shadow:
+                0 4px 20px rgba(7, 26, 51, 0.15);
+
+            position: sticky;
+            top: 0;
+            z-index: 1000;
         }
 
-        .welcome-box {
-            background: linear-gradient(135deg, #182848, #4b6cb7);
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
             color: white;
-            border-radius: 20px;
-            padding: 32px;
+            font-size: 20px;
+            font-weight: 800;
         }
 
-        .dashboard-card {
-            background: white;
-            border: none;
-            border-radius: 20px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
-        }
+        .brand-icon {
+            width: 42px;
+            height: 42px;
 
-        .profile-icon {
-            width: 80px;
-            height: 80px;
-            border-radius: 20px;
-            background: #eef3ff;
-            color: #3155c7;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 40px;
-            margin: auto;
+
+            border-radius: 12px;
+
+            background: rgba(255,255,255,0.13);
+
+            font-size: 23px;
         }
 
-        .stat-card {
+        .top-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-circle {
+            width: 40px;
+            height: 40px;
+
+            border-radius: 50%;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background: #3b82f6;
+            color: white;
+
+            font-weight: 800;
+        }
+
+        .logout-btn {
+            border: 1px solid rgba(255,255,255,0.35);
+            color: white;
+
+            border-radius: 9px;
+
+            padding: 8px 14px;
+
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .logout-btn:hover {
             background: white;
-            border-radius: 18px;
-            padding: 22px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.07);
+            color: #123b6d;
+        }
+
+        /* =====================================================
+           MAIN
+        ===================================================== */
+
+        .main-wrapper {
+            max-width: 1240px;
+            margin: auto;
+            padding: 28px 18px 50px;
+        }
+
+        /* =====================================================
+           WELCOME
+        ===================================================== */
+
+        .welcome-card {
+            position: relative;
+            overflow: hidden;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #0b1f3a 0%,
+                    #123b6d 55%,
+                    #2563a8 100%
+                );
+
+            color: white;
+
+            border-radius: 24px;
+
+            padding: 32px;
+
+            box-shadow:
+                0 12px 35px rgba(15, 44, 80, 0.18);
+        }
+
+        .welcome-card::after {
+            content: "";
+
+            position: absolute;
+
+            width: 220px;
+            height: 220px;
+
+            border-radius: 50%;
+
+            right: -70px;
+            top: -90px;
+
+            background: rgba(255,255,255,0.06);
+        }
+
+        .welcome-card::before {
+            content: "";
+
+            position: absolute;
+
+            width: 130px;
+            height: 130px;
+
+            border-radius: 50%;
+
+            right: 90px;
+            bottom: -80px;
+
+            background: rgba(255,255,255,0.05);
+        }
+
+        .welcome-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .welcome-label {
+            font-size: 12px;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            opacity: .75;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .welcome-title {
+            font-size: 30px;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .welcome-subtitle {
+            margin: 0;
+            opacity: .82;
+            font-size: 14px;
+        }
+
+        .online-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+
+            margin-top: 20px;
+
+            background: rgba(255,255,255,0.12);
+
+            border: 1px solid rgba(255,255,255,0.15);
+
+            border-radius: 30px;
+
+            padding: 7px 13px;
+
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .online-dot {
+            width: 8px;
+            height: 8px;
+            background: #4ade80;
+            border-radius: 50%;
+        }
+
+        /* =====================================================
+           SECTION TITLE
+        ===================================================== */
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 800;
+            color: #132b4f;
+        }
+
+        .section-subtitle {
+            color: #7a8798;
+            font-size: 12px;
+            margin-top: 3px;
+        }
+
+        /* =====================================================
+           PROFILE CARD
+        ===================================================== */
+
+        .card-modern {
+            background: white;
+
+            border: 1px solid #e8edf4;
+
+            border-radius: 20px;
+
+            box-shadow:
+                0 7px 25px rgba(15, 23, 42, 0.055);
+        }
+
+        .profile-card {
+            padding: 24px;
             height: 100%;
         }
 
-        .stat-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 14px;
+        .profile-top {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+
+            margin-bottom: 22px;
+        }
+
+        .profile-avatar {
+            width: 64px;
+            height: 64px;
+
+            flex-shrink: 0;
+
+            border-radius: 18px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #dbeafe,
+                    #eff6ff
+                );
+
+            color: #2563eb;
+
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
-            margin-bottom: 12px;
+
+            font-size: 29px;
+            font-weight: 800;
         }
 
-        .stat-number {
-            font-size: 30px;
-            font-weight: 700;
+        .profile-name {
+            font-size: 18px;
+            font-weight: 800;
+            margin: 0;
+            color: #152c4c;
         }
 
-        .scan-box {
-            border: 2px dashed #3155c7;
-            border-radius: 18px;
-            padding: 30px;
-            background: #f8faff;
+        .profile-role {
+            color: #7b8797;
+            font-size: 12px;
+            margin-top: 3px;
         }
 
-        .scan-icon {
-            font-size: 65px;
-            color: #3155c7;
+        .profile-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 13px;
         }
 
-        .btn-scan {
-            background: #3155c7;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 10px;
-            font-weight: 600;
-        }
-
-        .btn-scan:hover {
-            background: #182848;
+        .info-box {
+            background: #f8fafc;
+            border: 1px solid #edf1f5;
+            border-radius: 12px;
+            padding: 12px;
         }
 
         .info-label {
-            color: #777;
-            font-size: 13px;
-            margin-bottom: 3px;
+            color: #8995a5;
+            font-size: 10px;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: .5px;
+            margin-bottom: 5px;
         }
 
         .info-value {
-            font-weight: 600;
-            color: #182848;
+            color: #233b5c;
+            font-size: 13px;
+            font-weight: 700;
+
+            word-break: break-word;
         }
 
-        .progress {
-            height: 12px;
-            border-radius: 20px;
+        /* =====================================================
+           SCAN CARD
+        ===================================================== */
+
+        .scan-card {
+            padding: 24px;
+            height: 100%;
+
+            position: relative;
+            overflow: hidden;
         }
 
-        .history-table {
-            overflow-x: auto;
+        .scan-card::before {
+            content: "";
+
+            position: absolute;
+
+            width: 180px;
+            height: 180px;
+
+            border-radius: 50%;
+
+            right: -70px;
+            bottom: -80px;
+
+            background: #eff6ff;
         }
 
-        .history-table table {
-            min-width: 650px;
+        .scan-header {
+            position: relative;
+            z-index: 2;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            margin-bottom: 18px;
         }
 
-        .present {
+        .secure-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+
             color: #15803d;
+
+            background: #ecfdf5;
+
+            border-radius: 20px;
+
+            padding: 6px 10px;
+
+            font-size: 10px;
             font-weight: 700;
         }
 
-        .absent {
+        .scan-area {
+            position: relative;
+            z-index: 2;
+
+            border: 2px dashed #bdd2ef;
+
+            background:
+                linear-gradient(
+                    180deg,
+                    #f8fbff,
+                    #f1f6ff
+                );
+
+            border-radius: 18px;
+
+            padding: 26px;
+
+            text-align: center;
+        }
+
+        .scan-icon-wrap {
+            width: 76px;
+            height: 76px;
+
+            margin: 0 auto 14px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 20px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #2563eb,
+                    #1d4ed8
+                );
+
+            color: white;
+
+            font-size: 38px;
+
+            box-shadow:
+                0 10px 25px rgba(37, 99, 235, .25);
+        }
+
+        .scan-title {
+            font-size: 20px;
+            font-weight: 800;
+            color: #183354;
+        }
+
+        .scan-description {
+            color: #718096;
+            font-size: 13px;
+            line-height: 1.6;
+
+            max-width: 450px;
+
+            margin: 7px auto 15px;
+        }
+
+        .gps-note {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+
+            color: #64748b;
+
+            background: white;
+
+            border: 1px solid #e3eaf2;
+
+            padding: 7px 11px;
+
+            border-radius: 8px;
+
+            font-size: 11px;
+
+            margin-bottom: 18px;
+        }
+
+        .scan-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+
+            width: 100%;
+            max-width: 300px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #2563eb,
+                    #1749b7
+                );
+
+            color: white;
+
+            border: none;
+
+            border-radius: 12px;
+
+            padding: 13px 20px;
+
+            font-size: 14px;
+            font-weight: 700;
+
+            box-shadow:
+                0 8px 20px rgba(37,99,235,.22);
+
+            transition: .2s ease;
+        }
+
+        .scan-btn:hover {
+            transform: translateY(-2px);
+
+            color: white;
+
+            box-shadow:
+                0 12px 25px rgba(37,99,235,.3);
+        }
+
+        /* =====================================================
+           STATISTICS
+        ===================================================== */
+
+        .stat-card {
+            background: white;
+
+            border: 1px solid #e8edf4;
+
+            border-radius: 17px;
+
+            padding: 19px;
+
+            height: 100%;
+
+            box-shadow:
+                0 6px 22px rgba(15,23,42,.045);
+        }
+
+        .stat-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            margin-bottom: 14px;
+        }
+
+        .stat-icon {
+            width: 43px;
+            height: 43px;
+
+            border-radius: 12px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-size: 19px;
+        }
+
+        .stat-label {
+            color: #8290a2;
+            font-size: 11px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .stat-number {
+            color: #172f51;
+            font-size: 27px;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .stat-footer {
+            color: #9aa6b5;
+            font-size: 10px;
+            margin-top: 9px;
+        }
+
+        .icon-blue {
+            background: #eff6ff;
+            color: #2563eb;
+        }
+
+        .icon-green {
+            background: #ecfdf5;
+            color: #15803d;
+        }
+
+        .icon-red {
+            background: #fef2f2;
             color: #dc2626;
+        }
+
+        .icon-orange {
+            background: #fff7ed;
+            color: #ea580c;
+        }
+
+        /* =====================================================
+           PROGRESS
+        ===================================================== */
+
+        .progress-card {
+            padding: 21px 24px;
+        }
+
+        .progress {
+            height: 10px;
+            background: #edf1f6;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            border-radius: 20px;
+
+            background:
+                linear-gradient(
+                    90deg,
+                    #2563eb,
+                    #4f8df7
+                );
+        }
+
+        /* =====================================================
+           HISTORY
+        ===================================================== */
+
+        .history-card {
+            padding: 24px;
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            margin-bottom: 18px;
+        }
+
+        .records-badge {
+            background: #eff6ff;
+            color: #2563eb;
+
+            border-radius: 20px;
+
+            padding: 6px 11px;
+
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+        }
+
+        .attendance-table {
+            width: 100%;
+            min-width: 650px;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        .attendance-table thead th {
+            background: #f8fafc;
+
+            color: #7b8797;
+
+            font-size: 10px;
+
+            text-transform: uppercase;
+
+            letter-spacing: .5px;
+
+            font-weight: 700;
+
+            padding: 12px;
+
+            border-bottom: 1px solid #e7edf4;
+        }
+
+        .attendance-table tbody td {
+            padding: 14px 12px;
+
+            font-size: 12px;
+
+            color: #41536b;
+
+            border-bottom: 1px solid #edf1f5;
+        }
+
+        .attendance-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+
+            border-radius: 20px;
+
+            padding: 5px 9px;
+
+            font-size: 10px;
+
+            font-weight: 700;
+        }
+
+        .status-present {
+            color: #15803d;
+            background: #ecfdf5;
+        }
+
+        .status-absent {
+            color: #dc2626;
+            background: #fef2f2;
+        }
+
+        .location-verified {
+            color: #15803d;
+            background: #ecfdf5;
+
+            padding: 5px 9px;
+
+            border-radius: 20px;
+
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .location-not {
+            color: #64748b;
+            background: #f1f5f9;
+
+            padding: 5px 9px;
+
+            border-radius: 20px;
+
+            font-size: 10px;
             font-weight: 700;
         }
 
         .empty-box {
-            padding: 35px;
+            padding: 45px 20px;
+
             text-align: center;
-            color: #64748b;
+
+            color: #8a97a8;
+        }
+
+        .empty-icon {
+            width: 65px;
+            height: 65px;
+
+            margin: auto;
+
+            border-radius: 18px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background: #f1f5f9;
+
+            color: #94a3b8;
+
+            font-size: 28px;
+        }
+
+        /* =====================================================
+           HOW IT WORKS
+        ===================================================== */
+
+        .how-card {
+            padding: 24px;
+        }
+
+        .step-card {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+
+            height: 100%;
+
+            background: #f8fafc;
+
+            border: 1px solid #edf1f5;
+
+            border-radius: 14px;
+
+            padding: 16px;
+        }
+
+        .step-number {
+            width: 34px;
+            height: 34px;
+
+            flex-shrink: 0;
+
+            border-radius: 10px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background: #eff6ff;
+
+            color: #2563eb;
+
+            font-weight: 800;
+            font-size: 13px;
+        }
+
+        .step-title {
+            color: #233b5c;
+            font-size: 13px;
+            font-weight: 800;
+
+            margin-bottom: 4px;
+        }
+
+        .step-text {
+            color: #7b8797;
+            font-size: 11px;
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        /* =====================================================
+           INSTALL APP
+        ===================================================== */
+
+        .install-card {
+            display: none;
+
+            margin-top: 20px;
+
+            padding: 17px;
+
+            border-radius: 17px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #eef5ff,
+                    #f7faff
+                );
+
+            border: 1px solid #dbe8fb;
+        }
+
+        .install-card.show {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+        }
+
+        .install-title {
+            font-size: 13px;
+            font-weight: 800;
+            color: #183354;
+        }
+
+        .install-text {
+            color: #728096;
+            font-size: 10px;
+            margin-top: 3px;
+        }
+
+        .install-btn {
+            flex-shrink: 0;
+
+            border: none;
+
+            background: #2563eb;
+
+            color: white;
+
+            border-radius: 9px;
+
+            padding: 9px 14px;
+
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        /* =====================================================
+           FOOTER
+        ===================================================== */
+
+        .footer {
+            text-align: center;
+
+            color: #8b97a7;
+
+            font-size: 10px;
+
+            padding: 20px 10px 30px;
+        }
+
+        /* =====================================================
+           MOBILE
+        ===================================================== */
+
+        @media (max-width: 767px) {
+
+            .topbar {
+                min-height: 64px;
+            }
+
+            .brand {
+                font-size: 16px;
+            }
+
+            .brand-icon {
+                width: 36px;
+                height: 36px;
+                font-size: 19px;
+            }
+
+            .top-user .username {
+                display: none;
+            }
+
+            .user-circle {
+                width: 34px;
+                height: 34px;
+                font-size: 13px;
+            }
+
+            .logout-btn {
+                padding: 7px 9px;
+            }
+
+            .logout-btn span {
+                display: none;
+            }
+
+            .main-wrapper {
+                padding:
+                    18px 12px
+                    35px;
+            }
+
+            .welcome-card {
+                padding: 24px 20px;
+                border-radius: 20px;
+            }
+
+            .welcome-title {
+                font-size: 23px;
+            }
+
+            .welcome-subtitle {
+                font-size: 12px;
+                line-height: 1.5;
+            }
+
+            .profile-card,
+            .scan-card,
+            .history-card,
+            .how-card {
+                padding: 18px;
+            }
+
+            .profile-info {
+                grid-template-columns: 1fr 1fr;
+                gap: 9px;
+            }
+
+            .info-box {
+                padding: 10px;
+            }
+
+            .info-value {
+                font-size: 11px;
+            }
+
+            .scan-area {
+                padding: 23px 13px;
+            }
+
+            .scan-title {
+                font-size: 18px;
+            }
+
+            .scan-description {
+                font-size: 12px;
+            }
+
+            .stat-card {
+                padding: 16px;
+            }
+
+            .stat-number {
+                font-size: 23px;
+            }
+
+            .history-header {
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .section-title {
+                font-size: 16px;
+            }
+
+            .install-card.show {
+                align-items: flex-start;
+            }
+
         }
 
     </style>
@@ -162,165 +1072,349 @@ html
 <body>
 
 
-<!-- ================= NAVBAR ================= -->
+<!-- =========================================================
+     TOP NAVBAR
+========================================================= -->
 
-<nav class="navbar navbar-dark">
+<nav class="topbar">
 
-    <div class="container">
+    <div class="container-fluid px-3 px-md-4">
 
-        <span class="navbar-brand">
-
-            <i class="bi bi-qr-code-scan"></i>
-
-            Smart Attendance
-
-        </span>
-
-        <a
-            href="/accounts/logout/"
-            class="btn btn-outline-light btn-sm"
+        <div
+            class="d-flex justify-content-between align-items-center"
+            style="min-height:72px;"
         >
 
-            <i class="bi bi-box-arrow-right"></i>
+            <!-- BRAND -->
 
-            Logout
+            <a
+                href="/"
+                class="brand"
+            >
 
-        </a>
+                <span class="brand-icon">
+
+                    <i class="bi bi-qr-code-scan"></i>
+
+                </span>
+
+                <span>
+                    Smart Attendance
+                </span>
+
+            </a>
+
+
+            <!-- USER -->
+
+            <div class="top-user">
+
+                <div class="username text-white small">
+
+                    {% if student %}
+                        {{ student.name }}
+                    {% else %}
+                        {{ request.user.username }}
+                    {% endif %}
+
+                </div>
+
+                <div class="user-circle">
+
+                    {% if student %}
+                        {{ student.name|first|upper }}
+                    {% else %}
+                        {{ request.user.username|first|upper }}
+                    {% endif %}
+
+                </div>
+
+                <a
+                    href="/accounts/logout/"
+                    class="logout-btn"
+                >
+
+                    <i class="bi bi-box-arrow-right"></i>
+
+                    <span>Logout</span>
+
+                </a>
+
+            </div>
+
+        </div>
 
     </div>
 
 </nav>
 
 
-<!-- ================= MAIN ================= -->
+<!-- =========================================================
+     MAIN
+========================================================= -->
 
-<div class="container py-4">
+<main class="main-wrapper">
 
 
-    <!-- ================= WELCOME ================= -->
+    <!-- =====================================================
+         WELCOME
+    ====================================================== -->
 
-    <div class="welcome-box mb-4">
+    <section class="welcome-card mb-4">
 
-        <h2 class="fw-bold">
+        <div class="welcome-content">
 
-            Welcome, 
-            {% if student %}
-                {{ student.name }}
-            {% else %}
-                {{ request.user.username }}
-            {% endif %}
-            👋
+            <div class="welcome-label">
+                Student Portal
+            </div>
 
-        </h2>
+            <h1 class="welcome-title">
 
-        <p class="mb-0">
+                Welcome,
 
-            Smart Attendance Dashboard — QR Code + Location Verification
+                {% if student %}
+                    {{ student.name }}
+                {% else %}
+                    {{ request.user.username }}
+                {% endif %}
 
-        </p>
+                👋
+
+            </h1>
+
+            <p class="welcome-subtitle">
+
+                Manage your attendance, scan QR codes and view
+                your attendance history from one place.
+
+            </p>
+
+            <div class="online-badge">
+
+                <span class="online-dot"></span>
+
+                Smart Attendance System Active
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         INSTALL APP
+    ====================================================== -->
+
+    <div
+        id="installCard"
+        class="install-card"
+    >
+
+        <div>
+
+            <div class="install-title">
+
+                <i class="bi bi-phone"></i>
+
+                Install Smart Attendance
+
+            </div>
+
+            <div class="install-text">
+
+                Add Smart Attendance to your phone home screen.
+
+            </div>
+
+        </div>
+
+        <button
+            id="installButton"
+            class="install-btn"
+        >
+
+            <i class="bi bi-download"></i>
+
+            Install
+
+        </button>
 
     </div>
 
 
-    <!-- ================= PROFILE + SCAN ================= -->
+    <!-- =====================================================
+         PROFILE + SCAN
+    ====================================================== -->
 
-    <div class="row g-4 mb-4">
+    <div class="row g-4 mt-1 mb-4">
 
 
         <!-- PROFILE -->
 
         <div class="col-lg-4">
 
-            <div class="dashboard-card p-4 text-center h-100">
+            <div class="card-modern profile-card">
 
-                <div class="profile-icon mb-3">
+                <div class="profile-top">
 
-                    <i class="bi bi-person"></i>
+                    <div class="profile-avatar">
+
+                        {% if student %}
+                            {{ student.name|first|upper }}
+                        {% else %}
+                            <i class="bi bi-person"></i>
+                        {% endif %}
+
+                    </div>
+
+                    <div>
+
+                        <h2 class="profile-name">
+
+                            {% if student %}
+                                {{ student.name }}
+                            {% else %}
+                                Student Account
+                            {% endif %}
+
+                        </h2>
+
+                        <div class="profile-role">
+
+                            <i class="bi bi-person-badge"></i>
+
+                            Student Profile
+
+                        </div>
+
+                    </div>
 
                 </div>
 
-                <h4 class="fw-bold">
-
-                    {% if student %}
-                        {{ student.name }}
-                    {% else %}
-                        Student Account
-                    {% endif %}
-
-                </h4>
-
-                <p class="text-muted">
-
-                    Student Profile
-
-                </p>
-
-                <hr>
 
                 {% if student %}
 
-                <div class="text-start">
+                <div class="profile-info">
 
-                    <div class="mb-3">
+
+                    <div class="info-box">
 
                         <div class="info-label">
                             Roll Number
                         </div>
 
                         <div class="info-value">
-                            {{ student.roll_no }}
+
+                            {{ student.roll_no|default:"-" }}
+
                         </div>
 
                     </div>
 
 
-                    <div class="mb-3">
+                    <div class="info-box">
 
                         <div class="info-label">
                             Course
                         </div>
 
                         <div class="info-value">
+
                             {{ student.course|default:"-" }}
+
                         </div>
 
                     </div>
 
 
-                    <div class="mb-3">
+                    <div class="info-box">
 
                         <div class="info-label">
                             Year
                         </div>
 
                         <div class="info-value">
+
                             {{ student.year|default:"-" }}
+
                         </div>
 
                     </div>
 
 
-                    <div>
+                    <div class="info-box">
+
+                        <div class="info-label">
+                            Branch
+                        </div>
+
+                        <div class="info-value">
+
+                            {{ student.branch|default:"-" }}
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="info-box">
+
+                        <div class="info-label">
+                            Section
+                        </div>
+
+                        <div class="info-value">
+
+                            {{ student.section|default:"-" }}
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="info-box">
+
+                        <div class="info-label">
+                            Semester
+                        </div>
+
+                        <div class="info-value">
+
+                            {{ student.semester|default:"-" }}
+
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        class="info-box"
+                        style="grid-column:1/-1;"
+                    >
 
                         <div class="info-label">
                             Email
                         </div>
 
                         <div class="info-value">
+
                             {{ student.email|default:request.user.email|default:"-" }}
+
                         </div>
 
                     </div>
+
 
                 </div>
 
                 {% else %}
 
-                <p class="text-danger">
+                <div class="alert alert-danger">
 
                     Student profile not found.
 
-                </p>
+                </div>
 
                 {% endif %}
 
@@ -333,56 +1427,77 @@ html
 
         <div class="col-lg-8">
 
-            <div class="dashboard-card p-4 h-100">
+            <div class="card-modern scan-card">
 
-                <h4 class="fw-bold mb-3">
+                <div class="scan-header">
 
-                    <i class="bi bi-calendar-check text-primary"></i>
+                    <div>
 
-                    Mark Attendance
+                        <div class="section-title">
 
-                </h4>
+                            <i class="bi bi-calendar-check text-primary"></i>
+
+                            Mark Attendance
+
+                        </div>
+
+                        <div class="section-subtitle">
+
+                            Use your teacher's active attendance QR
+
+                        </div>
+
+                    </div>
+
+                    <div class="secure-badge">
+
+                        <i class="bi bi-shield-check"></i>
+
+                        Secure
+
+                    </div>
+
+                </div>
 
 
-                <div class="scan-box text-center">
+                <div class="scan-area">
 
-                    <div class="scan-icon mb-2">
+                    <div class="scan-icon-wrap">
 
                         <i class="bi bi-qr-code-scan"></i>
 
                     </div>
 
-
-                    <h4 class="fw-bold">
+                    <div class="scan-title">
 
                         Scan Teacher QR Code
 
-                    </h4>
+                    </div>
 
+                    <p class="scan-description">
 
-                    <p class="text-muted">
-
-                        Teacher ke projector/screen par displayed
-                        attendance QR code ko scan karein.
-
-                    </p>
-
-
-                    <p class="small text-muted">
-
-                        <i class="bi bi-geo-alt"></i>
-
-                        College location verification required.
+                        Teacher ke screen/projector par displayed
+                        dynamic QR code ko scan karein. QR verification
+                        ke baad aapki GPS location automatically check hogi.
 
                     </p>
 
+                    <div class="gps-note">
+
+                        <i class="bi bi-geo-alt-fill"></i>
+
+                        College location verification required
+
+                    </div>
+
+                    <br>
 
                     <a
                         href="/scan/"
-                        class="btn btn-primary btn-scan"
+                        class="scan-btn"
                     >
 
-                        <i class="bi bi-camera"></i>
+                        <i class="bi bi-camera-fill"></i>
 
                         Scan Attendance QR
 
@@ -397,30 +1512,54 @@ html
     </div>
 
 
-    <!-- ================= ATTENDANCE STATISTICS ================= -->
+    <!-- =====================================================
+         STATISTICS
+    ====================================================== -->
 
-    <div class="row g-4 mb-4">
+    <div class="mb-3">
+
+        <div class="section-title">
+            Attendance Overview
+        </div>
+
+        <div class="section-subtitle">
+            Your attendance performance at a glance
+        </div>
+
+    </div>
 
 
-        <div class="col-md-3">
+    <div class="row g-3 mb-4">
+
+
+        <!-- TOTAL -->
+
+        <div class="col-6 col-lg-3">
 
             <div class="stat-card">
 
-                <div
-                    class="stat-icon"
-                    style="background:#eef3ff; color:#3155c7;"
-                >
+                <div class="stat-top">
 
-                    <i class="bi bi-calendar3"></i>
+                    <div class="stat-icon icon-blue">
+
+                        <i class="bi bi-calendar3"></i>
+
+                    </div>
 
                 </div>
 
-                <div class="text-muted">
-                    Total Records
+                <div class="stat-label">
+                    TOTAL RECORDS
                 </div>
 
                 <div class="stat-number">
+
                     {{ total_days }}
+
+                </div>
+
+                <div class="stat-footer">
+                    Attendance sessions
                 </div>
 
             </div>
@@ -428,77 +1567,104 @@ html
         </div>
 
 
-        <div class="col-md-3">
+        <!-- PRESENT -->
+
+        <div class="col-6 col-lg-3">
 
             <div class="stat-card">
 
-                <div
-                    class="stat-icon"
-                    style="background:#ecfdf5; color:#15803d;"
-                >
+                <div class="stat-top">
 
-                    <i class="bi bi-check-circle"></i>
+                    <div class="stat-icon icon-green">
 
-                </div>
+                        <i class="bi bi-check-circle-fill"></i>
 
-                <div class="text-muted">
-                    Present
-                </div>
-
-                <div class="stat-number present">
-                    {{ present_days }}
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <div class="col-md-3">
-
-            <div class="stat-card">
-
-                <div
-                    class="stat-icon"
-                    style="background:#fef2f2; color:#dc2626;"
-                >
-
-                    <i class="bi bi-x-circle"></i>
+                    </div>
 
                 </div>
 
-                <div class="text-muted">
-                    Absent
-                </div>
-
-                <div class="stat-number absent">
-                    {{ absent_days }}
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <div class="col-md-3">
-
-            <div class="stat-card">
-
-                <div
-                    class="stat-icon"
-                    style="background:#fff7ed; color:#ea580c;"
-                >
-
-                    <i class="bi bi-bar-chart"></i>
-
-                </div>
-
-                <div class="text-muted">
-                    Attendance
+                <div class="stat-label">
+                    PRESENT
                 </div>
 
                 <div class="stat-number">
+
+                    {{ present_days }}
+
+                </div>
+
+                <div class="stat-footer">
+                    Verified attendance
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ABSENT -->
+
+        <div class="col-6 col-lg-3">
+
+            <div class="stat-card">
+
+                <div class="stat-top">
+
+                    <div class="stat-icon icon-red">
+
+                        <i class="bi bi-x-circle-fill"></i>
+
+                    </div>
+
+                </div>
+
+                <div class="stat-label">
+                    ABSENT
+                </div>
+
+                <div class="stat-number">
+
+                    {{ absent_days }}
+
+                </div>
+
+                <div class="stat-footer">
+                    Missed sessions
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- PERCENTAGE -->
+
+        <div class="col-6 col-lg-3">
+
+            <div class="stat-card">
+
+                <div class="stat-top">
+
+                    <div class="stat-icon icon-orange">
+
+                        <i class="bi bi-bar-chart-fill"></i>
+
+                    </div>
+
+                </div>
+
+                <div class="stat-label">
+                    ATTENDANCE
+                </div>
+
+                <div class="stat-number">
+
                     {{ attendance_percentage }}%
+
+                </div>
+
+                <div class="stat-footer">
+                    Overall percentage
                 </div>
 
             </div>
@@ -508,22 +1674,40 @@ html
     </div>
 
 
-    <!-- ================= ATTENDANCE PROGRESS ================= -->
+    <!-- =====================================================
+         PROGRESS
+    ====================================================== -->
 
-    <div class="dashboard-card p-4 mb-4">
+    <div class="card-modern progress-card mb-4">
 
-        <div class="d-flex justify-content-between align-items-center mb-2">
+        <div
+            class="d-flex justify-content-between align-items-center mb-3"
+        >
 
-            <h5 class="fw-bold mb-0">
+            <div>
 
-                <i class="bi bi-graph-up text-primary"></i>
+                <div class="section-title">
 
-                Attendance Progress
+                    <i class="bi bi-graph-up-arrow text-primary"></i>
 
-            </h5>
+                    Attendance Progress
 
-            <strong>
+                </div>
+
+                <div class="section-subtitle">
+
+                    Overall attendance percentage
+
+                </div>
+
+            </div>
+
+            <strong
+                style="font-size:20px; color:#2563eb;"
+            >
+
                 {{ attendance_percentage }}%
+
             </strong>
 
         </div>
@@ -532,9 +1716,12 @@ html
         <div class="progress">
 
             <div
-                class="progress-bar bg-primary"
+                class="progress-bar"
                 role="progressbar"
                 style="width: {{ attendance_percentage }}%;"
+                aria-valuenow="{{ attendance_percentage }}"
+                aria-valuemin="0"
+                aria-valuemax="100"
             ></div>
 
         </div>
@@ -542,21 +1729,33 @@ html
     </div>
 
 
-    <!-- ================= ATTENDANCE HISTORY ================= -->
+    <!-- =====================================================
+         HISTORY
+    ====================================================== -->
 
-    <div class="dashboard-card p-4 mb-4">
+    <div class="card-modern history-card mb-4">
 
-        <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="history-header">
 
-            <h4 class="fw-bold mb-0">
+            <div>
 
-                <i class="bi bi-clock-history text-primary"></i>
+                <div class="section-title">
 
-                Attendance History
+                    <i class="bi bi-clock-history text-primary"></i>
 
-            </h4>
+                    Attendance History
 
-            <span class="badge bg-primary">
+                </div>
+
+                <div class="section-subtitle">
+
+                    Your recent attendance records
+
+                </div>
+
+            </div>
+
+            <span class="records-badge">
 
                 {{ total_days }} Records
 
@@ -565,9 +1764,9 @@ html
         </div>
 
 
-        <div class="history-table">
+        <div class="table-wrap">
 
-            <table class="table table-hover align-middle">
+            <table class="attendance-table">
 
                 <thead>
 
@@ -587,30 +1786,38 @@ html
 
                 </thead>
 
-
                 <tbody>
+
 
                     {% for attendance in attendances %}
 
                     <tr>
 
                         <td>
-                            {{ forloop.counter }}
+
+                            <strong>
+                                {{ forloop.counter }}
+                            </strong>
+
                         </td>
 
                         <td>
+
                             {{ attendance.date }}
+
                         </td>
 
                         <td>
+
                             {{ attendance.time }}
+
                         </td>
 
                         <td>
 
                             {% if attendance.status == "Present" %}
 
-                            <span class="present">
+                            <span class="status-badge status-present">
 
                                 <i class="bi bi-check-circle-fill"></i>
 
@@ -620,7 +1827,7 @@ html
 
                             {% else %}
 
-                            <span class="absent">
+                            <span class="status-badge status-absent">
 
                                 <i class="bi bi-x-circle-fill"></i>
 
@@ -636,7 +1843,7 @@ html
 
                             {% if attendance.location_verified %}
 
-                            <span class="text-success">
+                            <span class="location-verified">
 
                                 <i class="bi bi-geo-alt-fill"></i>
 
@@ -646,9 +1853,9 @@ html
 
                             {% else %}
 
-                            <span class="text-muted">
+                            <span class="location-not">
 
-                                <i class="bi bi-dash-circle"></i>
+                                <i class="bi bi-geo-alt"></i>
 
                                 Not Verified
 
@@ -668,14 +1875,26 @@ html
 
                             <div class="empty-box">
 
-                                <i class="bi bi-calendar-x fs-1"></i>
+                                <div class="empty-icon">
 
-                                <h5 class="mt-3">
+                                    <i class="bi bi-calendar-x"></i>
+
+                                </div>
+
+                                <h6
+                                    class="mt-3 mb-1"
+                                    style="font-weight:800;"
+                                >
+
                                     No Attendance Records
-                                </h5>
+
+                                </h6>
 
                                 <p class="mb-0">
-                                    Your attendance history will appear here.
+
+                                    Your attendance history will appear here
+                                    after you scan a teacher QR code.
+
                                 </p>
 
                             </div>
@@ -686,6 +1905,7 @@ html
 
                     {% endfor %}
 
+
                 </tbody>
 
             </table>
@@ -695,35 +1915,48 @@ html
     </div>
 
 
-    <!-- ================= HOW IT WORKS ================= -->
+    <!-- =====================================================
+         HOW IT WORKS
+    ====================================================== -->
 
-    <div class="dashboard-card p-4">
+    <div class="card-modern how-card">
 
-        <h5 class="fw-bold">
+        <div class="section-title">
 
             <i class="bi bi-info-circle text-primary"></i>
 
             How Attendance Works
 
-        </h5>
+        </div>
+
+        <div class="section-subtitle mb-3">
+
+            Simple three-step attendance verification
+
+        </div>
 
 
-        <div class="row mt-3">
+        <div class="row g-3">
 
 
-            <div class="col-md-4 mb-3">
+            <div class="col-md-4">
 
-                <div class="d-flex">
+                <div class="step-card">
 
-                    <i class="bi bi-1-circle-fill text-primary fs-3 me-3"></i>
+                    <div class="step-number">
+                        1
+                    </div>
 
                     <div>
 
-                        <strong>Scan QR</strong>
+                        <div class="step-title">
+                            Scan QR
+                        </div>
 
-                        <p class="text-muted mb-0 small">
+                        <p class="step-text">
 
-                            Teacher ka dynamic QR code scan karein.
+                            Teacher ka active dynamic QR code
+                            scan karein.
 
                         </p>
 
@@ -734,19 +1967,24 @@ html
             </div>
 
 
-            <div class="col-md-4 mb-3">
+            <div class="col-md-4">
 
-                <div class="d-flex">
+                <div class="step-card">
 
-                    <i class="bi bi-2-circle-fill text-primary fs-3 me-3"></i>
+                    <div class="step-number">
+                        2
+                    </div>
 
                     <div>
 
-                        <strong>Location Check</strong>
+                        <div class="step-title">
+                            Verify Location
+                        </div>
 
-                        <p class="text-muted mb-0 small">
+                        <p class="step-text">
 
-                            System college location verify karega.
+                            System aapki GPS location ko
+                            college area se verify karega.
 
                         </p>
 
@@ -757,19 +1995,24 @@ html
             </div>
 
 
-            <div class="col-md-4 mb-3">
+            <div class="col-md-4">
 
-                <div class="d-flex">
+                <div class="step-card">
 
-                    <i class="bi bi-3-circle-fill text-primary fs-3 me-3"></i>
+                    <div class="step-number">
+                        3
+                    </div>
 
                     <div>
 
-                        <strong>Attendance Marked</strong>
+                        <div class="step-title">
+                            Attendance Marked
+                        </div>
 
-                        <p class="text-muted mb-0 small">
+                        <p class="step-text">
 
-                            Verification successful hone par Present mark hoga.
+                            Location valid hone par attendance
+                            Present ke roop mein save hogi.
 
                         </p>
 
@@ -778,29 +2021,134 @@ html
                 </div>
 
             </div>
+
 
         </div>
 
     </div>
 
 
-</div>
+</main>
 
 
-<!-- ================= FOOTER ================= -->
+<!-- =========================================================
+     FOOTER
+========================================================= -->
 
-<footer class="text-center py-4 text-muted">
+<footer class="footer">
 
-    <small>
+    <div>
 
-        Smart Attendance System | QR Code + Location Verification
+        <strong>
+            Smart Attendance System
+        </strong>
 
-    </small>
+        <span class="mx-1">•</span>
+
+        QR Code + GPS Location Verification
+
+    </div>
+
+    <div class="mt-1">
+
+        © 2026 Smart Attendance
+
+    </div>
 
 </footer>
+
+
+<!-- =========================================================
+     PWA INSTALL SCRIPT
+========================================================= -->
+
+<script>
+
+let deferredPrompt = null;
+
+const installCard =
+    document.getElementById("installCard");
+
+const installButton =
+    document.getElementById("installButton");
+
+
+window.addEventListener(
+    "beforeinstallprompt",
+    function(event) {
+
+        event.preventDefault();
+
+        deferredPrompt = event;
+
+        if (installCard) {
+
+            installCard.classList.add(
+                "show"
+            );
+
+        }
+
+    }
+);
+
+
+if (installButton) {
+
+    installButton.addEventListener(
+        "click",
+        async function() {
+
+            if (!deferredPrompt) {
+
+                alert(
+                    "Browser menu se 'Add to Home Screen' ya 'Install App' select karein."
+                );
+
+                return;
+            }
+
+            deferredPrompt.prompt();
+
+            const result =
+                await deferredPrompt.userChoice;
+
+            deferredPrompt = null;
+
+            if (installCard) {
+
+                installCard.classList.remove(
+                    "show"
+                );
+
+            }
+
+        }
+    );
+
+}
+
+
+window.addEventListener(
+    "appinstalled",
+    function() {
+
+        deferredPrompt = null;
+
+        if (installCard) {
+
+            installCard.classList.remove(
+                "show"
+            );
+
+        }
+
+    }
+);
+
+</script>
 
 
 </body>
 
 </html>
-

@@ -109,3 +109,125 @@ def student_logout(request):
     logout(request)
 
     return redirect("student_login")
+# =========================================================
+# STUDENT REGISTRATION
+# =========================================================
+
+from django.contrib.auth.models import User
+from django.contrib.auth import login
+from django.contrib import messages
+from attendance.models import Student
+
+
+def student_register(request):
+
+    if request.user.is_authenticated:
+        try:
+            request.user.student_profile
+            return redirect("student_dashboard")
+        except Student.DoesNotExist:
+            pass
+
+    if request.method == "POST":
+
+        name = request.POST.get("name", "").strip()
+        username = request.POST.get("username", "").strip()
+        password = request.POST.get("password", "")
+        password2 = request.POST.get("password2", "")
+
+        roll_no = request.POST.get("roll_no", "").strip()
+        course = request.POST.get("course", "").strip()
+        year = request.POST.get("year", "").strip()
+        branch = request.POST.get("branch", "").strip()
+        section = request.POST.get("section", "").strip()
+        semester = request.POST.get("semester", "").strip()
+        email = request.POST.get("email", "").strip()
+        phone = request.POST.get("phone", "").strip()
+
+        if not name or not username or not password or not roll_no:
+            messages.error(
+                request,
+                "Name, Username, Password and Roll Number are required."
+            )
+            return render(
+                request,
+                "accounts/student_register.html"
+            )
+
+        if password != password2:
+            messages.error(
+                request,
+                "Passwords do not match."
+            )
+            return render(
+                request,
+                "accounts/student_register.html"
+            )
+
+        if User.objects.filter(username=username).exists():
+            messages.error(
+                request,
+                "Username already exists. Please choose another username."
+            )
+            return render(
+                request,
+                "accounts/student_register.html"
+            )
+
+        if Student.objects.filter(roll_no=roll_no).exists():
+            messages.error(
+                request,
+                "Roll number already exists."
+            )
+            return render(
+                request,
+                "accounts/student_register.html"
+            )
+
+        semester_value = None
+
+        if semester:
+            try:
+                semester_value = int(semester)
+            except ValueError:
+                messages.error(
+                    request,
+                    "Semester must be a valid number."
+                )
+                return render(
+                    request,
+                    "accounts/student_register.html"
+                )
+
+        user = User.objects.create_user(
+            username=username,
+            password=password,
+            email=email
+        )
+
+        Student.objects.create(
+            user=user,
+            name=name,
+            roll_no=roll_no,
+            course=course,
+            year=year,
+            branch=branch,
+            section=section,
+            semester=semester_value,
+            email=email,
+            phone=phone
+        )
+
+        login(request, user)
+
+        messages.success(
+            request,
+            "Registration successful! Welcome to Smart Attendance."
+        )
+
+        return redirect("student_dashboard")
+
+    return render(
+        request,
+        "accounts/student_register.html"
+    )

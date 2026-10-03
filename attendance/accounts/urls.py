@@ -4,6 +4,13 @@ from . import views
 
 urlpatterns = [
 
+    # Student Registration
+    path(
+        "register/",
+        views.student_register,
+        name="student_register"
+    ),
+
     # Student Login
     path(
         "login/",

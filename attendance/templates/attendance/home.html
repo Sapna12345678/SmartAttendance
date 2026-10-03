@@ -1,1548 +1,926 @@
-html
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Smart Attendance</title>
-
-<!-- Google Font -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
-<!-- Font Awesome -->
-<link rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-
-<style>
-
-/* =====================================================
-   RESET
-===================================================== */
-
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-}
-
-html{
-    scroll-behavior:smooth;
-}
-
-body{
-    font-family:"Inter",Arial,sans-serif;
-    background:#f5f9ff;
-    color:#17213c;
-}
-
-
-/* =====================================================
-   SIDEBAR
-===================================================== */
-
-.sidebar{
-    position:fixed;
-    left:0;
-    top:0;
-    width:270px;
-    height:100vh;
-    overflow:hidden;
-    background:linear-gradient(
-        180deg,
-        #09245a 0%,
-        #071d4b 100%
-    );
-    color:white;
-    z-index:100;
-}
-
-
-/* LOGO */
-
-.logo{
-    height:90px;
-    padding:17px 18px;
-    display:flex;
-    align-items:center;
-    gap:12px;
-}
-
-.logo-box{
-    width:43px;
-    height:43px;
-    border:2px solid #3c9aff;
-    border-radius:8px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:25px;
-    color:white;
-    background:rgba(255,255,255,.04);
-    flex-shrink:0;
-}
-
-.logo-text h3{
-    font-size:18px;
-    font-weight:800;
-    line-height:1.2;
-}
-
-.logo-text p{
-    color:#bdd1ed;
-    font-size:10px;
-    margin-top:4px;
-    line-height:1.4;
-}
-
-
-/* MENU */
-
-.menu{
-    padding:5px 12px;
-}
-
-.menu-item{
-    list-style:none;
-    margin-bottom:7px;
-}
-
-.menu-item a{
-    height:47px;
-    padding:0 17px;
-    display:flex;
-    align-items:center;
-    gap:18px;
-    color:#dce8f8;
-    text-decoration:none;
-    border-radius:9px;
-    font-size:14px;
-    font-weight:500;
-    transition:.25s;
-}
-
-.menu-item a i{
-    width:22px;
-    text-align:center;
-    font-size:20px;
-}
-
-.menu-item.active a{
-    background:linear-gradient(
-        90deg,
-        #087df5,
-        #1975ec
-    );
-
-    box-shadow:
-        0 5px 14px rgba(0,100,255,.25);
-}
-
-.menu-item a:hover{
-    background:rgba(20,125,245,.45);
-}
-
-
-/* =====================================================
-   SIDEBAR DECORATION
-===================================================== */
-
-.wave1{
-    position:absolute;
-    width:420px;
-    height:190px;
-    bottom:-115px;
-    left:-100px;
-    background:#10366f;
-    border-radius:50%;
-    transform:rotate(-8deg);
-}
-
-.wave2{
-    position:absolute;
-    width:350px;
-    height:150px;
-    bottom:-105px;
-    left:-130px;
-    background:#0b2a60;
-    border-radius:50%;
-    transform:rotate(-8deg);
-}
-
-.sidebar-qr{
-    position:absolute;
-    bottom:70px;
-    left:78px;
-    width:85px;
-    height:85px;
-    border:3px solid #318dff;
-    border-radius:12px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    color:#54a7ff;
-    font-size:47px;
-    z-index:2;
-}
-
-
-/* =====================================================
-   MAIN
-===================================================== */
-
-.main{
-    margin-left:270px;
-    min-height:100vh;
-}
-
-
-/* =====================================================
-   TOP BAR
-===================================================== */
-
-.topbar{
-    height:58px;
-    background:white;
-    border-bottom:1px solid #e7edf5;
-
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-
-    padding:0 25px;
-
-    position:sticky;
-    top:0;
-    z-index:50;
-}
-
-.top-left{
-    display:flex;
-    align-items:center;
-    gap:25px;
-}
-
-.hamburger{
-    color:#64748b;
-    font-size:21px;
-    cursor:pointer;
-}
-
-.browser{
-    height:36px;
-    padding:0 14px;
-    border-radius:7px;
-
-    background:#f4f6f8;
-
-    display:flex;
-    align-items:center;
-    gap:8px;
-
-    color:#687586;
-    font-size:12px;
-}
-
-.browser i{
-    color:#65758a;
-}
-
-.top-right{
-    display:flex;
-    align-items:center;
-    gap:25px;
-}
-
-.bell{
-    position:relative;
-    color:#596779;
-    font-size:20px;
-    cursor:pointer;
-}
-
-.red-dot{
-    position:absolute;
-    right:-2px;
-    top:-2px;
-    width:7px;
-    height:7px;
-    background:#e53935;
-    border-radius:50%;
-}
-
-.account{
-    display:flex;
-    align-items:center;
-    gap:9px;
-    font-size:13px;
-    color:#26344b;
-}
-
-.account-avatar{
-    width:35px;
-    height:35px;
-    border-radius:50%;
-
-    background:#e8f1ff;
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
-
-    color:#164d96;
-    font-size:17px;
-}
-
-.account i{
-    font-size:11px;
-    color:#657286;
-}
-
-
-/* =====================================================
-   CONTENT
-===================================================== */
-
-.content{
-    padding:25px 33px 0;
-}
-
-
-/* =====================================================
-   HERO
-===================================================== */
-
-.hero{
-    min-height:122px;
-
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-
-    position:relative;
-    overflow:hidden;
-
-    margin-bottom:8px;
-}
-
-.hero:after{
-    content:"";
-
-    position:absolute;
-
-    width:620px;
-    height:260px;
-
-    right:-80px;
-    top:-170px;
-
-    border-radius:50%;
-
-    background:#e6f3ff;
-
-    z-index:-1;
-}
-
-.welcome{
-    display:inline-block;
-
-    padding:7px 17px;
-
-    color:white;
-
-    background:linear-gradient(
-        90deg,
-        #087ef4,
-        #198eff
-    );
-
-    border-radius:14px;
-
-    font-size:13px;
-    font-weight:700;
-
-    margin-bottom:5px;
-}
-
-.hero h1{
-    font-size:29px;
-    font-weight:800;
-
-    color:#071538;
-
-    letter-spacing:-.5px;
-}
-
-.hero-subtitle{
-    color:#6c7889;
-
-    font-size:15px;
-
-    margin-top:5px;
-}
-
-.hero-right{
-    display:flex;
-    align-items:center;
-
-    gap:25px;
-
-    padding-right:45px;
-}
-
-.qr-frame{
-    width:88px;
-    height:88px;
-
-    border:3px solid #1a83ef;
-
-    border-radius:13px;
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
-
-    background:white;
-
-    color:#0b2348;
-
-    font-size:52px;
-}
-
-.hero-menu{
-    color:#1267ac;
-
-    font-size:14px;
-
-    font-weight:600;
-
-    white-space:nowrap;
-}
-
-.hero-menu span{
-    margin:0 7px;
-}
-
-.hero-tagline{
-    color:#7a8797;
-
-    font-size:12px;
-
-    margin-top:12px;
-}
-
-
-/* =====================================================
-   ROLE CARDS
-===================================================== */
-
-.role-container{
-    display:grid;
-
-    grid-template-columns:1fr 1fr;
-
-    gap:20px;
-}
-
-.role-card{
-    min-height:315px;
-
-    padding:20px 21px;
-
-    border:1px solid #d7e5f2;
-
-    border-radius:12px;
-
-    background:white;
-
-    box-shadow:
-        0 3px 10px rgba(27,84,135,.04);
-
-    transition:.25s;
-}
-
-.role-card:hover{
-    transform:translateY(-2px);
-
-    box-shadow:
-        0 10px 25px rgba(27,84,135,.08);
-}
-
-.teacher-card{
-    background:
-        linear-gradient(
-            135deg,
-            #ffffff 0%,
-            #f8fbff 100%
-        );
-}
-
-.student-card{
-    background:
-        linear-gradient(
-            135deg,
-            #ffffff 0%,
-            #f3fcf8 100%
-        );
-}
-
-
-/* =====================================================
-   CARD HEADING
-===================================================== */
-
-.role-heading{
-    display:flex;
-
-    align-items:center;
-
-    gap:20px;
-}
-
-.avatar-circle{
-    width:84px;
-    height:84px;
-
-    border-radius:50%;
-
-    flex-shrink:0;
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
-
-    overflow:hidden;
-}
-
-.teacher-bg{
-    background:#dff0ff;
-}
-
-.student-bg{
-    background:#d9f5e7;
-}
-
-
-/* =====================================================
-   TEACHER AVATAR
-===================================================== */
-
-.teacher-avatar{
-    position:relative;
-
-    width:66px;
-    height:76px;
-}
-
-
-/* HAIR */
-
-.teacher-avatar .hair{
-    position:absolute;
-
-    width:48px;
-    height:40px;
-
-    top:5px;
-    left:9px;
-
-    background:#38251d;
-
-    border-radius:
-        50% 50% 43% 43%;
-
-    z-index:1;
-}
-
-
-/* FACE */
-
-.teacher-avatar .face{
-    position:absolute;
-
-    width:38px;
-    height:40px;
-
-    left:14px;
-    top:17px;
-
-    background:#f5b783;
-
-    border-radius:46%;
-
-    z-index:2;
-}
-
-
-/* EARS */
-
-.teacher-avatar .ear-left,
-.teacher-avatar .ear-right{
-    position:absolute;
-
-    width:8px;
-    height:13px;
-
-    top:30px;
-
-    background:#eaa877;
-
-    border-radius:50%;
-
-    z-index:1;
-}
-
-.teacher-avatar .ear-left{
-    left:9px;
-}
-
-.teacher-avatar .ear-right{
-    right:9px;
-}
-
-
-/* EYES */
-
-.teacher-avatar .eye-left,
-.teacher-avatar .eye-right{
-    position:absolute;
-
-    width:5px;
-    height:5px;
-
-    background:#30231e;
-
-    border-radius:50%;
-
-    top:34px;
-
-    z-index:4;
-}
-
-.teacher-avatar .eye-left{
-    left:24px;
-}
-
-.teacher-avatar .eye-right{
-    right:24px;
-}
-
-
-/* GLASSES */
-
-.teacher-avatar .glass-left,
-.teacher-avatar .glass-right{
-    position:absolute;
-
-    width:14px;
-    height:10px;
-
-    border:2px solid #3b3d43;
-
-    border-radius:5px;
-
-    top:31px;
-
-    z-index:5;
-}
-
-.teacher-avatar .glass-left{
-    left:17px;
-}
-
-.teacher-avatar .glass-right{
-    right:17px;
-}
-
-.teacher-avatar .glass-line{
-    position:absolute;
-
-    width:8px;
-    height:2px;
-
-    background:#3b3d43;
-
-    top:35px;
-    left:29px;
-
-    z-index:5;
-}
-
-
-/* NOSE */
-
-.teacher-avatar .nose{
-    position:absolute;
-
-    width:4px;
-    height:5px;
-
-    border-radius:50%;
-
-    background:#d98d61;
-
-    top:40px;
-    left:31px;
-
-    z-index:5;
-}
-
-
-/* SMILE */
-
-.teacher-avatar .smile{
-    position:absolute;
-
-    width:12px;
-    height:6px;
-
-    border-bottom:2px solid #8b4537;
-
-    border-radius:50%;
-
-    left:27px;
-    top:46px;
-
-    z-index:5;
-}
-
-
-/* BODY */
-
-.teacher-avatar .body{
-    position:absolute;
-
-    width:54px;
-    height:35px;
-
-    left:6px;
-    top:53px;
-
-    background:#6044b7;
-
-    border-radius:
-        17px 17px 5px 5px;
-
-    z-index:1;
-}
-
-
-/* SHIRT */
-
-.teacher-avatar .shirt{
-    position:absolute;
-
-    width:27px;
-    height:24px;
-
-    left:20px;
-    top:52px;
-
-    background:#f1f1f1;
-
-    clip-path:
-        polygon(
-            50% 0,
-            100% 100%,
-            0 100%
-        );
-
-    z-index:3;
-}
-
-
-/* NECK */
-
-.teacher-avatar .neck{
-    position:absolute;
-
-    width:12px;
-    height:9px;
-
-    left:27px;
-    top:48px;
-
-    background:#e9a875;
-
-    z-index:3;
-}
-
-
-/* =====================================================
-   STUDENT AVATAR
-===================================================== */
-
-.student-avatar{
-    position:relative;
-
-    width:65px;
-    height:76px;
-}
-
-
-/* HAIR */
-
-.student-avatar .hair{
-    position:absolute;
-
-    width:46px;
-    height:42px;
-
-    top:6px;
-    left:10px;
-
-    background:#272526;
-
-    border-radius:
-        50% 50% 35% 35%;
-
-    z-index:1;
-}
-
-
-/* FACE */
-
-.student-avatar .face{
-    position:absolute;
-
-    width:36px;
-    height:39px;
-
-    left:15px;
-    top:19px;
-
-    background:#d99768;
-
-    border-radius:45%;
-
-    z-index:2;
-}
-
-
-/* EYES */
-
-.student-avatar .eye-left,
-.student-avatar .eye-right{
-    position:absolute;
-
-    width:4px;
-    height:4px;
-
-    background:#252020;
-
-    border-radius:50%;
-
-    top:35px;
-
-    z-index:4;
-}
-
-.student-avatar .eye-left{
-    left:24px;
-}
-
-.student-avatar .eye-right{
-    right:24px;
-}
-
-
-/* CAP */
-
-.student-avatar .cap{
-    position:absolute;
-
-    width:46px;
-    height:22px;
-
-    top:0;
-    left:10px;
-
-    background:#172b47;
-
-    border-radius:
-        50% 50% 25% 25%;
-
-    z-index:5;
-}
-
-.student-avatar .cap-top{
-    position:absolute;
-
-    width:32px;
-    height:14px;
-
-    top:-4px;
-    left:17px;
-
-    background:#203a5e;
-
-    border-radius:50%;
-
-    z-index:6;
-}
-
-.student-avatar .cap-line{
-    position:absolute;
-
-    width:63px;
-    height:8px;
-
-    left:2px;
-    top:16px;
-
-    background:#172b47;
-
-    border-radius:50%;
-
-    z-index:6;
-}
-
-
-/* STUDENT NECK */
-
-.student-avatar .neck{
-    position:absolute;
-
-    width:11px;
-    height:9px;
-
-    left:27px;
-    top:51px;
-
-    background:#d18c61;
-
-    z-index:3;
-}
-
-
-/* STUDENT BODY */
-
-.student-avatar .body{
-    position:absolute;
-
-    width:52px;
-    height:30px;
-
-    left:7px;
-    top:57px;
-
-    background:#1e3045;
-
-    border-radius:
-        15px 15px 5px 5px;
-
-    z-index:1;
-}
-
-
-/* COLLAR */
-
-.student-avatar .collar-left{
-    position:absolute;
-
-    width:20px;
-    height:20px;
-
-    left:14px;
-    top:53px;
-
-    background:white;
-
-    clip-path:
-        polygon(
-            0 0,
-            100% 100%,
-            0 100%
-        );
-
-    z-index:3;
-}
-
-.student-avatar .collar-right{
-    position:absolute;
-
-    width:20px;
-    height:20px;
-
-    right:14px;
-    top:53px;
-
-    background:white;
-
-    clip-path:
-        polygon(
-            100% 0,
-            100% 100%,
-            0 100%
-        );
-
-    z-index:3;
-}
-
-
-/* =====================================================
-   CARD TEXT
-===================================================== */
-
-.role-info h2{
-    color:#10172d;
-
-    font-size:25px;
-
-    font-weight:800;
-
-    margin-bottom:8px;
-}
-
-.role-info p{
-    color:#697687;
-
-    font-size:13px;
-
-    line-height:1.55;
-
-    max-width:370px;
-}
-
-
-/* =====================================================
-   LOGIN BUTTON
-===================================================== */
-
-.login-button{
-    width:100%;
-    height:51px;
-
-    border:0;
-
-    border-radius:10px;
-
-    margin-top:16px;
-
-    color:white;
-
-    font-size:16px;
-
-    font-weight:700;
-
-    cursor:pointer;
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
-
-    position:relative;
-
-    transition:.2s;
-
-    text-decoration:none;
-}
-
-.teacher-button{
-    background:
-        linear-gradient(
-            90deg,
-            #1387f4,
-            #1378e9
-        );
-}
-
-.student-button{
-    background:
-        linear-gradient(
-            90deg,
-            #13ad63,
-            #06974d
-        );
-}
-
-.login-button .left-icon{
-    margin-right:9px;
-}
-
-.login-button .arrow{
-    position:absolute;
-
-    right:19px;
-
-    font-size:17px;
-}
-
-.login-button:hover{
-    transform:translateY(-1px);
-
-    box-shadow:
-        0 7px 15px rgba(0,0,0,.12);
-}
-
-
-/* =====================================================
-   CHECK LIST
-===================================================== */
-
-.check-list{
-    margin-top:10px;
-
-    padding:9px 20px;
-
-    border-radius:9px;
-}
-
-.teacher-list{
-    background:#eaf4ff;
-}
-
-.student-list{
-    background:#e6f7ef;
-}
-
-.check-list div{
-    height:21px;
-
-    display:flex;
-
-    align-items:center;
-
-    gap:8px;
-
-    color:#617084;
-
-    font-size:12px;
-}
-
-.check-list i{
-    font-size:12px;
-
-    color:#268ce8;
-}
-
-.student-list i{
-    color:#24a36a;
-}
-
-
-/* =====================================================
-   FEATURES
-===================================================== */
-
-.features{
-    display:grid;
-
-    grid-template-columns:
-        repeat(3,1fr);
-
-    gap:20px;
-
-    margin-top:20px;
-}
-
-.feature-box{
-    min-height:76px;
-
-    background:white;
-
-    border:1px solid #edf1f5;
-
-    border-radius:10px;
-
-    display:flex;
-
-    align-items:center;
-
-    gap:17px;
-
-    padding:12px 20px;
-
-    box-shadow:
-        0 2px 8px rgba(0,0,0,.035);
-
-    transition:.25s;
-}
-
-.feature-box:hover{
-    transform:translateY(-2px);
-
-    box-shadow:
-        0 8px 20px rgba(0,0,0,.07);
-}
-
-.feature-icon{
-    width:50px;
-    height:50px;
-
-    border-radius:50%;
-
-    display:flex;
-
-    align-items:center;
-    justify-content:center;
-
-    font-size:22px;
-
-    flex-shrink:0;
-}
-
-.lock{
-    background:#ffe7e7;
-
-    color:#e34b4b;
-}
-
-.location{
-    background:#eee3ff;
-
-    color:#7a42d2;
-}
-
-.report{
-    background:#dff8fa;
-
-    color:#13a1b2;
-}
-
-.feature-text h4{
-    color:#1d2639;
-
-    font-size:13px;
-
-    margin-bottom:4px;
-}
-
-.feature-text p{
-    color:#8994a4;
-
-    font-size:11px;
-}
-
-
-/* =====================================================
-   FOOTER
-===================================================== */
-
-footer{
-    text-align:center;
-
-    padding:20px 0 13px;
-
-    color:#7e8999;
-
-    font-size:10px;
-}
-
-
-/* =====================================================
-   MOBILE MENU
-===================================================== */
-
-.mobile-menu-btn{
-    display:none;
-}
-
-
-/* =====================================================
-   RESPONSIVE
-===================================================== */
-
-@media(max-width:1100px){
-
-    .sidebar{
-        width:230px;
-    }
-
-    .main{
-        margin-left:230px;
-    }
-
-    .role-container{
-        grid-template-columns:1fr;
-    }
-
-    .features{
-        grid-template-columns:1fr;
-    }
-
-    .hero-right{
-        padding-right:0;
-    }
-}
-
-
-@media(max-width:750px){
-
-    .sidebar{
-        display:none;
-    }
-
-    .main{
-        margin-left:0;
-    }
-
-    .content{
-        padding:18px;
-    }
-
-    .topbar{
-        padding:0 15px;
-    }
-
-    .browser{
-        display:none;
-    }
-
-    .hero{
-        height:auto;
-
-        padding:
-            10px 0 20px;
-
-        display:block;
-    }
-
-    .hero h1{
-        font-size:25px;
-    }
-
-    .hero-subtitle{
-        font-size:13px;
-    }
-
-    .hero-right{
-        margin-top:20px;
-    }
-
-    .role-container{
-        grid-template-columns:1fr;
-    }
-
-    .role-heading{
-        align-items:flex-start;
-    }
-
-    .role-info h2{
-        font-size:21px;
-    }
-
-    .features{
-        grid-template-columns:1fr;
-    }
-
-    .feature-box{
-        min-height:76px;
-    }
-
-    .account b{
-        display:none;
-    }
-}
-
-
-@media(max-width:480px){
-
-    .hero-right{
-        gap:15px;
-    }
-
-    .qr-frame{
-        width:70px;
-        height:70px;
-        font-size:40px;
-    }
-
-    .hero-menu{
-        font-size:12px;
-    }
-
-    .hero-tagline{
-        font-size:10px;
-    }
-
-    .role-card{
-        padding:18px;
-    }
-
-    .role-heading{
-        gap:12px;
-    }
-
-    .avatar-circle{
-        width:70px;
-        height:70px;
-    }
-
-}
-
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Smart Attendance | QR & GPS</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --navy: #071426;
+            --navy-2: #0b1d33;
+            --blue: #2563eb;
+            --blue-light: #eff6ff;
+            --green: #10b981;
+            --text: #172033;
+            --muted: #667085;
+            --border: #e6eaf0;
+            --white: #ffffff;
+            --bg: #f5f7fb;
+        }
+
+        body {
+            font-family: "Inter", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        /* ================= SIDEBAR ================= */
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 270px;
+            height: 100vh;
+            background: linear-gradient(180deg, #071426 0%, #0a1c31 100%);
+            color: white;
+            padding: 26px 18px;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            padding: 0 12px 30px;
+        }
+
+        .brand-icon {
+            width: 46px;
+            height: 46px;
+            border-radius: 13px;
+            background: linear-gradient(135deg, #2563eb, #38bdf8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 23px;
+            font-weight: 800;
+            box-shadow: 0 8px 22px rgba(37, 99, 235, .25);
+        }
+
+        .brand-text h2 {
+            font-size: 17px;
+            font-weight: 800;
+            letter-spacing: .2px;
+        }
+
+        .brand-text span {
+            display: block;
+            font-size: 10px;
+            color: #8ea0b8;
+            margin-top: 3px;
+            letter-spacing: 1.1px;
+            text-transform: uppercase;
+        }
+
+        .menu-title {
+            color: #60738d;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            padding: 0 13px 11px;
+        }
+
+        .nav {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .nav a {
+            color: #aab8ca;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            padding: 12px 13px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 500;
+            transition: .2s ease;
+        }
+
+        .nav a:hover {
+            background: rgba(255,255,255,.07);
+            color: white;
+            transform: translateX(2px);
+        }
+
+        .nav a.active {
+            background: rgba(37,99,235,.18);
+            color: white;
+        }
+
+        .nav-icon {
+            width: 19px;
+            text-align: center;
+            font-size: 15px;
+        }
+
+        .sidebar-bottom {
+            margin-top: auto;
+            padding: 16px 10px 5px;
+        }
+
+        .security-mini {
+            background: rgba(255,255,255,.055);
+            border: 1px solid rgba(255,255,255,.08);
+            border-radius: 13px;
+            padding: 15px;
+        }
+
+        .security-mini-title {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #22c55e;
+            box-shadow: 0 0 0 4px rgba(34,197,94,.1);
+        }
+
+        .security-mini p {
+            color: #71849d;
+            font-size: 10px;
+            line-height: 1.6;
+        }
+
+        /* ================= MAIN ================= */
+
+        .main {
+            margin-left: 270px;
+            min-height: 100vh;
+        }
+
+        /* ================= TOPBAR ================= */
+
+        .topbar {
+            height: 76px;
+            background: rgba(255,255,255,.94);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 38px;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            backdrop-filter: blur(10px);
+        }
+
+        .topbar-left h3 {
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        .topbar-left p {
+            color: var(--muted);
+            font-size: 11px;
+            margin-top: 4px;
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .secure-pill {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding: 8px 12px;
+            border: 1px solid #dce7f5;
+            background: #f7faff;
+            color: #49627e;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .secure-pill span {
+            color: var(--green);
+        }
+
+        .user-mini {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+        }
+
+        .avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: #eaf1ff;
+            color: #2563eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        .user-mini strong {
+            display: block;
+            font-size: 11px;
+        }
+
+        .user-mini small {
+            color: var(--muted);
+            font-size: 9px;
+        }
+
+        /* ================= CONTENT ================= */
+
+        .content {
+            padding: 36px 38px 45px;
+            max-width: 1500px;
+            margin: auto;
+        }
+
+        /* ================= HERO ================= */
+
+        .hero {
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(120deg, #0a1d34 0%, #102b4c 62%, #173f68 100%);
+            border-radius: 22px;
+            padding: 40px 42px;
+            min-height: 270px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 18px 45px rgba(7,20,38,.12);
+        }
+
+        .hero::before {
+            content: "";
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border: 1px solid rgba(255,255,255,.07);
+            border-radius: 50%;
+            right: 170px;
+            top: -140px;
+        }
+
+        .hero::after {
+            content: "";
+            position: absolute;
+            width: 420px;
+            height: 420px;
+            border: 1px solid rgba(255,255,255,.05);
+            border-radius: 50%;
+            right: -100px;
+            bottom: -270px;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 650px;
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            background: rgba(255,255,255,.09);
+            border: 1px solid rgba(255,255,255,.1);
+            padding: 7px 11px;
+            border-radius: 20px;
+            color: #b8d4ff;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: .7px;
+            text-transform: uppercase;
+            margin-bottom: 17px;
+        }
+
+        .eyebrow-dot {
+            width: 6px;
+            height: 6px;
+            background: #38bdf8;
+            border-radius: 50%;
+        }
+
+        .hero h1 {
+            color: white;
+            font-size: 38px;
+            line-height: 1.12;
+            letter-spacing: -1.1px;
+            margin-bottom: 13px;
+        }
+
+        .hero h1 span {
+            color: #60a5fa;
+        }
+
+        .hero p {
+            color: #b5c5d9;
+            font-size: 13px;
+            line-height: 1.7;
+            max-width: 570px;
+        }
+
+        .hero-buttons {
+            margin-top: 24px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .hero-btn {
+            text-decoration: none;
+            padding: 11px 17px;
+            border-radius: 9px;
+            font-size: 11px;
+            font-weight: 700;
+            transition: .2s ease;
+        }
+
+        .hero-btn.primary {
+            background: #2563eb;
+            color: white;
+            box-shadow: 0 7px 18px rgba(37,99,235,.28);
+        }
+
+        .hero-btn.primary:hover {
+            background: #1d4ed8;
+            transform: translateY(-1px);
+        }
+
+        .hero-btn.secondary {
+            background: rgba(255,255,255,.08);
+            border: 1px solid rgba(255,255,255,.13);
+            color: white;
+        }
+
+        .hero-btn.secondary:hover {
+            background: rgba(255,255,255,.13);
+        }
+
+        /* ================= QR VISUAL ================= */
+
+        .hero-qr {
+            position: relative;
+            z-index: 2;
+            width: 190px;
+            height: 190px;
+            background: white;
+            border-radius: 20px;
+            padding: 17px;
+            margin-right: 55px;
+            transform: rotate(2deg);
+            box-shadow: 0 22px 50px rgba(0,0,0,.22);
+        }
+
+        .qr-pattern {
+            width: 100%;
+            height: 100%;
+            background:
+                linear-gradient(90deg, #0a1728 10px, transparent 10px) 0 0 / 31px 31px,
+                linear-gradient(#0a1728 10px, transparent 10px) 0 0 / 31px 31px,
+                linear-gradient(90deg, transparent 20px, #0a1728 20px 29px, transparent 29px) 0 0 / 31px 31px,
+                linear-gradient(transparent 20px, #0a1728 20px 29px, transparent 29px) 0 0 / 31px 31px,
+                #fff;
+            border: 5px solid #0a1728;
+        }
+
+        .qr-center {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%,-50%);
+            width: 48px;
+            height: 48px;
+            border-radius: 11px;
+            background: #2563eb;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 15px;
+            border: 5px solid white;
+        }
+
+        /* ================= SECTION TITLE ================= */
+
+        .section-heading {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            margin: 32px 0 17px;
+        }
+
+        .section-heading h2 {
+            font-size: 18px;
+            font-weight: 800;
+            color: #172033;
+        }
+
+        .section-heading p {
+            font-size: 11px;
+            color: var(--muted);
+            margin-top: 5px;
+        }
+
+        .section-tag {
+            color: #2563eb;
+            font-size: 10px;
+            font-weight: 700;
+            background: #eff6ff;
+            padding: 7px 11px;
+            border-radius: 7px;
+        }
+
+        /* ================= ROLE CARDS ================= */
+
+        .role-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0,1fr));
+            gap: 20px;
+        }
+
+        .role-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 17px;
+            padding: 25px;
+            position: relative;
+            overflow: hidden;
+            transition: .25s ease;
+        }
+
+        .role-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(15,23,42,.08);
+            border-color: #d7e2f0;
+        }
+
+        .role-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .role-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 21px;
+            font-weight: 800;
+        }
+
+        .teacher-icon {
+            background: #eef4ff;
+            color: #2563eb;
+        }
+
+        .student-icon {
+            background: #ecfdf5;
+            color: #059669;
+        }
+
+        .role-badge {
+            font-size: 9px;
+            font-weight: 700;
+            padding: 6px 9px;
+            border-radius: 15px;
+            text-transform: uppercase;
+            letter-spacing: .4px;
+        }
+
+        .teacher-badge {
+            background: #eff6ff;
+            color: #2563eb;
+        }
+
+        .student-badge {
+            background: #ecfdf5;
+            color: #059669;
+        }
+
+        .role-card h3 {
+            font-size: 18px;
+            margin-top: 18px;
+            margin-bottom: 7px;
+        }
+
+        .role-card > p {
+            color: var(--muted);
+            font-size: 11px;
+            line-height: 1.65;
+            min-height: 38px;
+        }
+
+        .role-features {
+            margin: 19px 0 20px;
+            border-top: 1px solid #edf0f4;
+            padding-top: 17px;
+            display: grid;
+            gap: 10px;
+        }
+
+        .feature-line {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            font-size: 10px;
+            color: #526176;
+        }
+
+        .check {
+            width: 19px;
+            height: 19px;
+            border-radius: 50%;
+            background: #f0fdf8;
+            color: #10b981;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 800;
+        }
+
+        .role-btn {
+            width: 100%;
+            border-radius: 9px;
+            padding: 12px;
+            text-align: center;
+            text-decoration: none;
+            display: block;
+            font-size: 11px;
+            font-weight: 700;
+            transition: .2s;
+        }
+
+        .teacher-btn {
+            background: #2563eb;
+            color: white;
+        }
+
+        .teacher-btn:hover {
+            background: #1d4ed8;
+        }
+
+        .student-btn {
+            background: #0f766e;
+            color: white;
+        }
+
+        .student-btn:hover {
+            background: #0d655e;
+        }
+
+        /* ================= FEATURE CARDS ================= */
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0,1fr));
+            gap: 16px;
+        }
+
+        .feature-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            padding: 20px;
+        }
+
+        .feature-icon {
+            width: 39px;
+            height: 39px;
+            border-radius: 10px;
+            background: #f2f6ff;
+            color: #2563eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            font-weight: 800;
+            margin-bottom: 14px;
+        }
+
+        .feature-card h4 {
+            font-size: 13px;
+            margin-bottom: 7px;
+        }
+
+        .feature-card p {
+            color: var(--muted);
+            font-size: 10px;
+            line-height: 1.65;
+        }
+
+        /* ================= PROCESS ================= */
+
+        .process {
+            margin-top: 32px;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 17px;
+            padding: 24px;
+        }
+
+        .process-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .process-step {
+            text-align: center;
+            padding: 10px;
+        }
+
+        .step-number {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            margin: 0 auto 10px;
+            background: #eff6ff;
+            color: #2563eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        .process-step h4 {
+            font-size: 11px;
+            margin-bottom: 5px;
+        }
+
+        .process-step p {
+            color: var(--muted);
+            font-size: 9px;
+            line-height: 1.5;
+        }
+
+        /* ================= FOOTER ================= */
+
+        footer {
+            text-align: center;
+            color: #8995a7;
+            font-size: 10px;
+            padding: 30px 10px 10px;
+        }
+
+        footer strong {
+            color: #59677b;
+        }
+
+        /* ================= RESPONSIVE ================= */
+
+        @media (max-width: 1100px) {
+            .hero-qr {
+                margin-right: 10px;
+            }
+
+            .content {
+                padding: 30px 25px;
+            }
+
+            .topbar {
+                padding: 0 25px;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .sidebar {
+                width: 225px;
+            }
+
+            .main {
+                margin-left: 225px;
+            }
+
+            .hero {
+                padding: 30px;
+            }
+
+            .hero-qr {
+                width: 150px;
+                height: 150px;
+            }
+
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 700px) {
+            .sidebar {
+                position: relative;
+                width: 100%;
+                height: auto;
+                padding: 15px;
+            }
+
+            .brand {
+                padding-bottom: 15px;
+            }
+
+            .nav {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .sidebar-bottom {
+                display: none;
+            }
+
+            .main {
+                margin-left: 0;
+            }
+
+            .topbar {
+                padding: 0 18px;
+            }
+
+            .secure-pill {
+                display: none;
+            }
+
+            .content {
+                padding: 20px 15px;
+            }
+
+            .hero {
+                padding: 27px 22px;
+                min-height: auto;
+            }
+
+            .hero h1 {
+                font-size: 29px;
+            }
+
+            .hero-qr {
+                display: none;
+            }
+
+            .role-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .process-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 430px) {
+            .topbar-left h3 {
+                font-size: 13px;
+            }
+
+            .topbar-left p {
+                display: none;
+            }
+
+            .user-mini strong,
+            .user-mini small {
+                display: none;
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+            }
+
+            .hero-btn {
+                text-align: center;
+            }
+
+            .nav {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
-
 
 <body>
 
-
-<!-- =====================================================
-     SIDEBAR
-===================================================== -->
+<!-- ================= SIDEBAR ================= -->
 
 <aside class="sidebar">
 
-    <!-- LOGO -->
+    <div class="brand">
+        <div class="brand-icon">QR</div>
 
-    <div class="logo">
-
-        <div class="logo-box">
-            <i class="fa-solid fa-qrcode"></i>
+        <div class="brand-text">
+            <h2>Smart Attendance</h2>
+            <span>Attendance System</span>
         </div>
+    </div>
 
-        <div class="logo-text">
+    <div class="menu-title">Main Menu</div>
 
-            <h3>
-                Smart Attendance
-            </h3>
+    <nav class="nav">
+
+        <a href="{% url 'home' %}" class="active">
+            <span class="nav-icon">⌂</span>
+            Dashboard
+        </a>
+
+        <a href="#features">
+            <span class="nav-icon">▣</span>
+            Attendance Reports
+        </a>
+
+        <a href="#student-login">
+            <span class="nav-icon">◉</span>
+            Student Management
+        </a>
+
+        <a href="#teacher-login">
+            <span class="nav-icon">▣</span>
+            Projector Mode
+        </a>
+
+        <a href="#features">
+            <span class="nav-icon">⚙</span>
+            System Features
+        </a>
+
+    </nav>
+
+    <div class="sidebar-bottom">
+
+        <div class="security-mini">
+
+            <div class="security-mini-title">
+                <span class="status-dot"></span>
+                System Protected
+            </div>
 
             <p>
-                QR Code Based Attendance<br>
-                Management System
+                QR sessions and location verification
+                help keep attendance secure.
             </p>
 
         </div>
 
     </div>
 
-
-    <!-- MENU -->
-
-    <ul class="menu">
-
-        <li class="menu-item active">
-
-            <a href="{% url 'home' %}">
-                <i class="fa-solid fa-house"></i>
-                Dashboard
-            </a>
-
-        </li>
-
-
-        <li class="menu-item">
-
-            <a href="#features">
-                <i class="fa-solid fa-chart-simple"></i>
-                Attendance Reports
-            </a>
-
-        </li>
-
-
-        <li class="menu-item">
-
-            <a href="#student-login">
-                <i class="fa-solid fa-users"></i>
-                Student Management
-            </a>
-
-        </li>
-
-
-        <li class="menu-item">
-
-            <a href="#teacher-login">
-                <i class="fa-solid fa-display"></i>
-                Projector Mode
-            </a>
-
-        </li>
-
-
-        <li class="menu-item">
-
-            <a href="#features">
-                <i class="fa-solid fa-gear"></i>
-                Settings
-            </a>
-
-        </li>
-
-    </ul>
-
-
-    <!-- DECORATIVE QR -->
-
-    <div class="sidebar-qr">
-
-        <i class="fa-solid fa-qrcode"></i>
-
-    </div>
-
-
-    <!-- WAVES -->
-
-    <div class="wave1"></div>
-    <div class="wave2"></div>
-
 </aside>
 
 
-
-<!-- =====================================================
-     MAIN
-===================================================== -->
+<!-- ================= MAIN ================= -->
 
 <main class="main">
 
-
-    <!-- =================================================
-         TOP BAR
-    ================================================= -->
+    <!-- TOPBAR -->
 
     <header class="topbar">
 
-        <div class="top-left">
-
-            <i class="fa-solid fa-bars hamburger"></i>
-
-            <div class="browser">
-
-                <i class="fa-solid fa-shield-halved"></i>
-
-                <span>
-                    Smart Attendance
-                </span>
-
-                <span>
-                    QR • GPS • Secure
-                </span>
-
-            </div>
-
+        <div class="topbar-left">
+            <h3>Attendance Management Portal</h3>
+            <p>Manage attendance securely using QR Code & GPS verification</p>
         </div>
 
+        <div class="topbar-right">
 
-        <div class="top-right">
-
-            <div class="bell">
-
-                <i class="fa-regular fa-bell"></i>
-
-                <span class="red-dot"></span>
-
+            <div class="secure-pill">
+                <span>●</span>
+                QR • GPS • Secure
             </div>
 
+            <div class="user-mini">
+                <div class="avatar">SA</div>
 
-            <div class="account">
-
-                <div class="account-avatar">
-
-                    <i class="fa-solid fa-user"></i>
-
+                <div>
+                    <strong>Smart User</strong>
+                    <small>Attendance Portal</small>
                 </div>
-
-                <b>
-                    Smart User
-                </b>
-
-                <i class="fa-solid fa-chevron-down"></i>
-
             </div>
 
         </div>
@@ -1550,71 +928,54 @@ footer{
     </header>
 
 
-
-    <!-- =================================================
-         CONTENT
-    ================================================= -->
+    <!-- CONTENT -->
 
     <section class="content">
 
 
-        <!-- =================================================
-             HERO
-        ================================================= -->
+        <!-- HERO -->
 
         <div class="hero">
 
+            <div class="hero-content">
 
-            <div>
-
-                <span class="welcome">
-                    Welcome to
-                </span>
-
+                <div class="eyebrow">
+                    <span class="eyebrow-dot"></span>
+                    Smart Digital Attendance
+                </div>
 
                 <h1>
-                    Smart Attendance
+                    Welcome to<br>
+                    <span>Smart Attendance</span>
                 </h1>
 
-
-                <p class="hero-subtitle">
-                    QR Code Based Attendance Management System
+                <p>
+                    A modern QR-code based attendance management
+                    system with secure session control and GPS
+                    location verification.
                 </p>
+
+                <div class="hero-buttons">
+
+                    <a href="#teacher-login" class="hero-btn primary">
+                        Teacher Portal
+                    </a>
+
+                    <a href="#student-login" class="hero-btn secondary">
+                        Student Portal
+                    </a>
+
+                </div>
 
             </div>
 
 
-            <div class="hero-right">
+            <div class="hero-qr">
 
+                <div class="qr-pattern"></div>
 
-                <div class="qr-frame">
-
-                    <i class="fa-solid fa-qrcode"></i>
-
-                </div>
-
-
-                <div>
-
-                    <div class="hero-menu">
-
-                        <b>Scan</b>
-
-                        <span>•</span>
-
-                        <b>Mark</b>
-
-                        <span>•</span>
-
-                        <b>Manage</b>
-
-                    </div>
-
-
-                    <p class="hero-tagline">
-                        Smarter Attendance, Better Tomorrow
-                    </p>
-
+                <div class="qr-center">
+                    SA
                 </div>
 
             </div>
@@ -1622,218 +983,258 @@ footer{
         </div>
 
 
+        <!-- PORTALS -->
 
-        <!-- =================================================
-             TEACHER + STUDENT CARDS
-        ================================================= -->
+        <div class="section-heading">
 
-        <div class="role-container">
+            <div>
+                <h2>Choose Your Portal</h2>
+                <p>Access the attendance system according to your role.</p>
+            </div>
 
+            <span class="section-tag">
+                SECURE ACCESS
+            </span>
 
-            <!-- =================================================
-                 TEACHER CARD
-            ================================================= -->
-
-            <div
-                class="role-card teacher-card"
-                id="teacher-login"
-            >
-
-                <div class="role-heading">
+        </div>
 
 
-                    <!-- TEACHER AVATAR -->
+        <div class="role-grid">
 
-                    <div class="avatar-circle teacher-bg">
 
-                        <div class="teacher-avatar">
+            <!-- TEACHER -->
 
-                            <div class="hair"></div>
+            <article class="role-card" id="teacher-login">
 
-                            <div class="face"></div>
+                <div class="role-top">
 
-                            <div class="ear-left"></div>
-                            <div class="ear-right"></div>
-
-                            <div class="eye-left"></div>
-                            <div class="eye-right"></div>
-
-                            <div class="glass-left"></div>
-                            <div class="glass-right"></div>
-
-                            <div class="glass-line"></div>
-
-                            <div class="nose"></div>
-
-                            <div class="smile"></div>
-
-                            <div class="neck"></div>
-
-                            <div class="body"></div>
-
-                            <div class="shirt"></div>
-
-                        </div>
-
+                    <div class="role-icon teacher-icon">
+                        T
                     </div>
 
-
-                    <!-- TEXT -->
-
-                    <div class="role-info">
-
-                        <h2>
-                            Teacher
-                        </h2>
-
-                        <p>
-                            Generate secure QR codes,
-                            manage attendance and view
-                            subject-wise student reports.
-                        </p>
-
-                    </div>
+                    <span class="role-badge teacher-badge">
+                        Teacher
+                    </span>
 
                 </div>
 
+                <h3>Teacher Portal</h3>
 
-                <!-- TEACHER LOGIN BUTTON -->
+                <p>
+                    Generate attendance sessions, display QR codes
+                    and monitor student attendance.
+                </p>
 
-                <a
-                    href="{% url 'teacher_login' %}"
-                    class="login-button teacher-button"
-                >
+                <div class="role-features">
 
-                    <i class="fa-solid fa-chalkboard-user left-icon"></i>
-
-                    Teacher Login
-
-                    <i class="fa-solid fa-arrow-right arrow"></i>
-
-                </a>
-
-
-                <!-- TEACHER FEATURES -->
-
-                <div class="check-list teacher-list">
-
-                    <div>
-                        <i class="fa-solid fa-circle-check"></i>
+                    <div class="feature-line">
+                        <span class="check">✓</span>
                         Generate time-limited QR codes
                     </div>
 
-                    <div>
-                        <i class="fa-solid fa-circle-check"></i>
-                        Monitor live attendance
+                    <div class="feature-line">
+                        <span class="check">✓</span>
+                        Monitor today's attendance
                     </div>
 
-                    <div>
-                        <i class="fa-solid fa-circle-check"></i>
+                    <div class="feature-line">
+                        <span class="check">✓</span>
                         View student history & reports
                     </div>
 
                 </div>
 
-            </div>
-
-
-
-            <!-- =================================================
-                 STUDENT CARD
-            ================================================= -->
-
-            <div
-                class="role-card student-card"
-                id="student-login"
-            >
-
-                <div class="role-heading">
-
-
-                    <!-- STUDENT AVATAR -->
-
-                    <div class="avatar-circle student-bg">
-
-                        <div class="student-avatar">
-
-                            <div class="hair"></div>
-
-                            <div class="face"></div>
-
-                            <div class="eye-left"></div>
-                            <div class="eye-right"></div>
-
-                            <div class="cap"></div>
-
-                            <div class="cap-top"></div>
-
-                            <div class="cap-line"></div>
-
-                            <div class="neck"></div>
-
-                            <div class="body"></div>
-
-                            <div class="collar-left"></div>
-                            <div class="collar-right"></div>
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- TEXT -->
-
-                    <div class="role-info">
-
-                        <h2>
-                            Student
-                        </h2>
-
-                        <p>
-                            Scan your teacher's QR code,
-                            verify your college location
-                            and mark your attendance securely.
-                        </p>
-
-                    </div>
-
-                </div>
-
-
-                <!-- STUDENT LOGIN -->
-
-                <a
-                    href="/accounts/login/"
-                    class="login-button student-button"
-                >
-
-                    <i class="fa-solid fa-user-graduate left-icon"></i>
-
-                    Student Login
-
-                    <i class="fa-solid fa-arrow-right arrow"></i>
-
+                <a href="{% url 'teacher_login' %}" class="role-btn teacher-btn">
+                    Login as Teacher →
                 </a>
 
+            </article>
 
-                <!-- STUDENT FEATURES -->
 
-                <div class="check-list student-list">
+            <!-- STUDENT -->
 
-                    <div>
-                        <i class="fa-solid fa-circle-check"></i>
-                        Scan QR from your phone
+            <article class="role-card" id="student-login">
+
+                <div class="role-top">
+
+                    <div class="role-icon student-icon">
+                        S
                     </div>
 
-                    <div>
-                        <i class="fa-solid fa-circle-check"></i>
-                        GPS location verification
+                    <span class="role-badge student-badge">
+                        Student
+                    </span>
+
+                </div>
+
+                <h3>Student Portal</h3>
+
+                <p>
+                    Scan your teacher's QR code and verify your
+                    location to mark attendance.
+                </p>
+
+                <div class="role-features">
+
+                    <div class="feature-line">
+                        <span class="check">✓</span>
+                        Scan attendance QR from phone
                     </div>
 
-                    <div>
-                        <i class="fa-solid fa-circle-check"></i>
-                        View your attendance history
+                    <div class="feature-line">
+                        <span class="check">✓</span>
+                        Automatic GPS verification
                     </div>
+
+                    <div class="feature-line">
+                        <span class="check">✓</span>
+                        View personal attendance history
+                    </div>
+
+                </div>
+
+                <a href="/accounts/login/" class="role-btn student-btn">
+                    Login as Student →
+                </a>
+
+            </article>
+
+        </div>
+
+
+        <!-- FEATURES -->
+
+        <div class="section-heading" id="features">
+
+            <div>
+                <h2>Built for Secure Attendance</h2>
+                <p>Core features that make attendance simple and reliable.</p>
+            </div>
+
+        </div>
+
+
+        <div class="feature-grid">
+
+
+            <div class="feature-card">
+
+                <div class="feature-icon">
+                    QR
+                </div>
+
+                <h4>Dynamic QR Sessions</h4>
+
+                <p>
+                    Teachers can generate temporary QR sessions
+                    with controlled validity to reduce repeated
+                    or unauthorized use.
+                </p>
+
+            </div>
+
+
+            <div class="feature-card">
+
+                <div class="feature-icon">
+                    GPS
+                </div>
+
+                <h4>Location Verification</h4>
+
+                <p>
+                    Student location can be checked during
+                    attendance to verify whether the student
+                    is within the configured college area.
+                </p>
+
+            </div>
+
+
+            <div class="feature-card">
+
+                <div class="feature-icon">
+                    R
+                </div>
+
+                <h4>Attendance Reports</h4>
+
+                <p>
+                    Attendance records can be reviewed through
+                    student history, daily records and
+                    subject-wise reports.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- PROCESS -->
+
+        <div class="process">
+
+            <div class="section-heading" style="margin:0;">
+
+                <div>
+                    <h2>How Smart Attendance Works</h2>
+                    <p>Four simple steps from QR generation to verification.</p>
+                </div>
+
+            </div>
+
+
+            <div class="process-grid">
+
+
+                <div class="process-step">
+
+                    <div class="step-number">01</div>
+
+                    <h4>Generate QR</h4>
+
+                    <p>
+                        Teacher creates an attendance session.
+                    </p>
+
+                </div>
+
+
+                <div class="process-step">
+
+                    <div class="step-number">02</div>
+
+                    <h4>Scan QR</h4>
+
+                    <p>
+                        Student scans the displayed QR using phone.
+                    </p>
+
+                </div>
+
+
+                <div class="process-step">
+
+                    <div class="step-number">03</div>
+
+                    <h4>Verify GPS</h4>
+
+                    <p>
+                        Student location is checked automatically.
+                    </p>
+
+                </div>
+
+
+                <div class="process-step">
+
+                    <div class="step-number">04</div>
+
+                    <h4>Record Attendance</h4>
+
+                    <p>
+                        Attendance is stored in the system.
+                    </p>
 
                 </div>
 
@@ -1842,118 +1243,23 @@ footer{
         </div>
 
 
-
-        <!-- =================================================
-             FEATURES
-        ================================================= -->
-
-        <div
-            class="features"
-            id="features"
-        >
-
-
-            <!-- SECURE LOGIN -->
-
-            <div class="feature-box">
-
-                <div class="feature-icon lock">
-
-                    <i class="fa-solid fa-lock"></i>
-
-                </div>
-
-
-                <div class="feature-text">
-
-                    <h4>
-                        Secure Login
-                    </h4>
-
-                    <p>
-                        Protected teacher & student access
-                    </p>
-
-                </div>
-
-            </div>
-
-
-
-            <!-- GPS -->
-
-            <div class="feature-box">
-
-                <div class="feature-icon location">
-
-                    <i class="fa-solid fa-location-dot"></i>
-
-                </div>
-
-
-                <div class="feature-text">
-
-                    <h4>
-                        GPS Verification
-                    </h4>
-
-                    <p>
-                        Location-based attendance verification
-                    </p>
-
-                </div>
-
-            </div>
-
-
-
-            <!-- REPORTS -->
-
-            <div class="feature-box">
-
-                <div class="feature-icon report">
-
-                    <i class="fa-solid fa-file-excel"></i>
-
-                </div>
-
-
-                <div class="feature-text">
-
-                    <h4>
-                        Smart Reports
-                    </h4>
-
-                    <p>
-                        Attendance history & Excel reports
-                    </p>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-
-        <!-- =================================================
-             FOOTER
-        ================================================= -->
+        <!-- FOOTER -->
 
         <footer>
 
-            © 2026 Smart Attendance System
-            • QR Code + GPS Verification
-            • Secure & Smart
+            <strong>Smart Attendance System</strong>
+            &nbsp;•&nbsp;
+            QR Code + GPS Verification
+            &nbsp;•&nbsp;
+            Secure & Smart
+            &nbsp;•&nbsp;
+            © 2026
 
         </footer>
-
 
     </section>
 
 </main>
 
-
 </body>
 </html>
-

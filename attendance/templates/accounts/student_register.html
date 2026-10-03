@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Student Registration | Smart Attendance</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #eef4ff, #f8fbff);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 25px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.12);
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: 35% 65%;
+        }
+
+        .left {
+            background: linear-gradient(160deg, #071a3d, #123b78);
+            color: white;
+            padding: 45px 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .logo {
+            width: 65px;
+            height: 65px;
+            border-radius: 16px;
+            background: white;
+            color: #123b78;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            margin-bottom: 25px;
+        }
+
+        .left h1 {
+            font-size: 30px;
+            margin-bottom: 12px;
+        }
+
+        .left p {
+            color: #d7e5ff;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .feature {
+            margin: 14px 0;
+            font-size: 14px;
+            color: #e7efff;
+        }
+
+        .right {
+            padding: 40px;
+        }
+
+        .right h2 {
+            color: #102a56;
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            color: #6b7280;
+            margin-bottom: 25px;
+        }
+
+        .messages {
+            margin-bottom: 18px;
+        }
+
+        .error {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 17px;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .field.full {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 7px;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 12px 13px;
+            border: 1px solid #d5dbe7;
+            border-radius: 9px;
+            outline: none;
+            font-size: 14px;
+            background: #fff;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.10);
+        }
+
+        .register-btn {
+            width: 100%;
+            border: none;
+            border-radius: 10px;
+            padding: 14px;
+            margin-top: 23px;
+            background: linear-gradient(90deg, #2563eb, #1d4ed8);
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .register-btn:hover {
+            opacity: 0.94;
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 18px;
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .login-link a {
+            color: #2563eb;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        @media (max-width: 750px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+
+            .left {
+                padding: 28px;
+            }
+
+            .left h1 {
+                font-size: 24px;
+            }
+
+            .right {
+                padding: 28px 22px;
+            }
+        }
+
+        @media (max-width: 500px) {
+            body {
+                padding: 12px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .field.full {
+                grid-column: auto;
+            }
+
+            .left {
+                display: none;
+            }
+
+            .right {
+                padding: 25px 18px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="left">
+
+        <div class="logo">QR</div>
+
+        <h1>Smart Attendance</h1>
+
+        <p>
+            Create your student account and use secure
+            QR-based attendance with location verification.
+        </p>
+
+        <div class="feature">✓ Secure student account</div>
+        <div class="feature">✓ QR attendance</div>
+        <div class="feature">✓ GPS location verification</div>
+        <div class="feature">✓ Attendance history</div>
+
+    </div>
+
+
+    <div class="right">
+
+        <h2>Student Registration</h2>
+
+        <p class="subtitle">
+            Create your account to mark attendance.
+        </p>
+
+
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                <div class="error">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+            <div class="form-grid">
+
+                <div class="field full">
+                    <label>Full Name *</label>
+                    <input
+                        type="text"
+                        name="name"
+                        placeholder="Enter full name"
+                        required
+                    >
+                </div>
+
+
+                <div class="field">
+                    <label>Username *</label>
+                    <input
+                        type="text"
+                        name="username"
+                        placeholder="Create username"
+                        required
+                    >
+                </div>
+
+
+                <div class="field">
+                    <label>Roll Number *</label>
+                    <input
+                        type="text"
+                        name="roll_no"
+                        placeholder="Enter roll number"
+                        required
+                    >
+                </div>
+
+
+                <div class="field">
+                    <label>Password *</label>
+                    <input
+                        type="password"
+                        name="password"
+                        placeholder="Create password"
+                        required
+                    >
+                </div>
+
+
+                <div class="field">
+                    <label>Confirm Password *</label>
+                    <input
+                        type="password"
+                        name="password2"
+                        placeholder="Confirm password"
+                        required
+                    >
+                </div>
+
+
+                <div class="field">
+                    <label>Course</label>
+                    <input
+                        type="text"
+                        name="course"
+                        placeholder="e.g. B.Tech"
+                    >
+                </div>
+
+
+                <div class="field">
+                    <label>Year</label>
+                    <input
+                        type="text"
+                        name="year"
+                        placeholder="e.g. 4"
+                    >
+                </div>
+
+
+                <div class="field">
+                    <label>Branch</label>
+                    <input
+                        type="text"
+                        name="branch"
+                        placeholder="e.g. CSE"
+                    >
+                </div>
+
+
+                <div class="field">
+                    <label>Section</label>
+                    <input
+                        type="text"
+                        name="section"
+                        placeholder="e.g. A"
+                    >
+                </div>
+
+
+                <div class="field">
+                    <label>Semester</label>
+                    <select name="semester">
+                        <option value="">Select Semester</option>
+                        <option value="1">Semester 1</option>
+                        <option value="2">Semester 2</option>
+                        <option value="3">Semester 3</option>
+                        <option value="4">Semester 4</option>
+                        <option value="5">Semester 5</option>
+                        <option value="6">Semester 6</option>
+                        <option value="7">Semester 7</option>
+                        <option value="8">Semester 8</option>
+                    </select>
+                </div>
+
+
+                <div class="field">
+                    <label>Phone Number</label>
+                    <input
+                        type="tel"
+                        name="phone"
+                        placeholder="Enter phone number"
+                    >
+                </div>
+
+
+                <div class="field full">
+                    <label>Email</label>
+                    <input
+                        type="email"
+                        name="email"
+                        placeholder="Enter email address"
+                    >
+                </div>
+
+            </div>
+
+
+            <button type="submit" class="register-btn">
+                Create Student Account
+            </button>
+
+        </form>
+
+
+        <div class="login-link">
+            Already have an account?
+            <a href="{% url 'student_login' %}">
+                Student Login
+            </a>
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

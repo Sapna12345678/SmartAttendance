@@ -59,16 +59,35 @@ def get_public_host(request=None):
 # ============================================================
 # HOME
 # ============================================================
+
 def home(request):
     """
-    Main Smart Attendance landing page.
-    Always displays the public home page.
+    Main landing page.
     """
+
+    if request.user.is_authenticated:
+
+        # Student
+        try:
+            request.user.student_profile
+            return redirect("student_dashboard")
+        except Student.DoesNotExist:
+            pass
+
+        # Django admin/staff
+        if request.user.is_staff:
+            return redirect("/admin/")
+
+        # Teacher session
+        if request.session.get("teacher_logged_in"):
+            return redirect("teacher_dashboard")
 
     return render(
         request,
         "attendance/home.html"
     )
+
+
 # ============================================================
 # TEACHER REQUIRED
 # ============================================================
@@ -922,23 +941,6 @@ def scan_qr(request):
     )
 
     # --------------------------------------------------------
-    # JSON session validation for scan page
-    # --------------------------------------------------------
-
-    if request.GET.get("data") == "1":
-
-        return JsonResponse(
-            {
-                "valid": True,
-                "session_id": str(session.session_id),
-                "subject": str(session.subject) if session.subject else "General",
-                "branch": session.branch or "",
-                "section": session.section or "",
-                "semester": session.semester,
-                "time_left": time_left,
-            }
-        )
-    # ---------------------------------------------------
     # Identify logged-in student
     # --------------------------------------------------------
 
